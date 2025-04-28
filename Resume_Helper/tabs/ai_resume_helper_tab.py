@@ -1,10 +1,6 @@
 """
 AI Resume Helper Tab for the Resume Helper application
-(merged provider/API config, accordions for optional fields,
-and 🧪 icon on Test Key button).
 
-Paste this file into Resume_Helper/tabs/ai_resume_helper_tab.py
-and keep any imports of this function in your main app unchanged.
 """
 
 import os
