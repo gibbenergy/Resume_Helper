@@ -1,4 +1,5 @@
-# Resume Helper AI
+<h1 align="center">Resume Helper AI</h1>
+
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -30,6 +31,7 @@
 ### ⚡ One-Click Windows Installation
 
 1.  **Download or Clone** this repository and open the project folder.
+
 2.  **Double-click `install_run_windows.bat`** (or run from command prompt):
 
 ```cmd
@@ -39,10 +41,15 @@ install_run_windows.bat
 The script will automatically:
 
 ✅ Check and install Python 3.11+ if it's missing.
+
 ✅ Create and activate a local virtual environment (`venv`).
+
 ✅ Install all required dependencies (`pip install -r requirements.txt`).
+
 ✅ Free port `53630` automatically if currently in use.
+
 ✅ Launch the Resume Helper application at: `http://localhost:53630`
+
 ✅ Keep the console window open to clearly display any messages or errors.
 
 ⚠️ **SmartScreen or Antivirus Warning?**
