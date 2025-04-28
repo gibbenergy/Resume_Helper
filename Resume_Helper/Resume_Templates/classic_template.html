@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{full_name}} - Resume</title>
+    <style>
+        /* Base styles with responsive units - more compact spacing */
+        :root {
+            --primary-spacing: 0.75rem;
+            --secondary-spacing: 0.3rem;
+            --section-gap: 0.9rem;
+            --entry-gap: 0.5rem;
+            --content-gap: 0.25rem;
+            --content-indent: 0.5rem;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.4; /* Tighter line height */
+            margin: 0;
+            padding: var(--primary-spacing);
+            max-width: 800px;
+            margin: 0 auto;
+            color: #333;
+            font-size: 0.95rem; /* Slightly smaller base font size */
+        }
+        
+        /* Flexbox layout for the entire document */
+        .resume-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--section-gap);
+        }
+        
+        /* Header styles - more compact */
+        .header {
+            text-align: center;
+            margin-bottom: 0.3rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem; /* Adjusted to a reasonable size */
+            margin: 0;       /* Remove margin to prevent unintended gap */
+            line-height: 1;  /* Minimal line-height for tighter spacing */
+        }
+        
+        .contact-info {
+            font-size: 1rem;
+            margin-top: 0.2rem; /* Small, controlled margin from the name */
+            gap: 0; /* remove flex gap to tighten lines */
+        }
+        
+        /* Section styles - more compact */
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--entry-gap);
+            margin-bottom: 0.4rem;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            padding-bottom: 0.2rem;
+            margin: 0 0 0.3rem 0;
+        }
+        
+        /* Entry styles - more compact and single-line focused */
+        .entries-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem; /* Reduced gap between entries */
+        }
+        
+        .entry {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem; /* Minimal gap between header and content */
+            margin-bottom: 0.2rem;
+        }
+        
+        /* Optimized entry header for single line */
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline; /* Align text baselines */
+            flex-wrap: nowrap; /* Try to keep on one line */
+            gap: 0.5rem;
+            margin-bottom: 0.1rem;
+        }
+        
+        /* Single line formatting for all entries */
+        .single-line {
+            display: flex;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        .single-line .entry-title {
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .entry-title {
+            font-weight: bold;
+            flex: 1;
+            white-space: normal; /* Allow wrapping if needed */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .entry-date {
+            color: #666;
+            text-align: right;
+            white-space: nowrap; /* Keep dates on one line */
+            font-size: 0.85rem; /* Slightly smaller date text */
+        }
+        
+        /* Skill line formatting */
+        .skill-line {
+            display: flex;
+            width: 100%;
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            margin-bottom: 0.2rem;
+        }
+        
+        .entry-content {
+            padding-left: var(--content-indent);
+            font-size: 0.9rem; /* Slightly smaller content text */
+        }
+        
+        /* More compact list styles */
+        ul {
+            margin: 0.2rem 0;
+            padding-left: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.2rem;
+            line-height: 1.3;
+        }
+        
+        /* Specific styling for achievements lists */
+        .achievements-list {
+            margin-top: 0.1rem;
+        }
+        
+        /* Skills section with grid layout - more compact */
+        .skills-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+            gap: 0.3rem;
+            font-size: 0.9rem;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: normal;
+        }
+        
+        .skill-entry {
+            margin-bottom: 0.2rem;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: normal;
+            display: block;
+            width: 100%;
+        }
+        
+        /* Additional compact styling */
+        .technologies {
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+        
+        /* Optimize single-line entries */
+        .education-entry .entry-content,
+        .certification-entry .entry-content {
+            font-size: 0.85rem;
+            color: #444;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            :root {
+                --primary-spacing: 0.5rem;
+                --section-gap: 0.8rem;
+            }
+            
+            /* On mobile, allow header to wrap for readability */
+            .entry-header {
+                flex-direction: column;
+                gap: 0.1rem;
+            }
+            
+            .entry-date {
+                text-align: left;
+                margin-top: -0.1rem; /* Negative margin to reduce space */
+            }
+            
+            .skills-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Print-specific styles - optimized for Puppeteer PDF rendering */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0.75in 0.75in 1in 0.75in; /* Top, Right, Bottom, Left - Extra space at bottom for footer */
+                
+                @bottom-center {
+                    content: "{{full_name}} - Page " counter(page) " of " counter(pages);
+                    font-size: 9pt;
+                    color: #666;
+                    font-family: Arial, sans-serif;                   
+                    
+                }
+            }
+            
+            /* Explicitly set Flexbox containers to block display for better pagination with WeasyPrint */
+            .resume-container,
+            .entries-container,
+            .section,
+            .entry {
+                display: block !important;
+            }
+            
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                font-size: 9pt; /* Smaller font for print */
+                line-height: 1.2; /* Tighter line height for print */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                color-adjust: exact;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            
+            /* Removed fixed-position headers and footers to fix pagination issues */
+            body {
+                /* No extra margins needed since we're using @page for headers/footers */
+                margin: 0;
+                padding: 0; /* Let @page margins handle the spacing */
+            }
+            
+            /* Section styling */
+            .section {
+                margin-bottom: 0.4cm; /* Reduced spacing between sections */
+                position: relative; /* Create stacking context for better rendering */
+            }
+            
+            /* Entry styling */
+            .entry {
+                margin-bottom: 0.1cm; /* Minimal spacing between entries */
+                position: relative; /* Create stacking context for better rendering */
+            }
+            
+            /* Section title styling */
+            .section-title {
+                margin-bottom: 0.15cm;
+            }
+            
+            /* Entry header styling */
+            .entry-header {
+                margin-bottom: 0.05cm;
+            }
+            
+            /* Additional section title styling */
+            .section-title {
+                margin-bottom: 0.15cm;
+                font-size: 10pt;
+                padding-bottom: 0.1cm;
+            }
+            
+            /* Optimize single-line entries for print */
+            .single-line {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 8.5pt;
+                line-height: 1.1;
+            }
+            
+            .entry-header {
+                margin-bottom: 0.05cm; /* Minimal spacing after header */
+            }
+            
+            /* Adjust spacing for print */
+            .resume-container {
+                margin-top: 0; /* Remove top margin to prevent content shifting */
+                /* gap: 0.3cm; */ /* Removed Flexbox property for better pagination */
+                padding: 0; /* Remove padding to prevent content shifting */
+            }
+            
+            .entries-container {
+                /* gap: 0.15cm; */ /* Removed Flexbox property for better pagination */
+                margin-bottom: 0.15cm; /* Added margin instead of gap */
+            }
+            
+            /* List styling */
+            ul {
+                margin: 0.05cm 0;
+                padding-left: 0.3cm;
+            }
+            
+            /* List item styling */
+            li {
+                margin-bottom: 0.05cm;
+                line-height: 1.1;
+            }
+            
+            /* Optimize links for print */
+            a {
+                text-decoration: none;
+                color: #000;
+            }
+            
+            /* Compact entry content */
+            .entry-content {
+                padding-left: 0.2rem;
+                font-size: 8pt;
+                line-height: 1.1;
+            }
+            
+            /* Optimize header and contact info for print */
+            .header {
+                margin-bottom: 0.1cm;
+            }
+            
+            .header h1 {
+                font-size: 2rem; /* Adjusted to a reasonable size */
+                margin: 0;       /* Remove margin to prevent unintended gap */
+                line-height: 1;  /* Minimal line-height for tighter spacing */
+}
+            
+            .contact-info {
+                font-size: 1rem !important;
+                margin-top: 0.1rem !important;
+                gap: 0 !important;
+            }
+            
+            /* Optimize skills section for print */
+            .skills-section .skills-list {
+                display: block !important; /* Changed from grid to block for better pagination */
+                /* grid-template-columns: repeat(2, 1fr); */ /* Removed grid property */
+                /* gap: 0.1cm; */ /* Removed Flexbox property */
+                font-size: 8pt;
+                margin-bottom: 0.2cm;
+                overflow-wrap: break-word !important;
+                word-wrap: break-word !important;
+                word-break: normal !important;
+            }
+            
+            .skill-line {
+                font-size: 8pt;
+                line-height: 1.3;
+                white-space: normal !important;
+                overflow-wrap: break-word !important;
+                word-wrap: break-word !important;
+                word-break: break-word !important;
+                margin-bottom: 0.1cm;
+                display: block !important;
+                width: 100% !important;
+            }
+            
+            /* Ensure certifications fit well */
+            .certification-entry {
+                margin-bottom: 0.1cm;
+            }
+            
+            /* Ensure content doesn't overflow page boundaries */
+            * {
+                overflow-wrap: break-word;
+                word-wrap: break-word;
+                -ms-word-break: break-all;
+                word-break: break-word;
+                -ms-hyphens: auto;
+                -moz-hyphens: auto;
+                -webkit-hyphens: auto;
+                hyphens: auto;
+            }
+
+            /* ------------------------------------------------------------------
+            Prevent page breaks inside the key blocks
+            ------------------------------------------------------------------ */
+            .entry,
+            .role-entry,
+            .experience-entry,
+            .education-entry,
+            .project-entry,
+            .certification-entry,
+            .skill-entry,
+            .section {
+                break-inside: avoid;          /* modern spec */
+                page-break-inside: avoid;     /* legacy name – still needed for Chromium */
+            }
+
+            
+            /* Optimize specific sections */
+            .professional-summary-section {
+                margin-bottom: 0.3cm;
+            }
+            
+            .professional-summary-section .entry-content {
+                font-size: 8.5pt;
+                line-height: 1.2;
+            }
+            
+            /* Ensure achievements lists are compact */
+            .experience-entry ul {
+                margin-top: 0.03cm;
+            }
+            
+            .experience-entry li {
+                font-size: 8pt;
+            }
+            
+            /* Section-specific styling */
+            .experience-section, 
+            .projects-section, 
+            .education-section, 
+            .skills-section, 
+            .certifications-section {
+                /* No specific styling needed - let WeasyPrint handle pagination */
+            }
+            
+            /* Entry header and content styling */
+            .entry-header {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            .entry-content {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            /* Additional section title styling */
+            .section-title {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            /* Section title and entries container relationship */
+            .section-title + .entries-container {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            /* Additional list styling */
+            ul {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            /* Additional list item styling */
+            li {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            /* Relationship between section title and first entry */
+            .section-title + .entries-container > .entry:first-child,
+            .section-title + .entries-container > .experience-entry:first-child {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            /* Experience entry pagination rules - enhanced for better page breaks */
+            .experience-entry {
+                margin-bottom: 12px;
+            }
+            
+            .company-header {
+                margin-bottom: 8px;
+                font-size: 9pt;
+                font-weight: bold;
+            }
+            
+            /* Each role is a separate entry */
+            .role-entry {
+                margin-bottom: 10px;
+                padding-left: 0.25cm;
+            }
+            
+            /* Style role headers to be distinct from company headers */
+            .role-header {
+                margin-bottom: 4px;
+                font-weight: bold;
+            }
+            
+            /* Style role content */
+            .role-content {
+                /* Basic styling without pagination restrictions */
+            }
+            
+            /* Achievement lists styling */
+            .achievements-list {
+                margin-top: 3px !important;
+                margin-bottom: 3px !important;
+            }
+            
+            /* Individual list items styling */
+            .achievements-list li {
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with candidate's essential information -->
+    <div class="header">
+        <h1>{{full_name}}</h1>
+        <div class="contact-info">
+            {% if current_address %}{{current_address}}{% endif %}
+            {% if phone %}{% if current_address %} | {% endif %}{{phone}}{% endif %}
+            {% if email %}{% if phone or current_address %} | {% endif %}{{email}}{% endif %}
+            <br>
+            {% if linkedin_url %}{{linkedin_url}}{% endif %}
+            {% if github_url %}{% if linkedin_url %} | {% endif %}{{github_url}}{% endif %}
+            {% if portfolio_url %}{% if linkedin_url or github_url %} | {% endif %}{{portfolio_url}}{% endif %}
+        </div>
+    </div>
+    
+    <div class="resume-container">
+        
+
+        {% if professional_summary %}
+        <div class="section professional-summary-section">
+            <div class="section-title">Professional Summary</div>
+            <div class="entry-content">
+                {{ professional_summary }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if experiences %}
+        <div class="section experience-section">
+            <div class="section-title">Experience</div>
+            <div class="entries-container">
+                {% for work in experiences %}
+                <div class="experience-entry">
+                    <div class="company-header">
+                        <strong>{{work.company}}{% if work.location %}, {{work.location}}{% endif %} | {{work.start_date}} - {{work.end_date}}</strong>
+                    </div>
+                    
+                    <!-- Check if roles are defined, otherwise treat as a single role -->
+                    {% if work.roles is defined and work.roles %}
+                        <!-- Multiple roles within company -->
+                        {% for role in work.roles %}
+                        <div class="role-entry">
+                            <div class="role-header">
+                                <span class="entry-title">{{role.title}}</span>
+                            </div>
+                            <div class="role-content">
+                                {% if role.description %}{{role.description}}{% endif %}
+                                {% if role.achievements %}
+                                <ul class="achievements-list">
+                                    {% if role.achievements is string %}
+                                        {% for achievement in role.achievements.split('\n') %}
+                                            {% if achievement.strip() %}
+                                                <li>{{ achievement.strip('- ').strip() }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for achievement in role.achievements %}
+                                            {% if achievement.strip() %}
+                                                <li>{{ achievement.strip('- ').strip() }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Single role (backward compatibility) -->
+                        <div class="role-entry">
+                            <div class="role-header">
+                                <span class="entry-title">{{work.position}}</span>
+                            </div>
+                            <div class="role-content">
+                                {% if work.description %}{{work.description}}{% endif %}
+                                {% if work.achievements %}
+                                <ul class="achievements-list">
+                                    {% if work.achievements is string %}
+                                        {% for achievement in work.achievements.split('\n') %}
+                                            {% if achievement.strip() %}
+                                                <li>{{ achievement.strip('- ').strip() }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for achievement in work.achievements %}
+                                            {% if achievement.strip() %}
+                                                <li>{{ achievement.strip('- ').strip() }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if projects %}
+        <div class="section projects-section">
+            <div class="section-title">Projects</div>
+            <div class="entries-container">
+                {% for project in projects %}
+                <div class="entry project-entry">
+                    <div class="entry-header">
+                        <span class="entry-title" style="white-space: normal; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">{{project.title}}{% if project.url %} (<a href="{{project.url}}">Link</a>){% endif %} | {% if project.technologies %}{{project.technologies}}{% endif %} | {{project.start_date}} - {{project.end_date}}</span>
+                    </div>
+                    <div class="entry-content" style="white-space: normal; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
+                        {% if project.description %}{{project.description}}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if educations %}
+        <div class="section education-section">
+            <div class="section-title">Education</div>
+            <div class="entries-container">
+                {% for edu in educations %}
+                <div class="entry education-entry">
+                    <div class="entry-header single-line">
+                        <span class="entry-title">{{edu.institution}} | {{edu.degree}} in {{edu.field_of_study}} | {{edu.start_date}} - {{edu.end_date}}</span>
+                    </div>
+                    <div class="entry-content">
+                        {% if edu.gpa %}GPA: {{edu.gpa}}{% endif %}
+                        {% if edu.gpa and edu.description %} | {% endif %}
+                        {% if edu.description %}{{edu.description}}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if skills %}
+        <div class="section skills-section">
+            <div class="section-title">Skills</div>
+            <div class="skills-list">
+                {% for category, skills_list in skills.items() %}
+                <div class="entry skill-entry">
+                    <div class="skill-line">
+                        <strong>{{category}}:</strong> {{skills_list|join(', ') | wordwrap(80, wrapstring=', ', break_long_words=false) }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if certifications %}
+        <div class="section certifications-section">
+            <div class="section-title">Certifications</div>
+            <div class="entries-container">
+                {% for cert in certifications %}
+                {% set has_valid_issuer = cert.issuer and cert.issuer|lower != 'none' %}
+                <div class="entry certification-entry">
+                    <div class="entry-header single-line">
+                        <span class="entry-title">
+                            {{ cert.name }}
+                            {% if has_valid_issuer %} | {{ cert.issuer }}{% endif %}
+                            {% if cert.credential_id %} | ID: {{ cert.credential_id }}{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+{
+  "personal_info": {
+    "name": "John Doe",
+    "email": "john.doe@email.com",
+    "phone": "(555) 123-4567",
+    "location": "San Francisco, CA",
+    "linkedin": "linkedin.com/in/johndoe",
+    "github": "github.com/johndoe"
+  },
+  "education": [
+    {
+      "institution": "University of California, Berkeley",
+      "degree": "Bachelor of Science",
+      "field": "Computer Science",
+      "gpa": "3.8",
+      "start_date": "2016-09",
+      "end_date": "2020-05",
+      "description": "Relevant coursework: Data Structures, Algorithms, Machine Learning, Software Engineering"
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Tech Solutions Inc.",
+      "position": "Software Engineer",
+      "location": "San Francisco, CA",
+      "start_date": "2020-06",
+      "end_date": "Present",
+      "description": "Full-stack development of web applications",
+      "achievements": [
+        "Developed and maintained RESTful APIs using Python and Django",
+        "Implemented responsive front-end designs using React and TypeScript",
+        "Reduced application load time by 40% through optimization"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "category": "Programming Languages",
+      "name": "Python",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Web Technologies",
+      "name": "React",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Databases",
+      "name": "PostgreSQL",
+      "proficiency": "Intermediate"
+    }
+  ],
+  "projects": [
+    {
+      "title": "E-commerce Platform",
+      "description": "Built a full-stack e-commerce platform with user authentication and payment processing",
+      "technologies": ["Python", "Django", "React", "PostgreSQL"],
+      "url": "github.com/johndoe/ecommerce",
+      "start_date": "2019-09",
+      "end_date": "2020-03"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Certified Developer",
+      "issuer": "Amazon Web Services",
+      "date_obtained": "2021-03",
+      "credential_id": "AWS-DEV-123456",
+      "url": "aws.amazon.com/certification/verify"
+    }
+  ]
+}
