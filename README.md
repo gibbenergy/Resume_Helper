@@ -92,7 +92,7 @@ If the application is already set up, the script will skip installation steps an
 │   └── file_utils.py
 ├── LICENSE                    # Apache-2.0 License file
 └── README.md                  # This README file
-# (Potentially add requirements.txt and install_run_windows.bat here if created)
+
 ```
 
 ---
