@@ -1,6 +1,20 @@
-# Resume Helper AI
+<!-- ───────────── Title & quick-nav (centered) ───────────── -->
+<div align="center">
 
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+<h1>Resume Helper AI</h1>
+
+<p>
+  <a href="USAGE_GUIDE.md"><strong>Usage&nbsp;Guide</strong></a> •
+  <a href="README.md"><strong>Overview</strong></a> •
+  <a href="LICENSE"><strong>License</strong></a>
+</p>
+
+<!-- licence badge -->
+<a href="https://opensource.org/licenses/Apache-2.0">
+  <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" />
+</a>
+
+</div>
 
 **Resume Helper AI** is a desktop application leveraging state-of-the-art AI models (**Google Gemini** and **OpenAI GPT-4o**) to generate personalized resumes and cover letters. The application intelligently tailors your documents based on your provided information and selected job descriptions, simplifying the job application process.
 
