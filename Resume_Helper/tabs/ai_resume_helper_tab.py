@@ -1,8 +1,3 @@
-"""
-AI Resume Helper Tab for the Resume Helper application
-
-"""
-
 import os
 import json
 import uuid
@@ -93,6 +88,8 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     lines=8,
                     interactive=False,
                 )
+            
+            update_resume_btn = gr.Button("🔄 Update Resume", variant="secondary")
 
         # =========================================================
         #  ACTION BUTTONS
@@ -445,6 +442,23 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     projects_tab.get("project_list").value,
                     certifications_tab.get("cert_list").value,
                 )
+            
+            update_resume_btn.click(
+                fn=update_resume_json,
+                inputs=[
+                    # Personal
+                    personal_tab.get("email_input"),   personal_tab.get("name_input"),
+                    personal_tab.get("phone_input"),   personal_tab.get("current_address"),
+                    personal_tab.get("location_input"),personal_tab.get("citizenship"),
+                    personal_tab.get("linkedin_input"),personal_tab.get("github_input"),
+                    personal_tab.get("portfolio_input"),personal_tab.get("summary_input"),
+                    # Tables
+                    education_tab.get("edu_list"), work_tab.get("work_list"),
+                    skills_tab.get("skill_list"),  projects_tab.get("project_list"),
+                    certifications_tab.get("cert_list"),
+                ],
+                outputs=[resume_json],   # you can also add ai_status here if you wish
+    )
 
             tab.select(fn=load_current_json, inputs=None, outputs=resume_json)
 
