@@ -1,5 +1,4 @@
-<h1 align="center">Resume Helper AI</h1>
-
+# Resume Helper AI
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -12,7 +11,6 @@
 - **Automated Resume Generation**: Create professional, tailored resumes quickly.
 - **Customized Cover Letters**: Generate compelling, personalized cover letters instantly.
 - **AI-Powered Content**: Uses **Google Gemini** and **OpenAI GPT-4o** for accurate, context-sensitive outputs.
-- **Multiple Templates**: Choose from various resume and cover letter layouts.
 - **Easy-to-use Interface**: Tab-based GUI simplifies data entry and document management.
 
 ---
@@ -31,7 +29,6 @@
 ### ⚡ One-Click Windows Installation
 
 1.  **Download or Clone** this repository and open the project folder.
-
 2.  **Double-click `install_run_windows.bat`** (or run from command prompt):
 
 ```cmd
@@ -41,15 +38,10 @@ install_run_windows.bat
 The script will automatically:
 
 ✅ Check and install Python 3.11+ if it's missing.
-
 ✅ Create and activate a local virtual environment (`venv`).
-
 ✅ Install all required dependencies (`pip install -r requirements.txt`).
-
 ✅ Free port `53630` automatically if currently in use.
-
 ✅ Launch the Resume Helper application at: `http://localhost:53630`
-
 ✅ Keep the console window open to clearly display any messages or errors.
 
 ⚠️ **SmartScreen or Antivirus Warning?**
@@ -92,7 +84,7 @@ If the application is already set up, the script will skip installation steps an
 │   └── file_utils.py
 ├── LICENSE                    # Apache-2.0 License file
 └── README.md                  # This README file
-
+# (Potentially add requirements.txt and install_run_windows.bat here if created)
 ```
 
 ---
@@ -107,4 +99,4 @@ If the application is already set up, the script will skip installation steps an
 
 ## 📄 License
 
-This project is licensed under the Apache License, Version 2.0. The license allows wide-ranging usage, modification, distribution, and commercialization, including an explicit grant of patent rights. See `LICENSE` for details.
+This project is licensed under the Apache License, Version 2.0. 

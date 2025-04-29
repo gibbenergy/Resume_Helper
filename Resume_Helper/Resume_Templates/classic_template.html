@@ -394,19 +394,33 @@
             /* ------------------------------------------------------------------
             Prevent page breaks inside the key blocks
             ------------------------------------------------------------------ */
-            .entry,
-            .role-entry,
+            .section {
+                break-inside: auto !important;          /* modern spec */
+                page-break-inside: auto !important;     /* legacy name – still needed for Chromium */
+            }
+
+             /*  Glue the heading to at least the first entry */
+            .section-title {
+                break-after: avoid !important;
+                page-break-after: avoid !important;
+            }
+
+            /*  Keep every entry block intact */
             .experience-entry,
+            .role-entry,
+            .entry,
             .education-entry,
             .project-entry,
             .certification-entry,
-            .skill-entry,
-            .section {
-                break-inside: avoid;          /* modern spec */
-                page-break-inside: avoid;     /* legacy name – still needed for Chromium */
+            .skill-entry {
+                break-inside: avoid !important;          /* do NOT split inside a job */
+                page-break-inside: avoid !important;
             }
 
-            
+            /* safeguard against single orphan lines */
+            li { orphans: 3; widows: 3; }
+
+
             /* Optimize specific sections */
             .professional-summary-section {
                 margin-bottom: 0.3cm;

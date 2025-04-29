@@ -917,12 +917,17 @@ class UnifiedAIFeatures(BaseAIProvider):
         request_id = str(uuid.uuid4())
         logger.info(f"[Request {request_id}] Generating cover letter")
         
-        # First analyze the job description to extract key information
+          # 1. Analyse the JD
         job_analysis = self.analyze_job_description(job_description, model)
         if "error" in job_analysis:
-            logger.error(f"[Request {request_id}] Error analyzing job description: {job_analysis['error']}")
-            return f"Error generating cover letter: {job_analysis['error']}"
-        
+            logger.error(f"[{request_id}] JD analysis error: {job_analysis['error']}")
+            return {"error": f"Error analysing JD: {job_analysis['error']}"}
+
+        # 2. Work out résumé ↔ JD skill intersection 
+        skill_filter = self.identify_relevant_skills(resume_data, job_analysis)
+        matching_skills = skill_filter.get("matching_skills", [])
+        missing_skills  = skill_filter.get("missing_skills", [])
+
         # Extract personal information
         name = ""
         email = ""
@@ -962,7 +967,8 @@ class UnifiedAIFeatures(BaseAIProvider):
                     job_position = position_matches[0].strip()
         
         # Create a prompt for generating a cover letter
-        system_content = "You are a professional cover letter writer. Generate a compelling cover letter that highlights relevant skills and experience."
+        system_content = ("You are a professional cover-letter writer. The letter must be 100 % truthful—never introduce achievements or skills not present in the résumé.")
+
         
         user_content = f"""
                 Generate a professional cover letter for the following:
@@ -976,21 +982,26 @@ class UnifiedAIFeatures(BaseAIProvider):
                 
                 Job Description:
                 {job_description}
+
+                Résumé–JD matching skills (may cite freely):
+                {json.dumps(matching_skills, indent=2)}
+
+                JD skills missing from résumé (may acknowledge as growth areas, **do not claim mastery**):
+                {json.dumps(missing_skills, indent=2)}
                 
                 Resume Data:
-                {json.dumps(resume_data, indent=2)}
-                
-                Job Analysis:
-                {json.dumps(job_analysis, indent=2)}
-                
+                {json.dumps(resume_data, indent=2)}               
+                                
                 The cover letter should:
                 1. Have a compelling introduction that mentions the specific position
-                2. Highlight relevant skills and experience that match the job requirements
-                3. Explain why the applicant is a good fit for the role
-                4. Include a strong closing paragraph
-                5. Be concise (300-400 words)
+                2. Highlight **only** the “matching skills” above, phrasing them so they echo JD wording.
+                3. If crucial JD skills are in “missing_skills”, you may mention eagerness to develop them, but never state or imply current mastery.
+                4. Explain why the applicant is a good fit for the role
+                5. Include a strong closing paragraph
+                6. Be concise (300-400 words)
                 
                 IMPORTANT: 
+                - DO NOT invent qualifications, tools or degrees absent from the résumé.
                 - DO NOT include any placeholders like [Your Email], [Company Address], etc.
                 - DO NOT include header information (name, address, date, etc.) - this will be added automatically
                 - DO NOT include recipient information (company name, address, etc.) - this will be added automatically"""
@@ -1218,79 +1229,114 @@ class UnifiedAIFeatures(BaseAIProvider):
         
         return validation_result
     
-    def tailor_resume(self, resume_data: Dict, job_description: str, model: Optional[str] = None) -> Dict:
+    def tailor_resume(
+        self,
+        resume_data: Dict,
+        job_description: str,
+        model: Optional[str] = None,
+    ) -> Dict:
         """
-        Tailor a resume to better match a job description.
-        
-        Args:
-            resume_data: The resume data as a dictionary.
-            job_description: The job description to tailor the resume for.
-            model: Optional model override for this specific call.
-            
-        Returns:
-            A dictionary containing the tailored resume or an error message.
+        Tailor a résumé to a job description, then copy-edit it.
+        Returns the final JSON résumé or {"error": …}.
         """
-        # Generate a unique request ID for this request
         request_id = str(uuid.uuid4())
-        logger.info(f"[Request {request_id}] Tailoring resume for job description")
-        
-        try:
-            # First, analyze the job description
-            job_analysis = self.analyze_job_description(job_description, model)
-            
-            if "error" in job_analysis:
-                logger.error(f"[Request {request_id}] Error analyzing job description: {job_analysis['error']}")
-                return {"error": f"Error analyzing job description: {job_analysis['error']}", "request_id": request_id}
-            
-            # Create a prompt for tailoring the resume
-            messages = [
-                {"role": "system", "content": "You are a professional resume writer. Tailor resumes to match job descriptions."},
-                {"role": "user", "content": f"""
-                    Tailor this resume to better match the job description. Focus on:
-                    1. Highlighting relevant skills and experience
-                    2. Using keywords from the job description
-                    3. Prioritizing the most relevant information
-                    4. Adjusting the summary/objective to match the job
-                    
-                    Resume Data:
-                    {json.dumps(resume_data, indent=2)}
-                    
-                    Job Description:
-                    {job_description}
-                    
-                    Job Analysis:
-                    {json.dumps(job_analysis, indent=2)}
-                    
-                    Return the tailored resume as a JSON object with the same structure as the original resume.
-                    Do not add new sections or fields that don't exist in the original resume.
-                    Preserve all original fields and their types.
-                """}
-            ]
-            
-            # Use the prompt_function
-            tailored_resume = self.prompt_function(
-                messages=messages,
-                request_id=request_id,
-                model=model,
-                response_format={"type": "json_object"}
-            )
-            
-            # Check for errors
-            if "error" in tailored_resume:
-                logger.error(f"[Request {request_id}] Error tailoring resume: {tailored_resume['error']}")
-                return {"error": f"Error tailoring resume: {tailored_resume['error']}", "request_id": request_id}
-            
-            # Add request_id to the result
-            if isinstance(tailored_resume, dict) and "request_id" not in tailored_resume:
-                tailored_resume["request_id"] = request_id
-            
-            logger.info(f"[Request {request_id}] Resume tailored successfully")
-            return tailored_resume
-            
-        except Exception as e:
-            error_msg = f"Unexpected error tailoring resume: {str(e)}"
-            logger.error(f"[Request {request_id}] {error_msg}")
-            return {"error": error_msg, "request_id": request_id}
+        logger.info(f"[Request {request_id}] Tailoring résumé")
+
+        # 1. Analyse the JD
+        job_analysis = self.analyze_job_description(job_description, model)
+        if "error" in job_analysis:
+            logger.error(f"[Request {request_id}] JD analysis failed: {job_analysis['error']}")
+            return {"error": f"Error analysing JD: {job_analysis['error']}",
+                    "request_id": request_id}
+
+        # 2. Tailor pass
+        tailor_messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a professional résumé writer. Keep the résumé 100 % factual, and do **not delete** any section or entry."
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"""
+    Tailor this résumé to better match the job description.  Focus on:
+    1. Highlighting relevant skills and experience
+    2. Introducing exact JD keywords **only when the résumé already evidences the
+    same or a clearly synonymous skill/technique**  
+    – e.g. JD says “deep learning”; résumé shows an LSTM project ⇒ “deep-learning (LSTM)” is OK  
+    – if no supporting evidence exists, do NOT add the keyword
+    3. **Re-order** or re-phrase content for relevance, **but keep every original  entry.**
+    4. Refining the summary/objective to underscore existing, verifiable strengths
+    that align with the role; **never invent new achievements, titles, or skills**
+
+    Résumé JSON:
+    {json.dumps(resume_data, indent=2)}
+
+    Job description:
+    {job_description}
+
+    Job analysis (for convenience):
+    {json.dumps(job_analysis, indent=2)}
+
+    Return ONLY the tailored résumé as JSON (same schema as input).
+    """,
+            },
+        ]
+
+        first_pass = self.prompt_function(
+            messages=tailor_messages,
+            request_id=request_id,
+            model=model,
+            response_format={"type": "json_object"},
+            max_tokens=10000
+        )
+
+        if "error" in first_pass:
+            logger.error(f"[Request {request_id}] Tailoring error: {first_pass['error']}")
+            return {"error": f"Error tailoring résumé: {first_pass['error']}",
+                    "request_id": request_id}
+
+        # 3. Copy-edit pass
+        tailored_json_str = json.dumps(first_pass, ensure_ascii=False, indent=2)
+
+        proof_messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a meticulous copy-editor. Fix spelling, grammar, punctuation, "
+                    "and style only; do NOT alter factual content or field names."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    "Return the same JSON with language corrections only:\n\n"
+                    f"{tailored_json_str}"
+                ),
+            },
+        ]
+
+        proof_pass = self.prompt_function(
+            messages=proof_messages,
+            request_id=request_id,
+            model=model,
+            response_format={"type": "json_object"},
+            max_tokens=10000
+        )
+
+        if "error" in proof_pass:
+            logger.error(f"[Request {request_id}] Proof-read error: {proof_pass['error']}")
+            return {"error": f"Error during proof-reading: {proof_pass['error']}",
+                    "request_id": request_id}
+
+        # 4. Success
+        if "request_id" not in proof_pass:
+            proof_pass["request_id"] = request_id
+
+        logger.info(f"[Request {request_id}] Résumé tailored and proof-read successfully")
+        return proof_pass
+
     
     def get_improvement_suggestions(self, resume_data: Dict, job_description: str, model: Optional[str] = None) -> str:
         """
