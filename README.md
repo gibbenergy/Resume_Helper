@@ -38,10 +38,15 @@ install_run_windows.bat
 The script will automatically:
 
 ✅ Check and install Python 3.11+ if it's missing.
+
 ✅ Create and activate a local virtual environment (`venv`).
+
 ✅ Install all required dependencies (`pip install -r requirements.txt`).
+
 ✅ Free port `53630` automatically if currently in use.
+
 ✅ Launch the Resume Helper application at: `http://localhost:53630`
+
 ✅ Keep the console window open to clearly display any messages or errors.
 
 ⚠️ **SmartScreen or Antivirus Warning?**
@@ -80,11 +85,9 @@ If the application is already set up, the script will skip installation steps an
 │   ├── projects_tab.py
 │   └── skills_tab.py
 ├── utils/                     # Utility functions
-│   ├── __init__.py
-│   └── file_utils.py
-├── LICENSE                    # Apache-2.0 License file
-└── README.md                  # This README file
-# (Potentially add requirements.txt and install_run_windows.bat here if created)
+    ├── __init__.py
+    └── file_utils.py
+
 ```
 
 ---
