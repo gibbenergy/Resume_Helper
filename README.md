@@ -1,20 +1,6 @@
-<!-- ───────────── Title & quick-nav (centered) ───────────── -->
-<div align="center">
+# Resume Helper AI
 
-<h1>Resume Helper AI</h1>
-
-<p>
-  <a href="USAGE_GUIDE.md"><strong>Usage&nbsp;Guide</strong></a> •
-  <a href="README.md"><strong>Overview</strong></a> •
-  <a href="LICENSE"><strong>License</strong></a>
-</p>
-
-<!-- licence badge -->
-<a href="https://opensource.org/licenses/Apache-2.0">
-  <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" />
-</a>
-
-</div>
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **Resume Helper AI** is a desktop application leveraging state-of-the-art AI models (**Google Gemini** and **OpenAI GPT-4o**) to generate personalized resumes and cover letters. The application intelligently tailors your documents based on your provided information and selected job descriptions, simplifying the job application process.
 
@@ -28,6 +14,13 @@
 - **Easy-to-use Interface**: Tab-based GUI simplifies data entry and document management.
 
 ---
+
+## 🕓 Version History
+
+| Date | Version | Highlights |
+|------|:------:|-----------|
+| **2025-05-05** | **0.2.0** | **One-Click installer** overhauled<br>• now uses **Miniconda** to install Python 3.11+ if absent<br>• auto-installs GTK runtime (tschoonj build) for WeasyPrint |
+| 2025-04-29 | 0.1.0 | Initial public release on GitHub |
 
 ## 📌 Prerequisites
 
@@ -52,15 +45,10 @@ install_run_windows.bat
 The script will automatically:
 
 ✅ Check and install Python 3.11+ if it's missing.
-
 ✅ Create and activate a local virtual environment (`venv`).
-
 ✅ Install all required dependencies (`pip install -r requirements.txt`).
-
 ✅ Free port `53630` automatically if currently in use.
-
 ✅ Launch the Resume Helper application at: `http://localhost:53630`
-
 ✅ Keep the console window open to clearly display any messages or errors.
 
 ⚠️ **SmartScreen or Antivirus Warning?**
@@ -99,9 +87,11 @@ If the application is already set up, the script will skip installation steps an
 │   ├── projects_tab.py
 │   └── skills_tab.py
 ├── utils/                     # Utility functions
-    ├── __init__.py
-    └── file_utils.py
-
+│   ├── __init__.py
+│   └── file_utils.py
+├── LICENSE                    # Apache-2.0 License file
+└── README.md                  # This README file
+# (Potentially add requirements.txt and install_run_windows.bat here if created)
 ```
 
 ---

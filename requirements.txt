@@ -7,5 +7,3 @@ openai>=1.14.0
 google-generativeai>=0.4.0
 python-dotenv>=1.0.0
 psutil>=5.9.8
-# GTK library is also required for WeasyPrint on Windows, but is installed separately
-# Install from: https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
