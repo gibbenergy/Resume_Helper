@@ -10,36 +10,38 @@ echo.
 :: -----------------------------------------------------
 ::  1. Ensure Python 3.11+ is available (install locally if not)
 :: -----------------------------------------------------
-where python > nul 2>&1
-if %errorlevel% neq 0 (
-    echo Python not found - installing a private copy...
-    set PY_DIR=%LocalAppData%\SimpleResumePython
-    if not exist "%PY_DIR%" mkdir "%PY_DIR%"
-    set PY_ZIP=python-3.11-embed-amd64.zip
-    set PY_URL=https://www.python.org/ftp/python/3.11.8/%PY_ZIP%
-    echo Downloading %PY_URL%
-    powershell -Command "Invoke-WebRequest -Uri '%PY_URL%' -OutFile '%PY_DIR%\%PY_ZIP%'"
-    if not exist "%PY_DIR%\%PY_ZIP%" (
-        echo ❌ Failed to download Python.  Please connect to the Internet and try again.
-        pause & exit /b 1
-    )
-    echo Extracting...
-    powershell -Command ^
-      "Add-Type -A 'System.IO.Compression.FileSystem';" ^
-      "[IO.Compression.ZipFile]::ExtractToDirectory('%PY_DIR%\%PY_ZIP%','%PY_DIR%')"
+set "CONDA_DIR=%LocalAppData%\SimpleResumeConda"
 
-    del "%PY_DIR%\%PY_ZIP%"
-    echo Installed private Python to %PY_DIR%
-    set "PATH=%PY_DIR%;%PATH%"
+if exist "%CONDA_DIR%\python.exe" (
+    echo ✔ Existing Miniconda detected – reusing it
 ) else (
-    echo ✔ Found existing Python on PATH
+    echo ℹ Installing Miniconda via winget…
+    winget install -e --id Anaconda.Miniconda3 ^
+          --location "%CONDA_DIR%" ^
+          --silent --accept-package-agreements --accept-source-agreements --force
+    if not "%ERRORLEVEL%"=="0" if not "%ERRORLEVEL%"=="1" (
+    	echo ❌ winget reported failure (exit %ERRORLEVEL%) & pause & exit /b 1
+    )
+
+    rem ----- wait loop -----
+    echo Waiting for Miniconda to finish…
+    for /L %%i in (1,1,60) do (
+        if exist "%CONDA_DIR%\python.exe" goto :python_ready
+        timeout /t 2 >nul
+    )
+    echo ❌ Miniconda did not appear in %CONDA_DIR% after 120 s
+    pause & exit /b 1
+    :python_ready
 )
 
+rem now it’s safe to use python
+set "PATH=%CONDA_DIR%;%CONDA_DIR%\Scripts;%CONDA_DIR%\Library\bin;%PATH%"
 python --version || (echo ❌ Python still not available & pause & exit /b 1)
 
 :: -----------------------------------------------------
 ::  2. Ensure pip
 :: -----------------------------------------------------
+
 python -m pip --version > nul 2>&1
 if %errorlevel% neq 0 (
     echo pip not found – bootstrapping...
@@ -49,12 +51,16 @@ if %errorlevel% neq 0 (
     )
 )
 
+
 :: -----------------------------------------------------
-::  3. Virtual environment
+::  3-a. Virtual environment
 :: -----------------------------------------------------
+
+python -m pip show virtualenv >nul 2>&1 || python -m pip install virtualenv
+
 if not exist venv (
     echo Creating virtual environment...
-    python -m venv venv || (
+    python -m virtualenv venv || (
         echo ❌ venv creation failed & pause & exit /b 1
     )
 ) else (
@@ -62,13 +68,50 @@ if not exist venv (
 )
 
 echo Activating venv...
-call venv\Scripts\activate.bat || (echo ❌ venv activate failed & pause & exit /b 1)
+call venv\Scripts\activate.bat || (
+    echo ❌ venv activate failed & pause & exit /b 1
+)
+
+:: -----------------------------------------------------
+::  3-b. Install GTK runtime (tschoonj) if missing
+:: -----------------------------------------------------
+set "GTK_DIR=%ProgramFiles%\GTK3-Runtime Win64\bin"
+set "GTK_EXE=gtk3-runtime-3.24.31-2022-01-04-ts-win64.exe"
+set "GTK_URL=https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases/download/2022-01-04/%GTK_EXE%"
+
+rem 3-b-1.   Already installed?
+if exist "%GTK_DIR%\libgtk-3-0.dll" (
+    echo ✔ GTK runtime already present
+) else (
+    echo Installing GTK runtime for WeasyPrint…
+    powershell -NoLogo -NoProfile -Command ^
+        "Invoke-WebRequest -Uri '%GTK_URL%' -OutFile '%TEMP%\%GTK_EXE%'"
+    start /wait "" "%TEMP%\%GTK_EXE%" /S
+    if errorlevel 1 (
+        echo ❌ GTK installer failed & pause & exit /b 1
+    )
+)
+
+rem 3-b-2.   Prepend the DLL directory to PATH if not already in it
+echo %PATH% | find /I "%GTK_DIR%" >nul 2>&1 || (
+    set "PATH=%GTK_DIR%;%PATH%"
+    echo ℹ Added GTK runtime to PATH for this session
+)
+
 
 :: -----------------------------------------------------
 ::  4. Install dependencies
 :: -----------------------------------------------------
+
+:: make sure "Common AppData" exists – pip / platformdirs require it
+reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Common AppData" >nul 2>&1
+if errorlevel 1 (
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" ^
+            /v "Common AppData" /t REG_SZ /d "%ProgramData%" /f >nul
+)
+
 echo Installing requirements...
-pip install -r requirements.txt
+pip --isolated install -r requirements.txt
 if %errorlevel% neq 0 (
     echo ⚠  requirements.txt failed – installing core libs only
     pip install gradio openai google-generativeai weasyprint python-dotenv
