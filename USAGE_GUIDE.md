@@ -59,6 +59,12 @@ The application uses a tabbed interface to organize resume sections:
 2.  Click the **Generate Resume (PDF)** button.
 3.  A PDF file of your resume will be generated and saved. Click the **Download PDF** button to download the file .
 
+## 4.5 Getting Your API Keys 🔑
+
+> **Need an OpenAI or Google Gemini key?**  
+> Follow the step-by-step guide here:  
+> **[How to obtain your API keys](docs/API_KEYS.md)**
+
 ## 5. Using AI Features (Optional)
 
 The **AI Resume Helper** tab lets you refine your résumé (and draft a cover-letter) with OpenAI or Gemini models.

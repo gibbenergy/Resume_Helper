@@ -2,7 +2,7 @@ import os
 import json
 import uuid
 import logging
-import datetime
+import re, datetime as dt
 import gradio as gr
 from gradio import update
 from weasyprint import HTML
@@ -225,6 +225,17 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 if isinstance(result, dict) and "error" in result:
                     result.setdefault("request_id", str(req_id))
                     return json.dumps(result), f"Error: {result['error']}"
+                
+                if isinstance(result, dict):
+                    # `job_details_state` is defined in the outer scope of the tab
+                    js = job_details_state.value
+                    js["company_name"] = result.get("company_name",
+                                                    js.get("company_name", ""))
+                    js["job_position"] = result.get("job_position",
+                                                    js.get("job_position", ""))
+                    job_details_state.value = js                         
+                        
+                
                 result.setdefault("request_id", str(req_id))
                 return json.dumps(result, indent=2), "Resume tailored successfully!"
             except Exception as e:
@@ -280,15 +291,26 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 return "Error providing suggestions. Check inputs.", result
             return result, "Improvement suggestions generated successfully!"
 
+        def _slug(text: str, default: str = "document") -> str:
+            """Convert arbitrary text to filesystem-safe slug."""
+            text = re.sub(r"[^A-Za-z0-9]+", "_", text or "")
+            return text.strip("_").lower() or default
+
         def download_pdf_handler(pdf_type, tailored_json, cover_letter_text, resume_json_str, job_details):
             req_id = uuid.uuid4()
             temp_dir = resume_helper.resume_gen.temp_dir
             os.makedirs(temp_dir, exist_ok=True)
 
+             # ----- Build slug + timestamp ----------------------------
+            company   = job_details.get("company_name", "") or "company"
+            suffix    = "resume" if pdf_type == "Tailored Resume" else "cover_letter"
+            timestamp = dt.datetime.now().strftime("%Y%m%d")
+            filename  = f"{_slug(company)}_{suffix}_{timestamp}.pdf"
+            pdf_path  = os.path.join(temp_dir, filename)
+
             try:
                 if pdf_type == "Tailored Resume":
-                    data = json.loads(tailored_json)
-                    pdf_path = os.path.join(temp_dir, "tailored_resume.pdf")
+                    data = json.loads(tailored_json)                    
                     ok = resume_helper.resume_gen.generate_pdf(data, pdf_path)
                 else:
                     # cover letter
@@ -296,8 +318,7 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                         json.loads(resume_json_str)
                         if resume_json_str.strip()
                         else {}
-                    )
-                    pdf_path = os.path.join(temp_dir, "cover_letter.pdf")
+                    )                    
                     pdf_path = generate_cover_letter_pdf(
                         candidate_data=candidate_info,
                         cover_letter_content=cover_letter_text,
