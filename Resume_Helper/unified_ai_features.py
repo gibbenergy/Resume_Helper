@@ -970,28 +970,7 @@ class UnifiedAIFeatures(BaseAIProvider):
                 phone = personal_info[2]
         
         # Extract company name and job position from job analysis
-        company_name, job_position = self._extract_company_and_position(job_analysis, job_description)
-        # company_name = "Unknown Company"
-        # job_position = "Unknown Position"
-        
-        # # Try to extract company and position from job analysis if available
-        # if isinstance(job_analysis, dict):
-        #     company_name = job_analysis.get("company_name", "Unknown Company")
-        #     job_position = job_analysis.get("job_position", "Unknown Position")
-            
-        #     # If the values are still default or empty, try to extract from the job description
-        #     if company_name in ["Unknown Company", "the company", ""] and job_description:
-        #         # Look for company name in the job description
-        #         company_matches = re.findall(r'at\s+([A-Z][A-Za-z0-9\s&]+)[\.,]', job_description)
-        #         company_matches += re.findall(r'([A-Z][A-Za-z0-9\s&]+)\s+is\s+(?:looking|hiring|seeking)', job_description)
-        #         if company_matches:
-        #             company_name = company_matches[0].strip()
-            
-        #     if job_position in ["Unknown Position", "the position", ""] and job_description:
-        #         # Look for job position in the job description
-        #         position_matches = re.findall(r'((?:Senior|Junior|Lead|Principal|Staff)?\s*[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*\s+(?:Engineer|Developer|Programmer|Analyst|Manager|Director|Specialist))', job_description)
-        #         if position_matches:
-        #             job_position = position_matches[0].strip()
+        company_name, job_position = self._extract_company_and_position(job_analysis, job_description)       
         
         # Create a prompt for generating a cover letter
         system_content = ("You are a professional cover-letter writer. The letter must be 100 % truthful—never introduce achievements or skills not present in the résumé.")
