@@ -27,7 +27,7 @@ See the 👉 [Usage Guide](USAGE_GUIDE.md) for installation and step-by-step usa
 | Date | Version | Highlights |
 |------|:------:|-----------|
 | **2025-05-08** | **0.2.1** | • **HTML → PDF styling fixes** – clearer fonts (min 10 pt) & field alignment<br>• **Smart file-naming** – exported PDFs now include *company-name* + date for easy tracking<br>• **GPT-4 o-1** set as the new default OpenAI model (longer context & improved stability)<br>• Minor GUI polish & bug-fixes |
-| **2025-05-05** | **0.2.0** | **One-Click installer** overhauled<br>• now uses **Miniconda** to install Python 3.11+ if absent<br>• auto-installs GTK runtime (tschoonj build) for WeasyPrint |
+| 2025-05-05 | 0.2.0 | One-Click installer overhauled<br>• now uses Miniconda to install Python 3.11+ if absent<br>• auto-installs GTK runtime (tschoonj build) for WeasyPrint |
 | 2025-04-29 | 0.1.0 | Initial public release on GitHub |
 
 
