@@ -36,7 +36,7 @@
         /* Header styles - more compact */
         .header {
             text-align: center;
-            margin-bottom: 0.3rem;
+            margin-bottom: 1.5rem;
         }
         
         .header h1 {
@@ -47,7 +47,7 @@
         
         .contact-info {
             font-size: 1rem;
-            margin-top: 0.2rem; /* Small, controlled margin from the name */
+            margin-top: 0.6rem; /* Small, controlled margin from the name */
             gap: 0; /* remove flex gap to tighten lines */
         }
         
@@ -238,8 +238,8 @@
                 height: 100%;
                 margin: 0;
                 padding: 0;
-                font-size: 9pt; /* Smaller font for print */
-                line-height: 1.2; /* Tighter line height for print */
+                font-size: 10pt; /* Smaller font for print */
+                line-height: 1.25; /* Tighter line height for print */
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
                 color-adjust: exact;
@@ -279,7 +279,7 @@
             /* Additional section title styling */
             .section-title {
                 margin-bottom: 0.15cm;
-                font-size: 10pt;
+                font-size: 11pt;
                 padding-bottom: 0.1cm;
             }
             
@@ -288,7 +288,7 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                font-size: 8.5pt;
+                font-size: 9.5pt;
                 line-height: 1.1;
             }
             
@@ -329,13 +329,13 @@
             /* Compact entry content */
             .entry-content {
                 padding-left: 0.2rem;
-                font-size: 8pt;
+                font-size: 9pt;
                 line-height: 1.1;
             }
             
             /* Optimize header and contact info for print */
             .header {
-                margin-bottom: 0.1cm;
+                margin-bottom: 1.5rem !important;
             }
             
             .header h1 {
@@ -346,7 +346,7 @@
             
             .contact-info {
                 font-size: 1rem !important;
-                margin-top: 0.1rem !important;
+                margin-top: 0.6rem !important;
                 gap: 0 !important;
             }
             
@@ -355,7 +355,7 @@
                 display: block !important; /* Changed from grid to block for better pagination */
                 /* grid-template-columns: repeat(2, 1fr); */ /* Removed grid property */
                 /* gap: 0.1cm; */ /* Removed Flexbox property */
-                font-size: 8pt;
+                font-size: 9pt;
                 margin-bottom: 0.2cm;
                 overflow-wrap: break-word !important;
                 word-wrap: break-word !important;
@@ -363,7 +363,7 @@
             }
             
             .skill-line {
-                font-size: 8pt;
+                font-size: 9pt;
                 line-height: 1.3;
                 white-space: normal !important;
                 overflow-wrap: break-word !important;
@@ -427,7 +427,7 @@
             }
             
             .professional-summary-section .entry-content {
-                font-size: 8.5pt;
+                font-size: 9.5pt;
                 line-height: 1.2;
             }
             
@@ -437,7 +437,7 @@
             }
             
             .experience-entry li {
-                font-size: 8pt;
+                font-size: 9pt;
             }
             
             /* Section-specific styling */
@@ -530,6 +530,13 @@
         <h1>{{full_name}}</h1>
         <div class="contact-info">
             {% if current_address %}{{current_address}}{% endif %}
+            {% if location %}{% if current_address %}, {% endif %}{{ location }}{% endif %}
+
+            {% if citizenship %}
+                {% if current_address or location %} | {% endif %}
+                {{ citizenship }}
+            {% endif %}
+
             {% if phone %}{% if current_address %} | {% endif %}{{phone}}{% endif %}
             {% if email %}{% if phone or current_address %} | {% endif %}{{email}}{% endif %}
             <br>
@@ -542,23 +549,23 @@
     <div class="resume-container">
         
 
-        {% if professional_summary %}
+        {% if summary %}
         <div class="section professional-summary-section">
             <div class="section-title">Professional Summary</div>
             <div class="entry-content">
-                {{ professional_summary }}
+                {{ summary }}
             </div>
         </div>
         {% endif %}
 
-        {% if experiences %}
+        {% if experience %}
         <div class="section experience-section">
             <div class="section-title">Experience</div>
             <div class="entries-container">
-                {% for work in experiences %}
+                {% for work in experience %}
                 <div class="experience-entry">
                     <div class="company-header">
-                        <strong>{{work.company}}{% if work.location %}, {{work.location}}{% endif %} | {{work.start_date}} - {{work.end_date}}</strong>
+                        <strong>{{work.company}}{% if work.location %} | {{work.location}}{% endif %} | {{work.start_date}} - {{work.end_date}}</strong>
                     </div>
                     
                     <!-- Check if roles are defined, otherwise treat as a single role -->
@@ -631,26 +638,62 @@
             <div class="entries-container">
                 {% for project in projects %}
                 <div class="entry project-entry">
+
+                    {# 1 • Title and (optional) date range -------------------------------- #}
                     <div class="entry-header">
-                        <span class="entry-title" style="white-space: normal; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">{{project.title}}{% if project.url %} (<a href="{{project.url}}">Link</a>){% endif %} | {% if project.technologies %}{{project.technologies}}{% endif %} | {{project.start_date}} - {{project.end_date}}</span>
+                        <span class="entry-title" style="white-space:normal; overflow-wrap:break-word;">
+                            {{ project.title }}
+                            {% if project.start_date or project.end_date %}
+                                |
+                                {% if project.start_date and project.end_date %}
+                                    {{ project.start_date }} – {{ project.end_date }}
+                                {% elif project.start_date %}
+                                    {{ project.start_date }}
+                                {% else %}
+                                    {{ project.end_date }}
+                                {% endif %}
+                            {% endif %}
+                        </span>
                     </div>
-                    <div class="entry-content" style="white-space: normal; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
-                        {% if project.description %}{{project.description}}{% endif %}
+
+                    {# 2 • Bullet-point details ------------------------------------------ #}
+                    <div class="entry-content">
+                        <ul class="achievements-list">
+                            {% if project.url and project.url.strip() %}
+                                <li><strong>Link:</strong> <a href="{{ project.url }}">{{ project.url }}</a></li>
+                            {% endif %}
+                            {% if project.technologies %}
+                                <li><strong>Technical Stack:</strong> {{ project.technologies }}</li>
+                            {% endif %}
+                            {% if project.description %}
+                                <li><strong>Overview &amp; Results:</strong> {{ project.description }}</li>
+                            {% endif %}
+                        </ul>
                     </div>
+
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        {% if educations %}
+
+
+        {% if education %}
         <div class="section education-section">
             <div class="section-title">Education</div>
             <div class="entries-container">
-                {% for edu in educations %}
+                {% for edu in education %}
                 <div class="entry education-entry">
                     <div class="entry-header single-line">
-                        <span class="entry-title">{{edu.institution}} | {{edu.degree}} in {{edu.field_of_study}} | {{edu.start_date}} - {{edu.end_date}}</span>
+                        <span class="entry-title">
+                            {{ edu.institution }} | {{ edu.degree }} in {{ edu.field_of_study }} |
+                            {% if edu.start_date %}
+                                {{ edu.start_date }}{% if edu.end_date %} – {{ edu.end_date }}{% endif %}
+                            {% else %}
+                                {{ edu.end_date }}
+                            {% endif %}
+                        </span>                        
                     </div>
                     <div class="entry-content">
                         {% if edu.gpa %}GPA: {{edu.gpa}}{% endif %}
@@ -670,13 +713,15 @@
                 {% for category, skills_list in skills.items() %}
                 <div class="entry skill-entry">
                     <div class="skill-line">
-                        <strong>{{category}}:</strong> {{skills_list|join(', ') | wordwrap(80, wrapstring=', ', break_long_words=false) }}
+                        <strong>{{ category }}:</strong>
+                        {{ skills_list | join(', ') }}
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
+        
 
         {% if certifications %}
         <div class="section certifications-section">

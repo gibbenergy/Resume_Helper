@@ -72,67 +72,95 @@ class ResumeGenerator:
         logger.info(f"Temp folder cleanup complete: {files_removed} files removed, {files_kept} files kept")
         return files_removed, files_kept
 
-
-
-    def format_profile_data(self, profile):
-        """Format profile data for the template."""
-        # Ensure backward compatibility by converting field names
-        # For templates that still use 'educations' and 'experiences'
+    def format_profile_data(self, profile: Dict[str, Any]) -> Dict[str, Any]:
+        """Return a clean dict that uses only the canonical field names."""
         
-        # Handle education field
-        if 'education' in profile:
-            profile['educations'] = profile['education']  # For backward compatibility
-        elif 'educations' in profile and 'education' not in profile:
+        # Education
+        if 'education' not in profile and 'educations' in profile:
             profile['education'] = profile['educations']
-            
-        # Handle experience field
-        if 'experience' in profile:
-            profile['experiences'] = profile['experience']  # For backward compatibility
-        elif 'work_experience' in profile:
-            profile['experience'] = profile['work_experience']
-            profile['experiences'] = profile['work_experience']  # For backward compatibility
-        elif 'experiences' in profile and 'experience' not in profile:
-            profile['experience'] = profile['experiences']
-            
-        # Handle summary field
-        if 'summary' in profile and 'professional_summary' not in profile:
-            profile['professional_summary'] = profile['summary']
-            
-        # Group skills by category
-        skills_by_category = {}
-        if isinstance(profile.get('skills'), dict):
-            # Skills are already grouped by category
-            skills_by_category = profile['skills']
-        elif isinstance(profile.get('skills'), list):
-            # Convert list of skills to category groups
-            for skill in profile['skills']:
-                cat = skill.get('category', '')
-                if cat not in skills_by_category:
-                    skills_by_category[cat] = []
-                skill_text = skill.get('skill_name', '') or skill.get('name', '')
-                if skill.get('proficiency'):
-                    skill_text += f" ({skill['proficiency']})"
-                skills_by_category[cat].append(skill_text)
 
-        # Format data for template
-        data = {
+        # Experience
+        if 'experience' not in profile:
+            if 'work_experience' in profile:
+                profile['experience'] = profile['work_experience']
+            elif 'experiences' in profile:
+                profile['experience'] = profile['experiences']
+
+        # Summary
+        if 'summary' not in profile and 'professional_summary' in profile:
+            profile['summary'] = profile['professional_summary']
+
+        # Group skills by category
+        skills_by_category = {}        
+        raw_skills = profile.get("skills", [])
+
+        # Handle dict-of-categories case directly
+        if isinstance(raw_skills, dict):
+            # also trim each skill in case someone typed a space
+            for cat, skill_list in raw_skills.items():
+                cleaned = [s.strip() for s in skill_list if s and s.strip()]
+                skills_by_category[cat] = cleaned
+
+        # Handle list-of-rows coming from the Gradio table
+        elif isinstance(raw_skills, list):
+            for row in raw_skills:
+                # Row could be a dict or a simple list
+                if isinstance(row, dict):
+                    category   = (row.get("category") or "").strip()
+                    skill_line = (row.get("skill_name") or
+                                row.get("name", "")).strip()
+                else:  # assume list-style row: ["Category", "Skill Name", "Proficiency"]
+                    if len(row) < 2:
+                        continue
+                    category, skill_line = row[0].strip(), row[1].strip()
+
+                if not category or not skill_line:
+                    continue
+
+                # split "Skill1, Skill2 , ,Skill3"
+                tokens = [s.strip() for s in skill_line.split(",") if s.strip()]
+                if not tokens:
+                    continue
+
+                bucket = skills_by_category.setdefault(category, [])
+                existing = {s.lower() for s in bucket}
+
+                for tok in tokens:
+                    # add proficiency inline if present
+                    prof = ""
+                    if isinstance(row, dict):
+                        prof = row.get("proficiency", "").strip()
+                    elif len(row) >= 3:
+                        prof = (row[2] or "").strip()
+
+                    full_tok = f"{tok} ({prof})" if prof else tok
+
+                    if full_tok.lower() not in existing:
+                        bucket.append(full_tok)
+                        existing.add(full_tok.lower())
+
+
+        # Build clean payload 
+        clean = {
             'full_name': profile.get('full_name', ''),
             'email': profile.get('email', ''),
             'phone': profile.get('phone', ''),
             'current_address': profile.get('current_address', ''),
             'location': profile.get('location', ''),
+            'citizenship': profile.get('citizenship', ''),
             'linkedin_url': profile.get('linkedin_url', ''),
             'github_url': profile.get('github_url', ''),
             'portfolio_url': profile.get('portfolio_url', ''),
-            'summary': profile.get('summary', ''),
-            'professional_summary': profile.get('professional_summary', profile.get('summary', '')),
-            'educations': profile.get('educations', profile.get('education', [])),
-            'experiences': profile.get('experiences', profile.get('work_experience', [])),
+            'summary': profile.get('summary', ''),          
+            'education': profile.get('education', []),      
+            'experience': profile.get('experience', []),    
             'projects': profile.get('projects', []),
             'skills': skills_by_category,
             'certifications': profile.get('certifications', [])
         }
-        return data
+
+        return clean
+
 
     def generate_resume(self, profile_data: Dict[str, Any], output_path: str = None) -> str:
         """Generate PDF resume from profile data."""

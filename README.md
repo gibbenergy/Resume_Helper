@@ -26,8 +26,10 @@ See the 👉 [Usage Guide](USAGE_GUIDE.md) for installation and step-by-step usa
 
 | Date | Version | Highlights |
 |------|:------:|-----------|
+| **2025-05-08** | **0.2.1** | • **HTML → PDF styling fixes** – clearer fonts (min 10 pt) & field alignment<br>• **Smart file-naming** – exported PDFs now include *company-name* + date for easy tracking<br>• **GPT-4 o-1** set as the new default OpenAI model (longer context & improved stability)<br>• Minor GUI polish & bug-fixes |
 | **2025-05-05** | **0.2.0** | **One-Click installer** overhauled<br>• now uses **Miniconda** to install Python 3.11+ if absent<br>• auto-installs GTK runtime (tschoonj build) for WeasyPrint |
 | 2025-04-29 | 0.1.0 | Initial public release on GitHub |
+
 
 ## 📌 Prerequisites
 
@@ -58,9 +60,10 @@ The script will automatically:
 ✅ Launch the Resume Helper application at: `http://localhost:53630`
 ✅ Keep the console window open to clearly display any messages or errors.
 
-⚠️ **SmartScreen or Antivirus Warning?**
-Right-click on the batch file → `Properties` → `Unblock`, then run it again.
-(The script is plain text and safe to inspect with Notepad.)
+⚠️ **GTK Runtime Installation Warning**
+During setup, the script automatically downloads and installs the **tschoonj GTK runtime**, which is necessary for converting HTML to PDF files. Windows Defender, SmartScreen, or antivirus software may display a generic security warning because the GTK runtime installer isn't Microsoft-signed. 
+
+✅ **This warning is expected**—simply click `More info → Run anyway` or allow the installation to proceed. The GTK runtime is safe and widely used in open-source projects.
 
 🖱️ **Starting the App Later**
 Whenever you want to start Resume Helper AI again, simply double-click `install_run_windows.bat`.
@@ -94,8 +97,8 @@ If the application is already set up, the script will skip installation steps an
 │   ├── projects_tab.py
 │   └── skills_tab.py
 ├── utils/                     # Utility functions
-│   ├── __init__.py
-│   └── file_utils.py
+    ├── __init__.py
+    └── file_utils.py
 
 ```
 

@@ -40,10 +40,10 @@ class UnifiedAIFeatures(BaseAIProvider):
     """
     
     # OpenAI constants
-    OPENAI_DEFAULT_MODEL = "gpt-4o"
+    OPENAI_DEFAULT_MODEL = "gpt-4.1-2025-04-14"
     OPENAI_AVAILABLE_MODELS = [
         "gpt-4o",
-        "gpt-4o-mini-2024-07-18",
+        "o4-mini-2025-04-16",
         "gpt-4.1-2025-04-14",
         "o3-2025-04-16"
     ]
@@ -52,8 +52,7 @@ class UnifiedAIFeatures(BaseAIProvider):
     GEMINI_DEFAULT_MODEL = "Gemini 2.0 Flash"
     GEMINI_AVAILABLE_MODELS = [
         "Gemini 2.0 Flash", 
-        "Gemini 2.0 Flash Lite",
-        "Gemini 2.0 Pro",
+        "Gemini 2.0 Flash Lite",        
         "Gemini 1.5 Pro",
         "Gemini 1.5 Flash"
     ]
@@ -62,8 +61,7 @@ class UnifiedAIFeatures(BaseAIProvider):
     # Gemini model mapping to API endpoints
     GEMINI_MODEL_MAPPING = {
         "Gemini 2.0 Flash": "gemini-2.0-flash",
-        "Gemini 2.0 Flash Lite": "gemini-2.0-flash-lite",
-        "Gemini 2.0 Pro": "gemini-2.0-pro",
+        "Gemini 2.0 Flash Lite": "gemini-2.0-flash-lite",        
         "Gemini 1.5 Pro": "gemini-1.5-pro",
         "Gemini 1.5 Flash": "gemini-1.5-flash"
     }
@@ -760,6 +758,34 @@ class UnifiedAIFeatures(BaseAIProvider):
     # Core AI Features    #
     #######################
     
+    def _extract_company_and_position(self,job_analysis: dict, job_description: str):
+        """
+        Return (company_name, job_position) using the same heuristics
+        you had in generate_cover_letter().
+        """
+        company_name = job_analysis.get("company_name", "Unknown Company") \
+            if isinstance(job_analysis, dict) else "Unknown Company"
+        job_position = job_analysis.get("job_position", "Unknown Position") \
+            if isinstance(job_analysis, dict) else "Unknown Position"
+
+        # Fallback to regex on the job description
+        if (company_name in {"Unknown Company", "the company", ""}) and job_description:
+            m = re.findall(r'at\s+([A-Z][A-Za-z0-9\s&]+)[\.,]', job_description)
+            m += re.findall(r'([A-Z][A-Za-z0-9\s&]+)\s+is\s+(?:looking|hiring|seeking)',
+                            job_description)
+            if m:
+                company_name = m[0].strip()
+
+        if (job_position in {"Unknown Position", "the position", ""}) and job_description:
+            m = re.findall(
+                r'((?:Senior|Junior|Lead|Principal|Staff)?\s*[A-Z][A-Za-z]+'
+                r'(?:\s+[A-Z][A-Za-z]+)*\s+(?:Engineer|Developer|Programmer|'
+                r'Analyst|Manager|Director|Specialist))', job_description)
+            if m:
+                job_position = m[0].strip()
+
+        return company_name, job_position
+
     def analyze_job_description(self, job_description: str, model: Optional[str] = None) -> Dict[str, Any]:
         """
         Analyze a job description to extract key information.
@@ -944,27 +970,28 @@ class UnifiedAIFeatures(BaseAIProvider):
                 phone = personal_info[2]
         
         # Extract company name and job position from job analysis
-        company_name = "Unknown Company"
-        job_position = "Unknown Position"
+        company_name, job_position = self._extract_company_and_position(job_analysis, job_description)
+        # company_name = "Unknown Company"
+        # job_position = "Unknown Position"
         
-        # Try to extract company and position from job analysis if available
-        if isinstance(job_analysis, dict):
-            company_name = job_analysis.get("company_name", "Unknown Company")
-            job_position = job_analysis.get("job_position", "Unknown Position")
+        # # Try to extract company and position from job analysis if available
+        # if isinstance(job_analysis, dict):
+        #     company_name = job_analysis.get("company_name", "Unknown Company")
+        #     job_position = job_analysis.get("job_position", "Unknown Position")
             
-            # If the values are still default or empty, try to extract from the job description
-            if company_name in ["Unknown Company", "the company", ""] and job_description:
-                # Look for company name in the job description
-                company_matches = re.findall(r'at\s+([A-Z][A-Za-z0-9\s&]+)[\.,]', job_description)
-                company_matches += re.findall(r'([A-Z][A-Za-z0-9\s&]+)\s+is\s+(?:looking|hiring|seeking)', job_description)
-                if company_matches:
-                    company_name = company_matches[0].strip()
+        #     # If the values are still default or empty, try to extract from the job description
+        #     if company_name in ["Unknown Company", "the company", ""] and job_description:
+        #         # Look for company name in the job description
+        #         company_matches = re.findall(r'at\s+([A-Z][A-Za-z0-9\s&]+)[\.,]', job_description)
+        #         company_matches += re.findall(r'([A-Z][A-Za-z0-9\s&]+)\s+is\s+(?:looking|hiring|seeking)', job_description)
+        #         if company_matches:
+        #             company_name = company_matches[0].strip()
             
-            if job_position in ["Unknown Position", "the position", ""] and job_description:
-                # Look for job position in the job description
-                position_matches = re.findall(r'((?:Senior|Junior|Lead|Principal|Staff)?\s*[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*\s+(?:Engineer|Developer|Programmer|Analyst|Manager|Director|Specialist))', job_description)
-                if position_matches:
-                    job_position = position_matches[0].strip()
+        #     if job_position in ["Unknown Position", "the position", ""] and job_description:
+        #         # Look for job position in the job description
+        #         position_matches = re.findall(r'((?:Senior|Junior|Lead|Principal|Staff)?\s*[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*\s+(?:Engineer|Developer|Programmer|Analyst|Manager|Director|Specialist))', job_description)
+        #         if position_matches:
+        #             job_position = position_matches[0].strip()
         
         # Create a prompt for generating a cover letter
         system_content = ("You are a professional cover-letter writer. The letter must be 100 % truthful—never introduce achievements or skills not present in the résumé.")
@@ -1333,6 +1360,18 @@ class UnifiedAIFeatures(BaseAIProvider):
         # 4. Success
         if "request_id" not in proof_pass:
             proof_pass["request_id"] = request_id
+
+        # ---------- Ensure company_name and job_position -----------------
+        company_name, job_position = self._extract_company_and_position(
+            job_analysis,         # dict returned in step 1
+            job_description       # original JD text
+        )
+
+        if company_name:     
+            proof_pass["company_name"] = company_name
+        if job_position:
+            proof_pass["job_position"] = job_position
+        # ----------------------------------------------------------------------
 
         logger.info(f"[Request {request_id}] Résumé tailored and proof-read successfully")
         return proof_pass
