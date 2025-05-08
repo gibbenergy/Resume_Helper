@@ -54,18 +54,26 @@ install_run_windows.bat
 The script will automatically:
 
 ✅ Check and install Python 3.11+ if it's missing.
+
 ✅ Create and activate a local virtual environment (`venv`).
+
 ✅ Install all required dependencies (`pip install -r requirements.txt`).
+
 ✅ Free port `53630` automatically if currently in use.
+
 ✅ Launch the Resume Helper application at: `http://localhost:53630`
+
 ✅ Keep the console window open to clearly display any messages or errors.
 
 ⚠️ **GTK Runtime Installation Warning**
+
 During setup, the script automatically downloads and installs the **tschoonj GTK runtime**, which is necessary for converting HTML to PDF files. Windows Defender, SmartScreen, or antivirus software may display a generic security warning because the GTK runtime installer isn't Microsoft-signed. 
+
 
 ✅ **This warning is expected**—simply click `More info → Run anyway` or allow the installation to proceed. The GTK runtime is safe and widely used in open-source projects.
 
 🖱️ **Starting the App Later**
+
 Whenever you want to start Resume Helper AI again, simply double-click `install_run_windows.bat`.
 If the application is already set up, the script will skip installation steps and immediately launch the app.
 (Tip: Create a desktop shortcut to the batch file for even quicker access.)
