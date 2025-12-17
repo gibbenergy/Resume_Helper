@@ -885,7 +885,21 @@ def create_app():
     }
     """
     
-    with gr.Blocks(title="Resume Helper", css=custom_css) as app:
+    # JavaScript to force dark mode on load
+    js_force_dark = """
+    function() {
+        if (document.querySelectorAll('.dark').length) {
+            return;
+        }
+        const url = new URL(window.location);
+        if (url.searchParams.get('__theme') !== 'dark') {
+            url.searchParams.set('__theme', 'dark');
+            window.location.href = url.href;
+        }
+    }
+    """
+    
+    with gr.Blocks(title="Resume Helper", css=custom_css, js=js_force_dark) as app:
         gr.Markdown(
             "<h1 style='text-align: center; font-size: 48px; font-weight: bold; margin: 30px 0;'>Resume Helper</h1>"
         )
