@@ -1,0 +1,117 @@
+{
+  "name_prefix": "",
+  "email": "dev.example@email.com",
+  "full_name": "Alex Johnson",
+  "phone": "(555) 123-4567",
+  "current_address": "123 Tech Street",
+  "location": "San Francisco, CA",
+  "citizenship": "US Citizen",
+  "linkedin_url": "linkedin.com/in/alexjohnson",
+  "github_url": "github.com/alexj-dev",
+  "portfolio_url": "alexjohnson.dev",
+  "summary": "Full Stack Developer with 5 years of experience building scalable web applications. Expertise in Python, JavaScript, and cloud technologies.",
+  "education": [
+    {
+      "institution": "University of California, Berkeley",
+      "degree": "Bachelor of Science",
+      "field_of_study": "Computer Science",
+      "start_date": "2015",
+      "end_date": "2019",
+      "gpa": "3.8",
+      "description": "Focus on Software Engineering and Distributed Systems"
+    }
+  ],
+  "experience": [
+    {
+      "company": "TechCorp Inc.",
+      "position": "Senior Software Engineer",
+      "location": "San Francisco, CA",
+      "start_date": "2021",
+      "end_date": "Present",
+      "description": "Lead developer for cloud-based enterprise applications",
+      "achievements": [
+        "Reduced server costs by 40% through microservices optimization",
+        "Led team of 5 developers in major platform redesign",
+        "Implemented CI/CD pipeline reducing deployment time by 60%"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "category": "Programming",
+      "name": "Python",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Programming",
+      "name": "JavaScript",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Framework",
+      "name": "React",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Framework",
+      "name": "Django",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Cloud",
+      "name": "AWS",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Tools",
+      "name": "Docker",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Tools",
+      "name": "Git",
+      "proficiency": "Expert"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Cloud Migration Platform",
+      "description": "Developed a platform to automate cloud migration processes for enterprise clients",
+      "technologies": "Python, AWS, Docker, Kubernetes",
+      "url": "github.com/alexj-dev/cloud-migration",
+      "start_date": "2022",
+      "end_date": "2023"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Certified Solutions Architect",
+      "issuer": "Amazon Web Services",
+      "date_obtained": "2023",
+      "credential_id": "AWS-123456",
+      "url": "https://aws.amazon.com/verification"
+    }
+  ],
+  "others": {
+    "Awards": [
+      {
+        "title": "Employee of the Year",
+        "organization": "TechCorp Inc.",
+        "date": "2023",
+        "location": "San Francisco, CA",
+        "description": "Recognized for outstanding contribution to cloud platform development",
+        "url": ""
+      }
+    ],
+    "Publications": [
+      {
+        "title": "Microservices Architecture Best Practices",
+        "organization": "Tech Journal",
+        "date": "2022",
+        "location": "Online",
+        "description": "Research paper on optimizing microservices for cloud deployment",
+        "url": "https://techjournal.com/microservices-best-practices"
+      }
+    ]
+  }
+}

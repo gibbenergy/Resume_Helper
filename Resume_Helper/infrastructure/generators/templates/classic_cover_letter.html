@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cover Letter - {{full_name}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 1in;
+            @bottom-center {
+                content: "{{full_name}} - Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                color: #666;
+                font-family: Arial, sans-serif;
+                padding-top: 0.2in;
+            }
+        }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .cover-letter-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .header {
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+        
+        .date {
+            margin-bottom: 1.5rem;
+        }
+        
+        .recipient {
+            margin-bottom: 1.5rem;
+        }
+        
+        .greeting {
+            margin-bottom: 0.5rem;
+        }
+        
+        .content {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+            white-space: pre-wrap;
+            text-indent: 0;
+            padding: 0;
+            orphans: 3;
+            widows: 3;
+        }
+        
+        .content p:first-child {
+            margin-top: 0;
+        }
+        
+        .content p {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        
+        .closing {
+            margin-bottom: 0.25rem;
+        }
+        
+        .signature-section-group {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            margin-top: 1.5rem;
+        }
+        
+        .resume-attached {
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+        
+        .signature {
+            margin-bottom: 0.5rem;
+        }
+        
+        .signature-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 32pt;
+            padding-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #000066;
+            font-weight: 600;
+            line-height: 1;
+            letter-spacing: 0.5px;
+        }
+        
+        .full-name {
+            margin-bottom: 1rem;
+        }
+        
+        .sender-info {
+            margin-top: 2rem;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="cover-letter-container">
+        <div class="header">
+            <div>{{full_name}}</div>
+            {% if current_address and current_address.strip() %}
+            <div>{{current_address}}</div>
+            {% endif %}
+            {% if location and location.strip() %}
+            <div>{{location}}</div>
+            {% endif %}            
+            
+            {% if phone and phone.strip() %}
+            <div>Phone: {{phone}}</div>
+            {% endif %}
+            {% if email and email.strip() %}
+            <div>Email: {{email}}</div>
+            {% endif %}
+            {% if linkedin_url and linkedin_url.strip() %}
+            <div>LinkedIn: {{linkedin_url}}</div>
+            {% endif %}
+        </div>
+        
+        <div class="date">
+            {{date}}
+        </div>
+        
+        {% if letter_title and letter_title.strip() %}
+        <div class="letter-title" style="margin-bottom: 1rem; font-weight: bold; font-size: 14pt; text-align: center;">
+            {{letter_title}}
+        </div>
+        {% elif job_position and job_position.strip() and company_name and company_name.strip() and company_name != "the company" %}
+        <div class="letter-title" style="margin-bottom: 1rem; font-weight: bold; font-size: 14pt; text-align: center;">
+            Application for {{job_position}} position at {{company_name}}
+        </div>
+        {% elif job_position and job_position.strip() and job_position != "the position" %}
+        <div class="letter-title" style="margin-bottom: 1rem; font-weight: bold; font-size: 14pt; text-align: center;">
+            Application for {{job_position}} position
+        </div>
+        {% elif company_name and company_name.strip() and company_name != "the company" %}
+        <div class="letter-title" style="margin-bottom: 1rem; font-weight: bold; font-size: 14pt; text-align: center;">
+            Job Application - {{company_name}}
+        </div>
+        {% else %}
+        <div class="letter-title" style="margin-bottom: 1rem; font-weight: bold; font-size: 14pt; text-align: center;">
+            Job Application
+        </div>
+        {% endif %}
+        
+        <div class="greeting">
+            {% if recipient_greeting and recipient_greeting.strip() %}
+            {{recipient_greeting}}
+            {% elif company_name and company_name.strip() and company_name != "the company" %}
+            Dear Hiring Manager at {{company_name}},
+            {% else %}
+            Dear Hiring Manager,
+            {% endif %}
+        </div>
+        
+        <div class="content">{{cover_letter_content | trim}}</div>
+        
+        <div class="signature-section-group">
+            <div class="closing">
+                Sincerely,
+            </div>
+            
+            <div class="signature">
+                <div class="signature-name">
+                    {% if signature_name and signature_name.strip() %}
+                        {{ signature_name.split(' ')[0] }}
+                    {% else %}
+                        Candidate
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="full-name">
+                {{signature_name}}
+            </div>
+            
+            <div class="resume-attached">
+                Resume attached.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

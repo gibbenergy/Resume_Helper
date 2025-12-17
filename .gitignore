@@ -23,9 +23,20 @@ wheels/
 # User data - contains personal information and should never be committed
 Resume_Helper/data/
 Resume_Helper/temp/
+
+# Database files - prevent upload at any level
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+**/*.db-journal
+**/*.db-wal
+**/*.db-shm
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
 
 # Environment variables - may contain API keys and secrets
 .env
@@ -35,12 +46,18 @@ Resume_Helper/temp/
 # IDE and editor files
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 *~
 .project
 .pydevproject
 .settings/
+
+# All dot-prefixed folders (except .git which is handled by Git itself)
+# This catches .cursor, .vscode, .idea, and any other IDE-specific folders
+.*/
+!/.gitignore
 
 # OS files
 .DS_Store
