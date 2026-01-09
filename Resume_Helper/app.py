@@ -63,6 +63,7 @@ class ResumeHelper:
         saved_provider = "openai"
         saved_model = None
         saved_api_key = None
+        saved_base_url = None
         
         if os.path.exists(env_file_path):
             try:
