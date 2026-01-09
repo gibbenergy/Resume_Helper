@@ -1142,13 +1142,27 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 
                 save_env_var("RESUME_HELPER_LAST_PROVIDER", provider_ui_value)
                 
-                # Show base URL input for llama.cpp and LM Studio
+                # Show base URL input for llama.cpp and LM Studio with defaults
                 show_base_url = provider_ui_value in ["llama.cpp", "LM Studio"]
+                
+                # Auto-fill default base URLs
+                default_base_urls = {
+                    "llama.cpp": "http://localhost:8080/v1",
+                    "LM Studio": "http://localhost:1234/v1"
+                }
+                
+                # Load saved base URL or use default
+                saved_base_url = load_env_var("CUSTOM_BASE_URL", "")
+                if show_base_url and not saved_base_url:
+                    saved_base_url = default_base_urls.get(provider_ui_value, "")
+                    # Auto-save the default
+                    if saved_base_url:
+                        save_env_var("CUSTOM_BASE_URL", saved_base_url)
                 
                 return (
                     models_result[0],
                     gr.update(value=saved_key),
-                    gr.update(visible=show_base_url)
+                    gr.update(visible=show_base_url, value=saved_base_url if show_base_url else "")
                 )
             except Exception as e:
                 return gr.update(), gr.update(), gr.update()
