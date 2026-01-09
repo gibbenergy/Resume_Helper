@@ -99,6 +99,20 @@ PROVIDER_MODELS = {
             "grok-2",
             "grok-2-mini"
         ]
+    },
+    "llamacpp": {
+        "default": "openai/local-model",
+        "models": [
+            "openai/local-model"
+        ],
+        "base_url": "http://localhost:8080/v1"
+    },
+    "lmstudio": {
+        "default": "openai/local-model",
+        "models": [
+            "openai/local-model"
+        ],
+        "base_url": "http://localhost:1234/v1"
     }
 }
 
@@ -110,15 +124,22 @@ class LiteLLMProvider:
     through a single unified interface powered by LiteLLM.
     """
     
-    def __init__(self, provider: str = "openai", model: Optional[str] = None, api_key: Optional[str] = None):
+    def __init__(self, provider: str = "openai", model: Optional[str] = None, api_key: Optional[str] = None, base_url: Optional[str] = None):
         """Initialize the LiteLLM Provider."""
         self.provider = provider.lower()
         self.current_model = model or self._get_default_model(self.provider)
+        self.custom_base_url = base_url
         
         if api_key:
             self._set_provider_api_key(api_key)
         else:
             self._load_api_key_from_env()
+        
+        # Set custom base URL if provided or use default for provider
+        if base_url:
+            self._set_base_url(base_url)
+        else:
+            self._set_default_base_url()
         
         litellm.drop_params = True
         
@@ -137,6 +158,11 @@ class LiteLLMProvider:
             os.environ["OLLAMA_API_KEY"] = "ollama-local-dummy-key"
             os.environ["OLLAMA_API_BASE"] = "http://localhost:11434"
             logger.info(f"Set dummy API key for Ollama (local provider) at http://localhost:11434")
+            return
+        
+        if self.provider in ["llamacpp", "lmstudio"]:
+            os.environ["OPENAI_API_KEY"] = "sk-no-key-required"
+            logger.info(f"Set dummy API key for {self.provider} (local provider)")
             return
         
         env_key_map = {
@@ -162,6 +188,10 @@ class LiteLLMProvider:
             os.environ["OLLAMA_API_BASE"] = "http://localhost:11434"
             return
         
+        if self.provider in ["llamacpp", "lmstudio"]:
+            os.environ["OPENAI_API_KEY"] = api_key if api_key else "sk-no-key-required"
+            return
+        
         env_key_map = {
             "openai": "OPENAI_API_KEY",
             "anthropic": "ANTHROPIC_API_KEY",
@@ -175,14 +205,36 @@ class LiteLLMProvider:
         if env_key:
             os.environ[env_key] = api_key
 
+    def _set_base_url(self, base_url: str):
+        """Set custom base URL for OpenAI-compatible providers."""
+        self.custom_base_url = base_url
+        if self.provider in ["llamacpp", "lmstudio"]:
+            litellm.api_base = base_url
+            logger.info(f"Set custom base URL for {self.provider}: {base_url}")
     
-    def switch_provider(self, provider: str, model: Optional[str] = None) -> str:
+    def _set_default_base_url(self):
+        """Set default base URL based on provider."""
+        provider_config = PROVIDER_MODELS.get(self.provider)
+        if provider_config and "base_url" in provider_config:
+            default_url = provider_config["base_url"]
+            self.custom_base_url = default_url
+            if self.provider in ["llamacpp", "lmstudio"]:
+                litellm.api_base = default_url
+                logger.info(f"Set default base URL for {self.provider}: {default_url}")
+    
+    def get_base_url(self) -> Optional[str]:
+        """Get the current base URL."""
+        return self.custom_base_url
+
+    
+    def switch_provider(self, provider: str, model: Optional[str] = None, base_url: Optional[str] = None) -> str:
         """
         Switch to a different AI provider.
         
         Args:
             provider: Name of the provider to switch to
             model: Optional specific model to use, defaults to provider's default
+            base_url: Optional custom base URL for OpenAI-compatible providers
             
         Returns:
             Status message
@@ -198,6 +250,13 @@ class LiteLLMProvider:
             self.current_model = model
         else:
             self.current_model = self._get_default_model(self.provider)
+        
+        # Handle custom base URL
+        if base_url:
+            self.custom_base_url = base_url
+            self._set_base_url(base_url)
+        else:
+            self._set_default_base_url()
         
         self._load_api_key_from_env()
         
@@ -234,9 +293,14 @@ class LiteLLMProvider:
         try:
             model_to_use = model or self.current_model
             
+            # Add custom base URL for llamacpp and lmstudio
+            if self.provider in ["llamacpp", "lmstudio"] and self.custom_base_url:
+                kwargs["api_base"] = self.custom_base_url
+                logger.info(f"Using custom base URL: {self.custom_base_url}")
             
-            if self.provider == "ollama" and "response_format" in kwargs:
-                logger.info("Ollama detected - removing response_format parameter and adding JSON instruction to prompt")
+            # Remove response_format for providers that don't support it
+            if self.provider in ["ollama", "llamacpp", "lmstudio"] and "response_format" in kwargs:
+                logger.info(f"{self.provider} detected - removing response_format parameter and adding JSON instruction to prompt")
                 kwargs.pop("response_format")
                 if messages and len(messages) > 0:
                     last_msg = messages[-1]["content"]

@@ -81,13 +81,18 @@ class ResumeHelper:
                         "Ollama (Local)": "ollama",
                         "Groq (High-Speed)": "groq",
                         "Perplexity (Search)": "perplexity",
-                        "xAI (Grok)": "xai"
+                        "xAI (Grok)": "xai",
+                        "llama.cpp": "llamacpp",
+                        "LM Studio": "lmstudio"
                     }
                     saved_provider = provider_mapping.get(ui_provider, "openai")
                     saved_model = env_vars.get("RESUME_HELPER_LAST_MODEL")
+                    saved_base_url = env_vars.get("CUSTOM_BASE_URL")
                     
                     if saved_provider == "ollama":
                         saved_api_key = "ollama-local-dummy-key"
+                    elif saved_provider in ["llamacpp", "lmstudio"]:
+                        saved_api_key = "sk-no-key-required"
                     else:
                         env_key = f"{saved_provider.upper()}_API_KEY"
                         saved_api_key = env_vars.get(env_key)
@@ -97,7 +102,8 @@ class ResumeHelper:
             self.litellm_provider = LiteLLMProvider(
                 provider=saved_provider,
                 model=saved_model,
-                api_key=saved_api_key
+                api_key=saved_api_key,
+                base_url=saved_base_url
             )
             self.ai_workflows = ResumeAIWorkflows(self.litellm_provider)
             logger.info(f"✅ LiteLLM Provider initialized with {saved_provider}")
@@ -142,13 +148,14 @@ class ResumeHelper:
         """Get the LiteLLM provider instance."""
         return self.litellm_provider
     
-    def switch_to_litellm_provider(self, provider: str, model: Optional[str] = None, api_key: Optional[str] = None) -> str:
+    def switch_to_litellm_provider(self, provider: str, model: Optional[str] = None, api_key: Optional[str] = None, base_url: Optional[str] = None) -> str:
         """Switch to using LiteLLM provider with specified settings."""
         try:
             self.litellm_provider = LiteLLMProvider(
                 provider=provider,
                 model=model,
-                api_key=api_key
+                api_key=api_key,
+                base_url=base_url
             )
             return f"✅ Switched to LiteLLM {provider} provider successfully"
         except Exception as e:
