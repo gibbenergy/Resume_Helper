@@ -10,42 +10,42 @@ LOCAL_PROVIDER_CONFIG = {
         "default_model": "ollama/gpt-oss:latest",
         "requires_api_key": False,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,      # Increased for comprehensive JSON analysis
+            "cover_letter": 4096,       # Increased for detailed cover letters
+            "resume_tailoring": 6144,   # Increased for complete resume sections
+            "suggestions": 4096,        # Increased for detailed suggestions
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 300  # 5 minutes for local inference
+        "temperature": 0.8,  # Higher temperature for more creative outputs
+        "timeout": 600  # 10 minutes for local inference with larger models
     },
     "llamacpp": {
         "base_url": "http://localhost:8080/v1",
         "default_model": "openai/local-model",
         "requires_api_key": False,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 300
+        "temperature": 0.8,
+        "timeout": 600
     },
     "lmstudio": {
         "base_url": "http://localhost:1234/v1",
         "default_model": "openai/local-model",
         "requires_api_key": False,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 300
+        "temperature": 0.8,
+        "timeout": 600
     }
 }
 
@@ -54,74 +54,74 @@ CLOUD_PROVIDER_CONFIG = {
     "openai": {
         "requires_api_key": True,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,      # High limit for reasoning models
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 60
+        "temperature": 0.8,
+        "timeout": 120
     },
     "anthropic": {
         "requires_api_key": True,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 60
+        "temperature": 0.8,
+        "timeout": 120
     },
     "google": {
         "requires_api_key": True,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 60
+        "temperature": 0.8,
+        "timeout": 120
     },
     "groq": {
         "requires_api_key": True,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 60
+        "temperature": 0.8,
+        "timeout": 120
     },
     "perplexity": {
         "requires_api_key": True,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 60
+        "temperature": 0.8,
+        "timeout": 120
     },
     "xai": {
         "requires_api_key": True,
         "max_tokens": {
-            "job_analysis": 4096,
-            "cover_letter": 2048,
-            "resume_tailoring": 3072,
-            "suggestions": 2048,
-            "default": 2048
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
         },
-        "temperature": 0.7,
-        "timeout": 60
+        "temperature": 0.8,
+        "timeout": 120
     }
 }
 
