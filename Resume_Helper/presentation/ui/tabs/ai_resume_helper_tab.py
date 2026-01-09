@@ -138,24 +138,13 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 set_btn = gr.Button("Set", variant="primary", scale=1)
                 update_btn = gr.Button("🔄 Update LiteLLM", variant="secondary", scale=1)
             
-            # Add base URL input for custom endpoints
+            # Base URL is auto-configured in the background for llama.cpp and LM Studio
+            # Hidden input to maintain compatibility with existing code
             saved_base_url = load_env_var("CUSTOM_BASE_URL", "")
-            with gr.Row():
-                base_url_input = gr.Textbox(
-                    label="🌐 Custom Base URL (for llama.cpp/LM Studio)",
-                    placeholder="e.g., http://localhost:8080/v1 or http://localhost:1234/v1",
-                    value=saved_base_url,
-                    scale=5,
-                    visible=(saved_provider in ["llama.cpp", "LM Studio"])
-                )
-            
-            gr.Markdown("""
-            **Setup Notes:**
-            - **Ollama**: Runs at `http://localhost:11434` (auto-configured)
-            - **llama.cpp**: Default is `http://localhost:8080/v1` 
-            - **LM Studio**: Default is `http://localhost:1234/v1`
-            - Leave API key empty for local providers
-            """)
+            base_url_input = gr.Textbox(
+                value=saved_base_url,
+                visible=False  # Completely hidden - auto-configured in background
+            )
 
         with gr.Group():
             gr.Markdown("### 📝 Input")
@@ -1142,10 +1131,10 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 
                 save_env_var("RESUME_HELPER_LAST_PROVIDER", provider_ui_value)
                 
-                # Show base URL input for llama.cpp and LM Studio with defaults
-                show_base_url = provider_ui_value in ["llama.cpp", "LM Studio"]
+                # Auto-configure default base URLs in background (hidden from user)
+                is_local_provider = provider_ui_value in ["llama.cpp", "LM Studio"]
                 
-                # Auto-fill default base URLs
+                # Auto-fill default base URLs silently
                 default_base_urls = {
                     "llama.cpp": "http://localhost:8080/v1",
                     "LM Studio": "http://localhost:1234/v1"
@@ -1153,16 +1142,17 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 
                 # Load saved base URL or use default
                 saved_base_url = load_env_var("CUSTOM_BASE_URL", "")
-                if show_base_url and not saved_base_url:
+                if is_local_provider and not saved_base_url:
                     saved_base_url = default_base_urls.get(provider_ui_value, "")
-                    # Auto-save the default
+                    # Auto-save the default silently
                     if saved_base_url:
                         save_env_var("CUSTOM_BASE_URL", saved_base_url)
                 
+                # Update hidden base_url_input with the value
                 return (
                     models_result[0],
                     gr.update(value=saved_key),
-                    gr.update(visible=show_base_url, value=saved_base_url if show_base_url else "")
+                    gr.update(value=saved_base_url if is_local_provider else "", visible=False)
                 )
             except Exception as e:
                 return gr.update(), gr.update(), gr.update()
