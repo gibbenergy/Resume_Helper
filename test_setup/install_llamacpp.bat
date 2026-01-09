@@ -69,33 +69,10 @@ echo.
 set FOUND_URL=
 set CUDA_BUILD=
 
-:: Search for CUDA 12.4 build first (most compatible)
-for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.4" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
-    set LINE=%%a
-    for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
-        set URL=%%b
-        set URL=!URL:"=!
-        set URL=!URL: =!
-        set FOUND_URL=!URL!
-        set CUDA_BUILD=12.4
-        goto :found_url
-    )
-)
+:: RTX 5090 requires CUDA 12.8+ minimum
+:: Search in priority order: 12.8 -> 13.1 -> 12.6 -> 12.4 (last resort)
 
-:: If not found, try CUDA 12.6
-for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.6" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
-    set LINE=%%a
-    for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
-        set URL=%%b
-        set URL=!URL:"=!
-        set URL=!URL: =!
-        set FOUND_URL=!URL!
-        set CUDA_BUILD=12.6
-        goto :found_url
-    )
-)
-
-:: If not found, try CUDA 12.8
+:: Try CUDA 12.8 first (best for RTX 5090)
 for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.8" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
     set LINE=%%a
     for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
@@ -108,7 +85,7 @@ for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^
     )
 )
 
-:: Try CUDA 13.1 as fallback
+:: Try CUDA 13.1 (even better, forward compatible)
 for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-13" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
     set LINE=%%a
     for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
@@ -117,6 +94,32 @@ for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^
         set URL=!URL: =!
         set FOUND_URL=!URL!
         set CUDA_BUILD=13.1
+        goto :found_url
+    )
+)
+
+:: Try CUDA 12.6 (might work but not recommended)
+for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.6" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
+    set LINE=%%a
+    for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
+        set URL=%%b
+        set URL=!URL:"=!
+        set URL=!URL: =!
+        set FOUND_URL=!URL!
+        set CUDA_BUILD=12.6
+        goto :found_url
+    )
+)
+
+:: CUDA 12.4 (last resort - may not work properly with RTX 5090)
+for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.4" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
+    set LINE=%%a
+    for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
+        set URL=%%b
+        set URL=!URL:"=!
+        set URL=!URL: =!
+        set FOUND_URL=!URL!
+        set CUDA_BUILD=12.4
         goto :found_url
     )
 )
@@ -194,11 +197,11 @@ echo Please download llama.cpp manually:
 echo.
 echo 1. Go to: https://github.com/ggerganov/llama.cpp/releases/latest
 echo.
-echo 2. Download ONE of these (in order of preference):
-echo    BEST:   llama-*-bin-win-cuda-12.8-x64.zip (if available)
-echo    GOOD:   llama-*-bin-win-cuda-12.6-x64.zip
-echo    OK:     llama-*-bin-win-cuda-12.4-x64.zip
-echo    NEWER:  llama-*-bin-win-cuda-13.1-x64.zip (CUDA 13+ also works)
+echo 2. Download ONE of these (in order of preference for RTX 5090):
+echo    BEST:   llama-*-bin-win-cuda-12.8-x64.zip (REQUIRED for RTX 5090)
+echo    BETTER: llama-*-bin-win-cuda-13.1-x64.zip (Even better, newer CUDA)
+echo    OK:     llama-*-bin-win-cuda-12.6-x64.zip (May work)
+echo    AVOID:  llama-*-bin-win-cuda-12.4-x64.zip (Too old for RTX 5090)
 echo.
 echo 3. Extract to: %cd%\llama.cpp\
 echo.
