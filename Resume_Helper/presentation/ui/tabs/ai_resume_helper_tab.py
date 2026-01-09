@@ -129,7 +129,7 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 
                 api_key_input = gr.Textbox(
                     label="API Key",
-                    placeholder="Enter API key (auto-saved, not needed for Ollama/llama.cpp/LM Studio)",
+                    placeholder="(blank for local providers)",
                     value=saved_api_key,
                     type="password",
                     scale=3,

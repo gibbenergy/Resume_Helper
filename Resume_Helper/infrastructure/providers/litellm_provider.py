@@ -400,15 +400,21 @@ class LiteLLMProvider:
     def test_api_key(self, api_key: str, model: str) -> str:
         """Test if an API key is valid."""
         try:
-            # For Ollama, skip API key test and just test connection
-            if self.provider == "ollama":
-                logger.info("Testing Ollama connection...")
+            # For local providers (Ollama, llama.cpp, LM Studio), skip API key test and just test connection
+            if self.provider in ["ollama", "llamacpp", "lmstudio"]:
+                provider_names = {
+                    "ollama": "Ollama",
+                    "llamacpp": "llama.cpp",
+                    "lmstudio": "LM Studio"
+                }
+                provider_display = provider_names.get(self.provider, self.provider)
+                logger.info(f"Testing {provider_display} connection...")
                 test_messages = [{"role": "user", "content": "test"}]
                 response, error = self._call_litellm_completion(test_messages, model or self.current_model, max_tokens=5)
                 if response:
-                    return "✅ Ollama connection successful"
+                    return f"✅ {provider_display} connection successful"
                 else:
-                    return f"❌ Ollama connection failed: {error}"
+                    return f"❌ {provider_display} connection failed: {error}"
             
             old_key = os.environ.get(f"{self.provider.upper()}_API_KEY")
             self._set_provider_api_key(api_key)
