@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 echo ========================================
 echo llama.cpp Automated Setup for RTX 5090
 echo ========================================
@@ -21,7 +22,7 @@ echo.
 nvcc --version >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "tokens=5" %%v in ('nvcc --version ^| findstr "release"') do set CUDA_VERSION=%%v
-    echo Found CUDA version: %CUDA_VERSION%
+    echo Found CUDA version: !CUDA_VERSION!
 ) else (
     echo CUDA not found in PATH, assuming CUDA 12.8+ (RTX 5090)
     set CUDA_VERSION=12.8
@@ -29,7 +30,7 @@ if %errorlevel% equ 0 (
 
 echo.
 echo Detected System: NVIDIA RTX 5090
-echo CUDA Version: %CUDA_VERSION% (compatible with cu12.x builds)
+echo CUDA Version: !CUDA_VERSION! (compatible with cu12.x builds)
 echo.
 
 :: Check if curl is available
@@ -55,130 +56,89 @@ echo.
 echo Fetching latest release info from GitHub...
 curl -L -s https://api.github.com/repos/ggerganov/llama.cpp/releases/latest > release_info.json
 
-:: Debug: Check if file was created and has content
+:: Verify file was created
 if not exist release_info.json (
-    echo [DEBUG] ERROR: release_info.json not created
-    >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:32","message":"release_info.json not created","data":{"error":"file_not_found"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H4"}
-) else (
-    for %%A in (release_info.json) do set FILE_SIZE=%%~zA
-    echo [DEBUG] release_info.json size: !FILE_SIZE! bytes
-    >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:35","message":"release_info.json created","data":{"file_size":"!FILE_SIZE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H4"}
+    echo ERROR: Failed to download release info
+    goto :manual_download
 )
 
-:: Try to find CUDA 12.x build URLs (try multiple versions)
 echo Searching for CUDA 12.x compatible builds...
 echo.
 
 :: Extract download URLs and filter for CUDA builds
 set FOUND_URL=
-set LINE_COUNT=0
+set CUDA_BUILD=
 
-echo [DEBUG] Searching for CUDA builds in JSON...
->> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:50","message":"Starting URL search","data":{},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H1"}
-
-for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json') do (
-    set /a LINE_COUNT+=1
+:: Search for CUDA 12.4 build first (most compatible)
+for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.4" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
     set LINE=%%a
-    echo [DEBUG] Found line !LINE_COUNT!: !LINE!
-    >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:55","message":"Found browser_download_url line","data":{"line_num":"!LINE_COUNT!","content":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H1"}
-    
-    :: Check if line contains win-cuda
-    echo !LINE! | findstr "win-cuda" >nul
-    if !errorlevel! equ 0 (
-        echo [DEBUG] Line contains win-cuda
-        >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:61","message":"Found win-cuda in line","data":{"line":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H2"}
-        
-        :: Check if line contains x64.zip
-        echo !LINE! | findstr "x64.zip" >nul
-        if !errorlevel! equ 0 (
-            echo [DEBUG] Line matches all criteria
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:67","message":"Line matches all criteria","data":{"line":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H2"}
-        )
+    for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
+        set URL=%%b
+        set URL=!URL:"=!
+        set URL=!URL: =!
+        set FOUND_URL=!URL!
+        set CUDA_BUILD=12.4
+        goto :found_url
     )
 )
 
-echo [DEBUG] Total lines found: !LINE_COUNT!
->> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:74","message":"Search complete","data":{"total_lines":"!LINE_COUNT!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H1"}
-
-for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda" ^| findstr /c:"x64.zip"') do (
+:: If not found, try CUDA 12.6
+for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.6" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
     set LINE=%%a
-    echo [DEBUG] Processing matched line: !LINE!
-    >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:80","message":"Processing matched line","data":{"line":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
-    
-    setlocal enabledelayedexpansion
-    :: Extract URL from JSON line
     for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
         set URL=%%b
-        echo [DEBUG] Extracted token: !URL!
-        >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:87","message":"Extracted URL token","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H5"}
-        
         set URL=!URL:"=!
         set URL=!URL: =!
-        echo [DEBUG] Cleaned URL: !URL!
-        >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:93","message":"Cleaned URL","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H5"}
-        
-        :: Prioritize cuda-12.x (12.4, 12.6, 12.8) for RTX 5090
-        echo !URL! | findstr "cuda-12.8" >nul
-        if !errorlevel! equ 0 (
-            echo [DEBUG] Found cuda-12.8 build!
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:99","message":"Found cuda-12.8","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
-            endlocal
-            set FOUND_URL=!URL!
-            set CUDA_BUILD=12.8
-            goto :found_url
-        )
-        echo !URL! | findstr "cuda-12.6" >nul
-        if !errorlevel! equ 0 if not defined FOUND_URL (
-            echo [DEBUG] Found cuda-12.6 build!
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:109","message":"Found cuda-12.6","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
-            endlocal
-            set FOUND_URL=!URL!
-            set CUDA_BUILD=12.6
-            goto :found_url
-        )
-        echo !URL! | findstr "cuda-12.4" >nul
-        if !errorlevel! equ 0 if not defined FOUND_URL (
-            echo [DEBUG] Found cuda-12.4 build!
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:119","message":"Found cuda-12.4","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
-            endlocal
-            set FOUND_URL=!URL!
-            set CUDA_BUILD=12.4
-        )
-        echo !URL! | findstr "cuda-13" >nul
-        if !errorlevel! equ 0 if not defined FOUND_URL (
-            echo [DEBUG] Found cuda-13.x build (also compatible)!
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:129","message":"Found cuda-13","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
-            endlocal
-            set FOUND_URL=!URL!
-            set CUDA_BUILD=13.1
-        )
+        set FOUND_URL=!URL!
+        set CUDA_BUILD=12.6
+        goto :found_url
     )
-    endlocal
+)
+
+:: If not found, try CUDA 12.8
+for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-12.8" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
+    set LINE=%%a
+    for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
+        set URL=%%b
+        set URL=!URL:"=!
+        set URL=!URL: =!
+        set FOUND_URL=!URL!
+        set CUDA_BUILD=12.8
+        goto :found_url
+    )
+)
+
+:: Try CUDA 13.1 as fallback
+for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda-13" ^| findstr /c:"x64.zip" ^| findstr /v "cudart"') do (
+    set LINE=%%a
+    for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
+        set URL=%%b
+        set URL=!URL:"=!
+        set URL=!URL: =!
+        set FOUND_URL=!URL!
+        set CUDA_BUILD=13.1
+        goto :found_url
+    )
 )
 
 :found_url
 if not defined FOUND_URL (
-    echo [DEBUG] No CUDA 12.x build found
-    >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:132","message":"No CUDA build found","data":{"found_url":"empty"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H4"}
-    echo No CUDA 12.x build found automatically.
+    echo No CUDA 12.x/13.x build found automatically.
     goto :manual_download
 )
 
-echo [DEBUG] Final URL: !FOUND_URL!
->> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:139","message":"URL found successfully","data":{"url":"!FOUND_URL!","cuda_build":"!CUDA_BUILD!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
-
-echo Found: CUDA %CUDA_BUILD% build
-echo URL: %FOUND_URL%
+echo Found: CUDA !CUDA_BUILD! build
+echo URL: !FOUND_URL!
 echo.
 
 :: Extract filename from URL
-for %%a in (%FOUND_URL%) do set FILENAME=%%~nxa
+for %%a in (!FOUND_URL!) do set FILENAME=%%~nxa
 
-echo Downloading: %FILENAME%
+echo Downloading: !FILENAME!
 echo This may take a few minutes...
 echo.
 
-curl -L -o "%FILENAME%" "%FOUND_URL%"
+curl -L -o "!FILENAME!" "!FOUND_URL!"
 
 if %errorlevel% neq 0 (
     echo.
@@ -194,28 +154,28 @@ echo.
 mkdir llama.cpp 2>nul
 
 :: Extract using tar (built into Windows 10+)
-tar -xf "%FILENAME%" -C llama.cpp --strip-components=1
+tar -xf "!FILENAME!" -C llama.cpp --strip-components=1
 
 if %errorlevel% neq 0 (
     echo Extraction failed! Trying alternative method...
     
     :: Try PowerShell extraction
-    powershell -command "Expand-Archive -Path '%FILENAME%' -DestinationPath 'llama.cpp' -Force"
+    powershell -command "Expand-Archive -Path '!FILENAME!' -DestinationPath 'llama.cpp' -Force"
     
     if %errorlevel% neq 0 (
         echo.
         echo Automatic extraction failed. Please extract manually:
-        echo 1. Open %FILENAME%
+        echo 1. Open !FILENAME!
         echo 2. Extract contents to llama.cpp folder
         pause
     )
 )
 
 :: Clean up zip file
-del "%FILENAME%" 2>nul
+del "!FILENAME!" 2>nul
 
 :: Verify extraction
-if not exist "llama.cpp\llama-server.exe" if not exist "llama.cpp\server.exe" if not exist "llama.cpp\build\bin\Release\llama-server.exe" (
+if not exist "llama.cpp\llama-server.exe" if not exist "llama.cpp\server.exe" if not exist "llama.cpp\build\bin\Release\llama-server.exe" if not exist "llama.cpp\bin\llama-server.exe" (
     echo.
     echo WARNING: Could not find llama-server.exe!
     echo Please check llama.cpp folder.
@@ -270,10 +230,9 @@ echo Downloading from HuggingFace (this will take a few minutes)...
 echo Progress may appear slow at first, please be patient...
 echo.
 
-curl -L --progress-bar -o llama.cpp\models\qwen2.5-3b-instruct-q4_k_m.gguf ^
-    "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf"
+curl -L --progress-bar -o llama.cpp\models\qwen2.5-3b-instruct-q4_k_m.gguf "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf"
 
-if errorlevel 1 (
+if %errorlevel% neq 0 (
     echo.
     echo Download failed! You can download manually from:
     echo https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/tree/main
@@ -336,15 +295,19 @@ echo pause
 
 echo.
 echo ========================================
-echo 🎉 Installation Complete!
+echo SUCCESS - Installation Complete!
 echo ========================================
 echo.
-echo 📂 Location: %cd%\llama.cpp
-echo 🤖 Model: Qwen2.5-3B-Instruct-Q4_K_M (~2GB)
-echo 🎮 GPU: NVIDIA RTX 5090 (CUDA %CUDA_BUILD%)
+echo Location: %cd%\llama.cpp
+echo Model: Qwen2.5-3B-Instruct-Q4_K_M (~2GB)
+if defined CUDA_BUILD (
+    echo GPU: NVIDIA RTX 5090 (CUDA !CUDA_BUILD!)
+) else (
+    echo GPU: NVIDIA RTX 5090
+)
 echo.
 echo ========================================
-echo 🚀 Quick Start
+echo Quick Start
 echo ========================================
 echo.
 echo 1. Start the server:
@@ -360,14 +323,14 @@ echo    - API Key: (leave empty)
 echo    - Click "Set"
 echo.
 echo ========================================
-echo ⚡ Performance (RTX 5090)
+echo Performance (RTX 5090)
 echo ========================================
 echo.
 echo Expected speeds with this 3B model:
-echo   • 500-1000 tokens/second
-echo   • Near-instant resume analysis
-echo   • Sub-second cover letter generation
+echo   - 500-1000 tokens/second
+echo   - Near-instant resume analysis
+echo   - Sub-second cover letter generation
 echo.
-echo Your RTX 5090 will absolutely dominate! 💪
+echo Your RTX 5090 will absolutely dominate!
 echo.
 pause
