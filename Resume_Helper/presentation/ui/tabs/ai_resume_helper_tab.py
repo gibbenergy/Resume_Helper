@@ -127,6 +127,9 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     scale=2,
                 )
                 
+                # Add refresh button for local providers
+                refresh_models_btn = gr.Button("🔄", scale=1, min_width=40, visible=False, variant="secondary")
+                
                 api_key_input = gr.Textbox(
                     label="API Key",
                     placeholder="(blank for local providers)",
@@ -1132,7 +1135,7 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 save_env_var("RESUME_HELPER_LAST_PROVIDER", provider_ui_value)
                 
                 # Auto-configure default base URLs in background (hidden from user)
-                is_local_provider = provider_ui_value in ["llama.cpp", "LM Studio"]
+                is_local_provider = provider_ui_value in ["llama.cpp", "LM Studio", "Ollama (Local)"]
                 
                 # Auto-fill default base URLs silently
                 default_base_urls = {
@@ -1142,20 +1145,21 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 
                 # Load saved base URL or use default
                 saved_base_url = load_env_var("CUSTOM_BASE_URL", "")
-                if is_local_provider and not saved_base_url:
+                if provider_ui_value in ["llama.cpp", "LM Studio"] and not saved_base_url:
                     saved_base_url = default_base_urls.get(provider_ui_value, "")
                     # Auto-save the default silently
                     if saved_base_url:
                         save_env_var("CUSTOM_BASE_URL", saved_base_url)
                 
-                # Update hidden base_url_input with the value
+                # Update hidden base_url_input with the value and show refresh button for local providers
                 return (
-                    models_result[0],
-                    gr.update(value=saved_key),
-                    gr.update(value=saved_base_url if is_local_provider else "", visible=False)
+                    models_result[0],  # model_selector update
+                    gr.update(value=saved_key),  # api_key_input update
+                    gr.update(value=saved_base_url if provider_ui_value in ["llama.cpp", "LM Studio"] else "", visible=False),  # base_url_input update
+                    gr.update(visible=is_local_provider)  # refresh_models_btn visibility
                 )
             except Exception as e:
-                return gr.update(), gr.update(), gr.update()
+                return gr.update(), gr.update(), gr.update(), gr.update()
         
         def set_ai_configuration(provider_ui_value, api_key, model, base_url):
             """Set AI configuration and update current AI status."""
@@ -1237,7 +1241,23 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
         provider_selector.change(
             fn=on_provider_change,
             inputs=[provider_selector],
-            outputs=[model_selector, api_key_input, base_url_input],
+            outputs=[model_selector, api_key_input, base_url_input, refresh_models_btn],
+        )
+        
+        # Refresh models button handler
+        def refresh_local_models(provider_ui_value):
+            """Refresh the list of models from local AI servers."""
+            try:
+                models_result = update_model_choices(provider_ui_value, None)
+                return models_result[0]  # Return model_selector update
+            except Exception as e:
+                logger.error(f"Error refreshing models: {e}")
+                return gr.update()
+        
+        refresh_models_btn.click(
+            fn=refresh_local_models,
+            inputs=[provider_selector],
+            outputs=[model_selector]
         )
         
         model_selector.change(

@@ -101,17 +101,13 @@ PROVIDER_MODELS = {
         ]
     },
     "llamacpp": {
-        "default": "openai/local-model",
-        "models": [
-            "openai/local-model"
-        ],
+        "default": None,  # Will be set dynamically from server
+        "models": [],  # Fetched dynamically from /v1/models
         "base_url": "http://localhost:8080/v1"
     },
     "lmstudio": {
-        "default": "openai/local-model",
-        "models": [
-            "openai/local-model"
-        ],
+        "default": None,  # Will be set dynamically from server
+        "models": [],  # Fetched dynamically from /v1/models
         "base_url": "http://localhost:1234/v1"
     }
 }
@@ -149,8 +145,44 @@ class LiteLLMProvider:
         """Get the default model for a provider."""
         provider_config = PROVIDER_MODELS.get(provider)
         if provider_config:
-            return provider_config["default"]
+            default = provider_config["default"]
+            # For local providers with None default, fetch from server
+            if default is None and provider in ["ollama", "llamacpp", "lmstudio"]:
+                available_models = self._fetch_local_models_for_provider(provider)
+                if available_models:
+                    return available_models[0]  # Return first available model
+                # Return a placeholder if server is not running
+                return f"{provider}/model-not-loaded"
+            return default
         return "gpt-4.1"
+    
+    def _fetch_local_models_for_provider(self, provider: str) -> List[str]:
+        """Fetch models for a specific provider (used during initialization)."""
+        import requests
+        
+        try:
+            if provider == "ollama":
+                url = "http://localhost:11434/api/tags"
+                response = requests.get(url, timeout=2)
+                if response.status_code == 200:
+                    data = response.json()
+                    models = data.get("models", [])
+                    return [f"ollama/{m.get('name', '')}" for m in models if m.get('name')]
+            
+            elif provider in ["llamacpp", "lmstudio"]:
+                base_url = PROVIDER_MODELS.get(provider, {}).get("base_url", "")
+                if base_url:
+                    url = f"{base_url}/models"
+                    response = requests.get(url, timeout=2)
+                    if response.status_code == 200:
+                        data = response.json()
+                        models = data.get("data", [])
+                        return [f"openai/{m.get('id', '')}" for m in models if m.get('id')]
+        
+        except Exception:
+            pass
+        
+        return []
     
     def _load_api_key_from_env(self):
         """Load API key from environment variables."""
@@ -384,9 +416,70 @@ class LiteLLMProvider:
             }
     
     def get_available_models(self) -> List[str]:
-        """Get available models for the current provider."""
+        """
+        Get list of available models for the current provider.
+        For local providers (Ollama, llama.cpp, LM Studio), fetch from server dynamically.
+        For cloud providers, return hardcoded list.
+        
+        Returns:
+            List of model names
+        """
+        # For local providers, try to fetch models from the server
+        if self.provider in ["ollama", "llamacpp", "lmstudio"]:
+            dynamic_models = self._fetch_local_models()
+            if dynamic_models:
+                return dynamic_models
+            # Fallback to empty list if server is not running
+            return []
+        
+        # For cloud providers, return hardcoded list
         provider_config = PROVIDER_MODELS.get(self.provider)
         return provider_config["models"] if provider_config else [self.current_model]
+    
+    def _fetch_local_models(self) -> List[str]:
+        """
+        Fetch available models from local AI servers (Ollama, llama.cpp, LM Studio).
+        
+        Returns:
+            List of model identifiers, or empty list if unavailable
+        """
+        import requests
+        
+        try:
+            if self.provider == "ollama":
+                # Ollama API endpoint
+                url = "http://localhost:11434/api/tags"
+                response = requests.get(url, timeout=2)
+                if response.status_code == 200:
+                    data = response.json()
+                    models = data.get("models", [])
+                    # Format: ollama/model_name:tag
+                    model_list = [f"ollama/{m.get('name', '')}" for m in models if m.get('name')]
+                    logger.info(f"Fetched {len(model_list)} models from Ollama")
+                    return model_list
+            
+            elif self.provider in ["llamacpp", "lmstudio"]:
+                # OpenAI-compatible /v1/models endpoint
+                base_url = self.custom_base_url or PROVIDER_MODELS.get(self.provider, {}).get("base_url", "")
+                if not base_url:
+                    return []
+                
+                url = f"{base_url}/models"
+                response = requests.get(url, timeout=2)
+                if response.status_code == 200:
+                    data = response.json()
+                    models = data.get("data", [])
+                    # Format: openai/model_id
+                    model_list = [f"openai/{m.get('id', '')}" for m in models if m.get('id')]
+                    logger.info(f"Fetched {len(model_list)} models from {self.provider}")
+                    return model_list
+        
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Could not fetch models from {self.provider}: {e}")
+        except Exception as e:
+            logger.error(f"Error fetching models from {self.provider}: {e}")
+        
+        return []
     
     def set_model(self, model_name: str) -> str:
         """Set the model to use."""
