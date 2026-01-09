@@ -409,12 +409,25 @@ class LiteLLMProvider:
                 }
                 provider_display = provider_names.get(self.provider, self.provider)
                 logger.info(f"Testing {provider_display} connection...")
+                
+                # Try to connect
                 test_messages = [{"role": "user", "content": "test"}]
                 response, error = self._call_litellm_completion(test_messages, model or self.current_model, max_tokens=5)
+                
                 if response:
                     return f"✅ {provider_display} connection successful"
                 else:
-                    return f"❌ {provider_display} connection failed: {error}"
+                    # Enhanced error message for local providers
+                    if "connection" in error.lower() or "refused" in error.lower() or "failed to connect" in error.lower():
+                        server_instructions = {
+                            "ollama": "Please start Ollama server first:\n1. Open terminal\n2. Run: ollama serve",
+                            "llamacpp": f"Please start llama.cpp server first:\n1. Navigate to: test_setup\\llama.cpp\n2. Run: start_server.bat\n3. Server will start at {self.custom_base_url or 'http://localhost:8080'}",
+                            "lmstudio": f"Please start LM Studio server first:\n1. Open LM Studio\n2. Go to Local Server tab\n3. Click 'Start Server'\n4. Ensure it's running at {self.custom_base_url or 'http://localhost:1234'}"
+                        }
+                        instructions = server_instructions.get(self.provider, f"Please start {provider_display} server")
+                        return f"❌ {provider_display} server not running!\n\n{instructions}"
+                    else:
+                        return f"❌ {provider_display} connection failed: {error}"
             
             old_key = os.environ.get(f"{self.provider.upper()}_API_KEY")
             self._set_provider_api_key(api_key)
