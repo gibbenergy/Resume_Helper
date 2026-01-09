@@ -82,14 +82,14 @@ for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json')
     echo [DEBUG] Found line !LINE_COUNT!: !LINE!
     >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:55","message":"Found browser_download_url line","data":{"line_num":"!LINE_COUNT!","content":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H1"}
     
-    :: Check if line contains cuda-cu12
-    echo !LINE! | findstr "cuda-cu12" >nul
+    :: Check if line contains win-cuda
+    echo !LINE! | findstr "win-cuda" >nul
     if !errorlevel! equ 0 (
-        echo [DEBUG] Line contains cuda-cu12
-        >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:61","message":"Found cuda-cu12 in line","data":{"line":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H2"}
+        echo [DEBUG] Line contains win-cuda
+        >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:61","message":"Found win-cuda in line","data":{"line":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H2"}
         
-        :: Check if line contains win and x64.zip
-        echo !LINE! | findstr "win" | findstr "x64.zip" >nul
+        :: Check if line contains x64.zip
+        echo !LINE! | findstr "x64.zip" >nul
         if !errorlevel! equ 0 (
             echo [DEBUG] Line matches all criteria
             >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:67","message":"Line matches all criteria","data":{"line":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H2"}
@@ -100,7 +100,7 @@ for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json')
 echo [DEBUG] Total lines found: !LINE_COUNT!
 >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:74","message":"Search complete","data":{"total_lines":"!LINE_COUNT!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H1"}
 
-for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"cuda-cu12" ^| findstr /c:"win" ^| findstr /c:"x64.zip"') do (
+for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^| findstr /c:"win-cuda" ^| findstr /c:"x64.zip"') do (
     set LINE=%%a
     echo [DEBUG] Processing matched line: !LINE!
     >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:80","message":"Processing matched line","data":{"line":"!LINE!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
@@ -117,32 +117,40 @@ for /f "tokens=*" %%a in ('findstr /c:"browser_download_url" release_info.json ^
         echo [DEBUG] Cleaned URL: !URL!
         >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:93","message":"Cleaned URL","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H5"}
         
-        :: Prioritize cu12.8, then cu12.6, then cu12.4
-        echo !URL! | findstr "cu12.8" >nul
+        :: Prioritize cuda-12.x (12.4, 12.6, 12.8) for RTX 5090
+        echo !URL! | findstr "cuda-12.8" >nul
         if !errorlevel! equ 0 (
-            echo [DEBUG] Found cu12.8 build!
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:99","message":"Found cu12.8","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
+            echo [DEBUG] Found cuda-12.8 build!
+            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:99","message":"Found cuda-12.8","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
             endlocal
             set FOUND_URL=!URL!
             set CUDA_BUILD=12.8
             goto :found_url
         )
-        echo !URL! | findstr "cu12.6" >nul
+        echo !URL! | findstr "cuda-12.6" >nul
         if !errorlevel! equ 0 if not defined FOUND_URL (
-            echo [DEBUG] Found cu12.6 build!
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:109","message":"Found cu12.6","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
+            echo [DEBUG] Found cuda-12.6 build!
+            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:109","message":"Found cuda-12.6","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
             endlocal
             set FOUND_URL=!URL!
             set CUDA_BUILD=12.6
             goto :found_url
         )
-        echo !URL! | findstr "cu12.4" >nul
+        echo !URL! | findstr "cuda-12.4" >nul
         if !errorlevel! equ 0 if not defined FOUND_URL (
-            echo [DEBUG] Found cu12.4 build!
-            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:119","message":"Found cu12.4","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
+            echo [DEBUG] Found cuda-12.4 build!
+            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:119","message":"Found cuda-12.4","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
             endlocal
             set FOUND_URL=!URL!
             set CUDA_BUILD=12.4
+        )
+        echo !URL! | findstr "cuda-13" >nul
+        if !errorlevel! equ 0 if not defined FOUND_URL (
+            echo [DEBUG] Found cuda-13.x build (also compatible)!
+            >> c:\Users\Gibbenergy\Downloads\Support Llama.cpp\.cursor\debug.log echo {"location":"install_llamacpp.bat:129","message":"Found cuda-13","data":{"url":"!URL!"},"timestamp":%time%,"sessionId":"debug-session","runId":"setup","hypothesisId":"H3"}
+            endlocal
+            set FOUND_URL=!URL!
+            set CUDA_BUILD=13.1
         )
     )
     endlocal
@@ -227,9 +235,10 @@ echo.
 echo 1. Go to: https://github.com/ggerganov/llama.cpp/releases/latest
 echo.
 echo 2. Download ONE of these (in order of preference):
-echo    BEST:   llama-*-bin-win-cuda-cu12.8.0-x64.zip
-echo    GOOD:   llama-*-bin-win-cuda-cu12.6.0-x64.zip
-echo    OK:     llama-*-bin-win-cuda-cu12.4.0-x64.zip
+echo    BEST:   llama-*-bin-win-cuda-12.8-x64.zip (if available)
+echo    GOOD:   llama-*-bin-win-cuda-12.6-x64.zip
+echo    OK:     llama-*-bin-win-cuda-12.4-x64.zip
+echo    NEWER:  llama-*-bin-win-cuda-13.1-x64.zip (CUDA 13+ also works)
 echo.
 echo 3. Extract to: %cd%\llama.cpp\
 echo.
