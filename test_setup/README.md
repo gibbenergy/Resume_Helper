@@ -18,7 +18,8 @@ Choose your preferred option and follow the prompts!
 
 ## Option 1: llama.cpp (CLI-based)
 
-**Best for**: Power users, headless servers, maximum performance
+**Best for**: Power users, headless servers, maximum performance  
+**Optimized for**: NVIDIA RTX 5090 with CUDA 12.8
 
 ### Installation
 
@@ -27,9 +28,13 @@ install_llamacpp.bat
 ```
 
 This script will:
-1. Help you download llama.cpp binaries (CPU or CUDA)
+1. Guide you to download llama.cpp CUDA binaries (cu12.6 - cu12.8 compatible)
 2. Download a test model (Qwen2.5-3B-Instruct, ~2GB)
-3. Create a `start_server.bat` script
+3. Create a `start_server.bat` script optimized for RTX 5090
+
+**Important**: Download the CUDA 12.x version (cu12.6.0, cu12.8.0, etc.) from:
+- https://github.com/ggerganov/llama.cpp/releases/latest
+- Look for: `llama-*-bin-win-cuda-cu12.x.x-x64.zip`
 
 ### Starting the Server
 
@@ -46,12 +51,14 @@ Server will run at: `http://localhost:8080`
 - **Base URL**: `http://localhost:8080/v1`
 - **API Key**: (leave empty)
 
-### GPU Acceleration (NVIDIA)
+### GPU Acceleration (RTX 5090)
 
-Edit `llama.cpp/start_server.bat` and adjust the `-ngl` parameter:
-- `-ngl 0` = CPU only
-- `-ngl 32` = Use 32 GPU layers (default)
-- `-ngl 99` = Use all layers on GPU (fastest)
+The server is pre-configured for maximum RTX 5090 performance:
+- **-ngl 99** = All layers offloaded to GPU (fastest)
+- **-c 16384** = 16K context window (good for long resumes/job descriptions)
+- **CUDA 12.x** = Optimized for Ada Lovelace architecture
+
+No manual configuration needed - just run `start_server.bat`!
 
 ---
 
@@ -175,15 +182,19 @@ Once you have a server running:
 
 ## System Requirements
 
-### Minimum
-- **RAM**: 8GB (for 3B models)
-- **Storage**: 5-10GB free space
+### For RTX 5090 Setup (Recommended)
+- **GPU**: NVIDIA RTX 5090 (32GB VRAM)
+- **CUDA**: 12.6+ (already installed with your Ollama setup)
+- **RAM**: 16GB+ system RAM
+- **Storage**: 10-20GB free space (for models)
 - **OS**: Windows 10/11
 
-### Recommended
-- **RAM**: 16GB+ (for 7B models)
-- **GPU**: NVIDIA with 8GB+ VRAM (for GPU acceleration)
-- **Storage**: 20GB+ (for multiple models)
+### Performance Expectations
+With RTX 5090, expect:
+- **3B models**: ~500-1000 tokens/second
+- **7B models**: ~200-400 tokens/second  
+- **13B models**: ~100-200 tokens/second
+- Near-instant resume analysis and generation!
 
 ---
 

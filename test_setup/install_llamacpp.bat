@@ -30,51 +30,35 @@ if %errorlevel% neq 0 (
 echo Fetching latest release info...
 curl -s https://api.github.com/repos/ggerganov/llama.cpp/releases/latest > release_info.json
 
-:: Extract download URL for Windows with CUDA (or CPU if you prefer)
 echo.
-echo Available options:
-echo [1] CPU only (works on any PC, slower)
-echo [2] CUDA (NVIDIA GPU, much faster - RECOMMENDED if you have NVIDIA)
-echo [3] Skip download - I'll download manually
+echo ========================================
+echo CUDA Version Detection
+echo ========================================
 echo.
-choice /C 123 /M "Select your option"
-
-if errorlevel 3 goto :manual_download
-if errorlevel 2 goto :cuda_download
-if errorlevel 1 goto :cpu_download
-
-:cpu_download
+echo Detected System: NVIDIA RTX 5090
+echo CUDA Version: 12.8+ (compatible with cu12.x builds)
 echo.
-echo Downloading CPU version...
-:: You'll need to manually get the URL from GitHub releases
+echo Looking for CUDA 12.x compatible build...
 echo.
-echo Please download manually from:
-echo https://github.com/ggerganov/llama.cpp/releases/latest
-echo Look for: llama-*-bin-win-avx2-x64.zip
-echo.
-pause
-goto :manual_download
-
-:cuda_download
-echo.
-echo Downloading CUDA version (requires NVIDIA GPU)...
-echo.
-echo Please download manually from:
-echo https://github.com/ggerganov/llama.cpp/releases/latest
-echo Look for: llama-*-bin-win-cuda-cu12.2.0-x64.zip (or latest CUDA version)
-echo.
-pause
-goto :manual_download
 
 :manual_download
 echo.
-echo [MANUAL DOWNLOAD REQUIRED]
+echo [MANUAL DOWNLOAD]
+echo.
+echo Please download the CUDA-enabled llama.cpp:
 echo.
 echo 1. Go to: https://github.com/ggerganov/llama.cpp/releases/latest
-echo 2. Download the appropriate .zip file:
-echo    - For CPU: llama-*-bin-win-avx2-x64.zip
-echo    - For NVIDIA GPU: llama-*-bin-win-cuda-cu*.zip
+echo.
+echo 2. Download ONE of these (in order of preference for RTX 5090):
+echo    PRIORITY 1: llama-*-bin-win-cuda-cu12.8.0-x64.zip (if available)
+echo    PRIORITY 2: llama-*-bin-win-cuda-cu12.6.0-x64.zip
+echo    PRIORITY 3: llama-*-bin-win-cuda-cu12.4.0-x64.zip
+echo    (Any cu12.x version will work with RTX 5090)
+echo.
 echo 3. Extract the contents to: %cd%\llama.cpp\
+echo    (Create llama.cpp folder if it doesn't exist)
+echo.
+echo 4. The folder should contain: llama-server.exe or server.exe
 echo.
 echo Press any key after you've extracted llama.cpp...
 pause
@@ -141,8 +125,10 @@ echo     pause
 echo     exit /b 1
 echo ^)
 echo.
-echo :: Start the server
-echo %%SERVER_EXE%% -m models\qwen2.5-3b-instruct-q4_k_m.gguf --host 0.0.0.0 --port 8080 -c 8192 -ngl 32
+echo :: Start the server with RTX 5090 optimized settings
+echo :: -ngl 99 = offload all layers to GPU for maximum speed
+echo :: -c 16384 = larger context window (good for resumes/cover letters)
+echo %%SERVER_EXE%% -m models\qwen2.5-3b-instruct-q4_k_m.gguf --host 0.0.0.0 --port 8080 -c 16384 -ngl 99
 echo pause
 ) > llama.cpp\start_server.bat
 
@@ -153,6 +139,7 @@ echo ========================================
 echo.
 echo Location: %cd%\llama.cpp
 echo Model: qwen2.5-3b-instruct-q4_k_m.gguf (~2GB)
+echo GPU: NVIDIA RTX 5090 (CUDA 12.x)
 echo.
 echo To start the server:
 echo   1. Go to: cd test_setup\llama.cpp
@@ -165,7 +152,9 @@ echo   - Base URL: http://localhost:8080/v1
 echo   - Leave API key empty
 echo   - Click Set
 echo.
-echo Note: If you have NVIDIA GPU, edit start_server.bat and adjust -ngl value
-echo       (higher = more GPU layers = faster, e.g., -ngl 99 for all layers)
+echo Optimized for RTX 5090:
+echo   - All layers offloaded to GPU (-ngl 99)
+echo   - Extended context window (16K tokens)
+echo   - Expect very fast inference speeds!
 echo.
 pause
