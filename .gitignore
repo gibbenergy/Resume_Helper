@@ -119,3 +119,7 @@ test_setup/*.exe
 test_setup/*.json
 test_setup/*.gguf
 
+
+# R session history
+.Rhistory
+.RData
