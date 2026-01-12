@@ -46,6 +46,20 @@ LOCAL_PROVIDER_CONFIG = {
         },
         "temperature": 0.8,
         "timeout": 600
+    },
+    "lemonade": {
+        "base_url": "http://localhost:8000/api/v1",
+        "default_model": "openai/local-model",
+        "requires_api_key": False,
+        "max_tokens": {
+            "job_analysis": 8192,
+            "cover_letter": 4096,
+            "resume_tailoring": 6144,
+            "suggestions": 4096,
+            "default": 4096
+        },
+        "temperature": 0.8,
+        "timeout": 600
     }
 }
 

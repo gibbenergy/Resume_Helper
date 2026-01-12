@@ -112,14 +112,9 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# Test setup folder - local AI installations for testing
-test_setup/llama.cpp/
-test_setup/LMStudio/
-test_setup/*.exe
-test_setup/*.json
-test_setup/*.gguf
+# Test setup folder - local AI installations for testing (exclude everything)
+test_setup/
 
-
-# R session history
-.Rhistory
-.RData
+# Testing documentation - development only
+LLAMA_CPP_LM_STUDIO_TESTING.md
+LLAMA_CPP_LM_STUDIO_TESTING.html

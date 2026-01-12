@@ -84,15 +84,24 @@ class ResumeHelper:
                         "Perplexity (Search)": "perplexity",
                         "xAI (Grok)": "xai",
                         "llama.cpp": "llamacpp",
-                        "LM Studio": "lmstudio"
+                        "LM Studio": "lmstudio",
+                        "Lemonade": "lemonade"
                     }
                     saved_provider = provider_mapping.get(ui_provider, "openai")
                     saved_model = env_vars.get("RESUME_HELPER_LAST_MODEL")
-                    saved_base_url = env_vars.get("CUSTOM_BASE_URL")
                     
-                    if saved_provider == "ollama":
-                        saved_api_key = "ollama-local-dummy-key"
-                    elif saved_provider in ["llamacpp", "lmstudio"]:
+                    # Load provider-specific base URL
+                    provider_base_url_map = {
+                        "llamacpp": "LLAMACPP_API_BASE",
+                        "lmstudio": "LMSTUDIO_API_BASE",
+                        "lemonade": "LEMONADE_API_BASE",
+                        "ollama": "OLLAMA_API_BASE"
+                    }
+                    base_url_env_var = provider_base_url_map.get(saved_provider, "CUSTOM_BASE_URL")
+                    saved_base_url = env_vars.get(base_url_env_var)
+                    
+                    # All local providers use the same dummy key format
+                    if saved_provider in ["ollama", "llamacpp", "lmstudio", "lemonade"]:
                         saved_api_key = "sk-no-key-required"
                     else:
                         env_key = f"{saved_provider.upper()}_API_KEY"
@@ -100,11 +109,15 @@ class ResumeHelper:
             except Exception as e:
                 logger.warning(f"Could not load saved provider config: {e}")
         try:
+            # Pass base_url if it's saved (supports custom ports, Lemonade, Harbor, etc.)
+            # The provider will handle the priority: custom URL -> Harbor env -> defaults
+            logger.info(f"Provider: {saved_provider}, saved_base_url: {saved_base_url}")
+            
             self.litellm_provider = LiteLLMProvider(
                 provider=saved_provider,
                 model=saved_model,
                 api_key=saved_api_key,
-                base_url=saved_base_url
+                base_url=saved_base_url  # Always pass it - provider handles priority
             )
             self.ai_workflows = ResumeAIWorkflows(self.litellm_provider)
             logger.info(f"✅ LiteLLM Provider initialized with {saved_provider}")
@@ -124,7 +137,10 @@ class ResumeHelper:
                 "ollama": "ollama",
                 "groq": "groq",
                 "perplexity": "perplexity",
-                "xai": "xai"
+                "xai": "xai",
+                "llamacpp": "llamacpp",
+                "lmstudio": "lmstudio",
+                "lemonade": "lemonade"
             }
             mapped_provider = provider_mapping.get(provider_name.lower(), provider_name.lower())
             self.litellm_provider = LiteLLMProvider(provider=mapped_provider)
