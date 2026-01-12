@@ -36,7 +36,7 @@
 
 📋 **Application Tracker** - Track applications, interviews, and outcomes
 
-🔌 **Multi-AI Support** - OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI
+🔌 **Multi-AI Support** - OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio, Lemonade
 
 📄 **PDF Generation** - Export professional resumes and cover letters
 
@@ -48,8 +48,8 @@ install_run_windows.bat
 
 Or manually:
 ```bash
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 playwright install chromium
 cd Resume_Helper
@@ -70,9 +70,28 @@ Keys are auto-saved and remembered for next session.
 
 ## Supported AI Models
 
-**🦙 Recommended: Ollama (Free & Local)**
+**🦙 Recommended: Local Models (Free)**
+
+**Ollama** - Easiest local setup
 - **gpt-oss** - OpenAI's open-weight model (14GB, 128K context) - best for reasoning
 - Qwen2.5, Llama 3.3, DeepSeek-R1 - smaller alternatives
+
+**llama.cpp** - High-performance C++ inference
+- Run any GGUF model with OpenAI-compatible API
+- Lower memory usage, faster inference
+- Default: `http://localhost:8080/v1`
+
+**LM Studio** - User-friendly GUI
+- Easy model downloads and management
+- Built-in OpenAI-compatible server
+- Default: `http://localhost:1234/v1`
+
+**Lemonade** - Advanced LLM router/proxy
+- Route requests to multiple local backends
+- Smart model selection and load balancing
+- OpenAI-compatible API with extended features
+- Default: `http://localhost:8000/v1`
+- **Recommended:** Use `--ctx-size 8192` or higher for job analysis
 
 **☁️ Cloud Providers (API key required)**
 - **OpenAI**: GPT-4.1, GPT-5, GPT-5-mini

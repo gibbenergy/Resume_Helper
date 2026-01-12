@@ -60,18 +60,22 @@ The application uses a tabbed interface to organize resume sections:
 2.  Click the **Generate Resume (PDF)** button.
 3.  A PDF file of your resume will be generated and saved. Click the **Download PDF** button to download the file.
 
-## 4.5 Setting Up Ollama (Recommended - Free & Local) 🦙
+## 4.5 Setting Up Local AI Models (Recommended - Free) 🦙
 
-Ollama lets you run AI models locally on your computer - no API key, no cost, no internet required after setup.
+You have **three options** for running AI models locally on your computer - no API key, no cost, no internet required after setup.
 
-### Step 1: Install Ollama
+### Option 1: Ollama (Easiest - Recommended for Beginners)
+
+Ollama is the easiest way to get started with local AI models.
+
+#### Step 1: Install Ollama
 
 1. Go to: https://ollama.com/download
 2. Download the **Windows** installer
 3. Run the installer and follow the prompts
 4. Ollama will start automatically as a background service
 
-### Step 2: Download the GPT-OSS Model
+#### Step 2: Download a Model
 
 Open **Command Prompt** or **PowerShell** and run:
 
@@ -88,7 +92,7 @@ ollama pull llama3.3        # ~4GB, good quality
 ollama pull deepseek-r1:8b  # ~5GB, strong reasoning
 ```
 
-### Step 3: Verify Ollama is Running
+#### Step 3: Verify Ollama is Running
 
 ```bash
 ollama list
@@ -96,14 +100,109 @@ ollama list
 
 You should see your downloaded model(s) listed.
 
-### Step 4: Use in Resume Helper
+#### Step 4: Use in Resume Helper
 
 1. Launch Resume Helper
 2. Go to **AI Resume Helper** tab
-3. Select **Ollama** as the provider
+3. Select **Ollama (Local)** as the provider
 4. Leave the API key field **empty**
 5. Select **gpt-oss:latest** (or your downloaded model) from the Model dropdown
-6. Click **Test and Save**
+6. Click **Set**
+
+---
+
+### Option 2: llama.cpp (High Performance)
+
+llama.cpp provides the fastest inference with the lowest memory usage. Perfect if you want maximum performance.
+
+#### Step 1: Install llama.cpp
+
+**Option A: Pre-built Binary (Easiest)**
+1. Go to: https://github.com/ggerganov/llama.cpp/releases
+2. Download the latest `llama-cpp-windows-xxx.zip` for your system
+3. Extract to a folder (e.g., `C:\llama.cpp`)
+
+**Option B: Build from Source**
+```bash
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp
+cmake -B build
+cmake --build build --config Release
+```
+
+#### Step 2: Download a GGUF Model
+
+Download models from HuggingFace (GGUF format):
+- **Recommended**: [TheBloke/Llama-2-7B-Chat-GGUF](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF)
+- Or search "GGUF" on HuggingFace for any model
+
+Save the `.gguf` file to your llama.cpp folder.
+
+#### Step 3: Start the Server
+
+Open **Command Prompt** in your llama.cpp folder:
+
+```bash
+# For CPU (works on any PC)
+.\build\bin\Release\server.exe -m your-model.gguf --host 0.0.0.0 --port 8080
+
+# For NVIDIA GPU (faster)
+.\build\bin\Release\server.exe -m your-model.gguf --host 0.0.0.0 --port 8080 -ngl 32
+```
+
+**Parameters**:
+- `-m` = path to your GGUF model file
+- `--port` = server port (default: 8080)
+- `-ngl` = number of GPU layers (for GPU acceleration)
+- `-c` = context size (e.g., `-c 8192`)
+
+#### Step 4: Use in Resume Helper
+
+1. Launch Resume Helper
+2. Go to **AI Resume Helper** tab
+3. Select **llama.cpp** as the provider
+4. Leave the API key field **empty**
+5. **Custom Base URL**: `http://localhost:8080/v1` (or your custom port)
+6. Click **Set**
+
+---
+
+### Option 3: LM Studio (User-Friendly GUI)
+
+LM Studio provides the easiest way to download, manage, and run models with a beautiful interface.
+
+#### Step 1: Install LM Studio
+
+1. Go to: https://lmstudio.ai/
+2. Download **LM Studio** for Windows
+3. Install and launch the application
+
+#### Step 2: Download a Model
+
+1. In LM Studio, click **🔍 Search** (or "Discover" tab)
+2. Search for models (recommended):
+   - `TheBloke/Llama-2-7B-Chat-GGUF`
+   - `TheBloke/Mistral-7B-Instruct-v0.2-GGUF`
+   - `TheBloke/Qwen2.5-7B-Instruct-GGUF`
+3. Click **Download** on your chosen model
+4. Wait for download to complete
+
+#### Step 3: Start the Local Server
+
+1. In LM Studio, click **↔️ Local Server** (left sidebar)
+2. Select your downloaded model from the dropdown
+3. Click **Start Server**
+4. Server will start at `http://localhost:1234` by default
+5. Keep LM Studio running while using Resume Helper
+
+#### Step 4: Use in Resume Helper
+
+1. Launch Resume Helper
+2. Go to **AI Resume Helper** tab
+3. Select **LM Studio** as the provider
+4. Leave the API key field **empty**
+5. **Custom Base URL**: `http://localhost:1234/v1` (default)
+6. Click **Set**
 
 ---
 
@@ -120,18 +219,20 @@ You should see your downloaded model(s) listed.
 
 ## 5. Using AI Features (Optional)
 
-The **AI Resume Helper** tab lets you refine your résumé (and draft a cover-letter) with any of the supported AI models (OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, or xAI).
+The **AI Resume Helper** tab lets you refine your résumé (and draft a cover-letter) with any of the supported AI models (OpenAI, Anthropic, Google, Groq, Ollama, llama.cpp, LM Studio, Perplexity, or xAI).
 
 1. **Configure AI**
 
-   - Choose the provider (OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, or xAI).  
-   - Paste your API key (not required for Ollama local models).  
-   - Click **🧪 Test and Save API Key**.  
+   - Choose the provider (OpenAI, Anthropic, Google, Groq, **Ollama**, **llama.cpp**, **LM Studio**, Perplexity, or xAI).
+   - **For local providers** (Ollama/llama.cpp/LM Studio): Leave API key empty
+   - **For llama.cpp/LM Studio**: Enter the custom base URL (e.g., `http://localhost:8080/v1`)
+   - **For cloud providers**: Paste your API key
+   - Click **Set**.
    - Pick the desired model in **Model**.
 
 2. **Paste the Job Description**
 
-   Insert the full posting into **Job Description** so the model knows what you’re targeting.
+   Insert the full posting into **Job Description** so the model knows what you're targeting.
 
 3. **Load Your Latest Résumé**
 
@@ -160,7 +261,7 @@ The **AI Resume Helper** tab lets you refine your résumé (and draft a cover-le
 
 7. **Review the Outputs**
 
-   Check each output tab, copy or tweak content as needed, and you’re ready to apply!
+   Check each output tab, copy or tweak content as needed, and you're ready to apply!
 
 
 ## 6. Application Tracker 📋

@@ -63,6 +63,7 @@ class ResumeHelper:
         saved_provider = "openai"
         saved_model = None
         saved_api_key = None
+        saved_base_url = None
         
         if os.path.exists(env_file_path):
             try:
@@ -81,23 +82,42 @@ class ResumeHelper:
                         "Ollama (Local)": "ollama",
                         "Groq (High-Speed)": "groq",
                         "Perplexity (Search)": "perplexity",
-                        "xAI (Grok)": "xai"
+                        "xAI (Grok)": "xai",
+                        "llama.cpp": "llamacpp",
+                        "LM Studio": "lmstudio",
+                        "Lemonade": "lemonade"
                     }
                     saved_provider = provider_mapping.get(ui_provider, "openai")
                     saved_model = env_vars.get("RESUME_HELPER_LAST_MODEL")
                     
-                    if saved_provider == "ollama":
-                        saved_api_key = "ollama-local-dummy-key"
+                    # Load provider-specific base URL
+                    provider_base_url_map = {
+                        "llamacpp": "LLAMACPP_API_BASE",
+                        "lmstudio": "LMSTUDIO_API_BASE",
+                        "lemonade": "LEMONADE_API_BASE",
+                        "ollama": "OLLAMA_API_BASE"
+                    }
+                    base_url_env_var = provider_base_url_map.get(saved_provider, "CUSTOM_BASE_URL")
+                    saved_base_url = env_vars.get(base_url_env_var)
+                    
+                    # All local providers use the same dummy key format
+                    if saved_provider in ["ollama", "llamacpp", "lmstudio", "lemonade"]:
+                        saved_api_key = "sk-no-key-required"
                     else:
                         env_key = f"{saved_provider.upper()}_API_KEY"
                         saved_api_key = env_vars.get(env_key)
             except Exception as e:
                 logger.warning(f"Could not load saved provider config: {e}")
         try:
+            # Pass base_url if it's saved (supports custom ports, Lemonade, Harbor, etc.)
+            # The provider will handle the priority: custom URL -> Harbor env -> defaults
+            logger.info(f"Provider: {saved_provider}, saved_base_url: {saved_base_url}")
+            
             self.litellm_provider = LiteLLMProvider(
                 provider=saved_provider,
                 model=saved_model,
-                api_key=saved_api_key
+                api_key=saved_api_key,
+                base_url=saved_base_url  # Always pass it - provider handles priority
             )
             self.ai_workflows = ResumeAIWorkflows(self.litellm_provider)
             logger.info(f"✅ LiteLLM Provider initialized with {saved_provider}")
@@ -117,7 +137,10 @@ class ResumeHelper:
                 "ollama": "ollama",
                 "groq": "groq",
                 "perplexity": "perplexity",
-                "xai": "xai"
+                "xai": "xai",
+                "llamacpp": "llamacpp",
+                "lmstudio": "lmstudio",
+                "lemonade": "lemonade"
             }
             mapped_provider = provider_mapping.get(provider_name.lower(), provider_name.lower())
             self.litellm_provider = LiteLLMProvider(provider=mapped_provider)
@@ -142,13 +165,14 @@ class ResumeHelper:
         """Get the LiteLLM provider instance."""
         return self.litellm_provider
     
-    def switch_to_litellm_provider(self, provider: str, model: Optional[str] = None, api_key: Optional[str] = None) -> str:
+    def switch_to_litellm_provider(self, provider: str, model: Optional[str] = None, api_key: Optional[str] = None, base_url: Optional[str] = None) -> str:
         """Switch to using LiteLLM provider with specified settings."""
         try:
             self.litellm_provider = LiteLLMProvider(
                 provider=provider,
                 model=model,
-                api_key=api_key
+                api_key=api_key,
+                base_url=base_url
             )
             return f"✅ Switched to LiteLLM {provider} provider successfully"
         except Exception as e:
