@@ -129,7 +129,7 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     except:
                         all_models = []
                 else:
-                    all_models = PROVIDER_MODELS.get(provider_name.lower(), {}).get("models", [])
+                all_models = PROVIDER_MODELS.get(provider_name.lower(), {}).get("models", [])
                 
                 default_model = saved_model if saved_model in all_models else (all_models[0] if all_models else saved_model if saved_model else "gpt-4o")
 

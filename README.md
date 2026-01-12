@@ -36,7 +36,7 @@
 
 📋 **Application Tracker** - Track applications, interviews, and outcomes
 
-🔌 **Multi-AI Support** - OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio
+🔌 **Multi-AI Support** - OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio, Lemonade
 
 📄 **PDF Generation** - Export professional resumes and cover letters
 
@@ -48,8 +48,8 @@ install_run_windows.bat
 
 Or manually:
 ```bash
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 playwright install chromium
 cd Resume_Helper
@@ -85,6 +85,13 @@ Keys are auto-saved and remembered for next session.
 - Easy model downloads and management
 - Built-in OpenAI-compatible server
 - Default: `http://localhost:1234/v1`
+
+**Lemonade** - Advanced LLM router/proxy
+- Route requests to multiple local backends
+- Smart model selection and load balancing
+- OpenAI-compatible API with extended features
+- Default: `http://localhost:8000/v1`
+- **Recommended:** Use `--ctx-size 8192` or higher for job analysis
 
 **☁️ Cloud Providers (API key required)**
 - **OpenAI**: GPT-4.1, GPT-5, GPT-5-mini
