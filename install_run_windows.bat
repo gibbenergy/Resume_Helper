@@ -33,12 +33,23 @@ if not exist .venv (
     call .venv\Scripts\activate.bat
 )
 
-:: Check if port 53441 is in use and kill that specific process
-echo Checking port 53441...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":53441" ^| findstr "LISTENING"') do taskkill /F /PID %%a >nul 2>&1 && echo Stopped old instance PID %%a && timeout /t 2 /nobreak >nul
+:: Kill any old Resume Helper instances
+echo Checking for old Resume Helper instances...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":53441" ^| findstr "LISTENING"') do (
+    echo Stopping old instance on port 53441 (PID %%a)
+    taskkill /F /PID %%a >nul 2>&1
+)
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":7860" ^| findstr "LISTENING"') do (
+    echo Stopping old instance on port 7860 (PID %%a)
+    taskkill /F /PID %%a >nul 2>&1
+)
+
+:: Wait for ports to be released
+echo Waiting for ports to be released...
+timeout /t 3 /nobreak >nul
 
 :: Launch app (using venv's python)
-echo Starting app...
+echo Starting app on port 53441...
 cd Resume_Helper
 python app.py --host 0.0.0.0 --port 53441
 cd ..

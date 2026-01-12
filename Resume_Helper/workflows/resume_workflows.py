@@ -10,6 +10,7 @@ import re
 import hashlib
 from typing import Dict, List, Optional, Any
 import logging
+from infrastructure.providers.local_provider_config import get_max_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +126,17 @@ class ResumeAIWorkflows:
         Provide thorough, insightful analysis - not just data extraction. Be specific and actionable.
         """
         
+        # Get appropriate max_tokens for this provider and operation
+        provider_name = self.llm_provider.provider
+        max_tokens = get_max_tokens(provider_name, "job_analysis")
+        
         messages = [{"role": "user", "content": prompt}]
-        result = self.llm_provider.prompt_function(messages, model=model, response_format={"type": "json_object"})
+        result = self.llm_provider.prompt_function(
+            messages, 
+            model=model, 
+            response_format={"type": "json_object"},
+            max_tokens=max_tokens
+        )
         
         if result["success"]:
             try:
@@ -258,11 +268,9 @@ class ResumeAIWorkflows:
         
         messages = [{"role": "user", "content": prompt}]
         
-        # Set appropriate max_tokens based on provider
-        # Ollama: Lower limit for local resource constraints
-        # API providers: High limit for reasoning models (GPT-5, o1, o3) that use tokens for internal reasoning
-        provider = getattr(self.llm_provider, 'provider', '').lower()
-        max_tokens = 1500 if provider == 'ollama' else 25000
+        # Get appropriate max_tokens from centralized config
+        provider_name = self.llm_provider.provider
+        max_tokens = get_max_tokens(provider_name, "cover_letter")
         
         result = self.llm_provider.prompt_function(messages, model=model, max_tokens=max_tokens)
         
@@ -378,8 +386,17 @@ class ResumeAIWorkflows:
         
         prompt += "\n\nReturn ONLY valid JSON."
         
+        # Get appropriate max_tokens from centralized config
+        provider_name = self.llm_provider.provider
+        max_tokens = get_max_tokens(provider_name, "resume_tailoring")
+        
         messages = [{"role": "user", "content": prompt}]
-        result = self.llm_provider.prompt_function(messages, model=model, response_format={"type": "json_object"})
+        result = self.llm_provider.prompt_function(
+            messages, 
+            model=model, 
+            response_format={"type": "json_object"},
+            max_tokens=max_tokens
+        )
         
         if result["success"]:
             try:
@@ -518,8 +535,17 @@ class ResumeAIWorkflows:
         Make each suggestion specific and actionable. Focus on improvements that will increase the match score with this particular job.
         """
         
+        # Get appropriate max_tokens from centralized config
+        provider_name = self.llm_provider.provider
+        max_tokens = get_max_tokens(provider_name, "suggestions")
+        
         messages = [{"role": "user", "content": prompt}]
-        result = self.llm_provider.prompt_function(messages, model=model, response_format={"type": "json_object"})
+        result = self.llm_provider.prompt_function(
+            messages, 
+            model=model, 
+            response_format={"type": "json_object"},
+            max_tokens=max_tokens
+        )
         
         if result["success"]:
             try:

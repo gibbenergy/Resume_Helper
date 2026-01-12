@@ -80,7 +80,10 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
             "Ollama (Local)": "ollama",
             "Groq (High-Speed)": "groq",
             "Perplexity (Search)": "perplexity",
-            "xAI (Grok)": "xai"
+            "xAI (Grok)": "xai",
+            "llama.cpp": "llamacpp",
+            "LM Studio": "lmstudio",
+            "Lemonade": "lemonade"
         }
         provider_name = provider_mapping.get(saved_provider, "openai")
         env_key = f"{provider_name.upper()}_API_KEY"
@@ -107,26 +110,45 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     choices=[
                         "OpenAI", "Anthropic (Claude)", "Google (Gemini)", 
                         "Ollama (Local)", "Groq (High-Speed)", 
-                        "Perplexity (Search)", "xAI (Grok)"
+                        "Perplexity (Search)", "xAI (Grok)",
+                        "llama.cpp", "LM Studio", "Lemonade"
                     ],
                     value=saved_provider,
                     scale=2,
                 )
                 
                 from infrastructure.providers.litellm_provider import PROVIDER_MODELS
+                # For local providers, try to fetch models dynamically at startup
+                if saved_provider in ["Lemonade", "llama.cpp", "LM Studio", "Ollama (Local)"]:
+                    try:
+                        provider, _ = initialize_litellm_provider(saved_provider, base_url=saved_base_url)
+                        if provider:
+                            all_models = provider.get_available_models()
+                        else:
+                            all_models = []
+                    except:
+                        all_models = []
+                else:
                 all_models = PROVIDER_MODELS.get(provider_name.lower(), {}).get("models", [])
-                default_model = saved_model if saved_model in all_models else (all_models[0] if all_models else "gpt-4o")
+                
+                default_model = saved_model if saved_model in all_models else (all_models[0] if all_models else saved_model if saved_model else "gpt-4o")
 
                 model_selector = gr.Dropdown(
                     label="Model",
                     choices=all_models,
                     value=default_model,
                     scale=2,
+                    allow_custom_value=True,
+                    info="💡 Tip: You can type model name if auto-detection fails"
                 )
+                
+                # Add refresh button for local providers - visible if current provider is local
+                is_local_provider_at_startup = saved_provider in ["Lemonade", "llama.cpp", "LM Studio", "Ollama (Local)"]
+                refresh_models_btn = gr.Button("🔄", scale=1, min_width=40, visible=is_local_provider_at_startup, variant="secondary")
                 
                 api_key_input = gr.Textbox(
                     label="API Key",
-                    placeholder="Enter API key (auto-saved, not needed for Ollama)",
+                    placeholder="(blank for local providers)",
                     value=saved_api_key,
                     type="password",
                     scale=3,
@@ -134,6 +156,26 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 
                 set_btn = gr.Button("Set", variant="primary", scale=1)
                 update_btn = gr.Button("🔄 Update LiteLLM", variant="secondary", scale=1)
+            
+            # Helper function to get provider-specific base URL environment variable name
+            def get_base_url_env_var(provider_ui_value):
+                """Get the provider-specific base URL environment variable name."""
+                provider_base_url_map = {
+                    "llama.cpp": "LLAMACPP_API_BASE",
+                    "LM Studio": "LMSTUDIO_API_BASE",
+                    "Lemonade": "LEMONADE_API_BASE",
+                    "Ollama (Local)": "OLLAMA_API_BASE"
+                }
+                return provider_base_url_map.get(provider_ui_value, "CUSTOM_BASE_URL")
+            
+            # Base URL configuration - completely hidden, only accessible programmatically
+            # Users never see this - defaults work automatically for each provider
+            base_url_input = gr.Textbox(
+                label="Base URL",
+                value="",
+                visible=False,  # Completely hidden from UI
+                interactive=False
+            )
 
         with gr.Group():
             gr.Markdown("### 📝 Input")
@@ -264,7 +306,7 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
         cover_letter_pdf_state = gr.State(None)
         suggestions_pdf_state = gr.State(None)
 
-        def initialize_litellm_provider(provider_ui_value, api_key="", model=""):
+        def initialize_litellm_provider(provider_ui_value, api_key="", model="", base_url=""):
             """Initialize or update the LiteLLM provider based on UI selections."""
             try:
                 provider_mapping = {
@@ -274,7 +316,10 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     "Ollama (Local)": "ollama",
                     "Groq (High-Speed)": "groq",
                     "Perplexity (Search)": "perplexity",
-                    "xAI (Grok)": "xai"
+                    "xAI (Grok)": "xai",
+                    "llama.cpp": "llamacpp",
+                    "LM Studio": "lmstudio",
+                    "Lemonade": "lemonade"
                 }
                 
                 provider_name = provider_mapping.get(provider_ui_value, "openai")
@@ -282,7 +327,8 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 provider = LiteLLMProvider(
                     provider=provider_name,
                     model=model if model else None,
-                    api_key=api_key if api_key else None
+                    api_key=api_key if api_key else None,
+                    base_url=base_url if base_url else None
                 )
                 
                 return provider, f"✅ Initialized {provider_ui_value} provider successfully"
@@ -291,21 +337,30 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 logger.error(f"Error initializing provider: {e}")
                 return None, f"❌ Error initializing provider: {str(e)}"
 
-        def update_model_choices(provider_ui_value, current_provider_state):
+        def update_model_choices(provider_ui_value, base_url, current_provider_state):
             """Update available models when provider changes."""
             try:
-                provider, status_msg = initialize_litellm_provider(provider_ui_value)
+                # Load saved base URL if not provided - use provider-specific environment variable
+                if not base_url and provider_ui_value in ["llama.cpp", "LM Studio", "Lemonade"]:
+                    base_url_env_var = get_base_url_env_var(provider_ui_value)
+                    base_url = load_env_var(base_url_env_var, "")
+                
+                provider, status_msg = initialize_litellm_provider(provider_ui_value, base_url=base_url)
                 
                 if provider is None:
-                    return gr.update(choices=[], value=""), status_msg, current_provider_state
+                    return gr.update(choices=[], value=""), status_msg, current_provider_state, gr.update(visible=False)
                 
                 all_models = provider.get_available_models()
                 default_model = all_models[0] if all_models else ""
                 
+                # Show base URL input for llama.cpp, LM Studio, and Lemonade
+                show_base_url = provider_ui_value in ["llama.cpp", "LM Studio", "Lemonade"]
+                
                 return (
                     gr.update(choices=all_models, value=default_model),
                     status_msg,
-                    provider
+                    provider,
+                    gr.update(visible=show_base_url)
                 )
                 
             except Exception as e:
@@ -313,14 +368,15 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 return (
                     gr.update(choices=[], value=""),
                     f"❌ Error loading models: {str(e)}",
-                    current_provider_state
+                    current_provider_state,
+                    gr.update(visible=False)
                 )
 
-        def test_api_connection(provider_ui_value, api_key, model, current_provider_state):
+        def test_api_connection(provider_ui_value, api_key, model, base_url, current_provider_state):
             """Test the API connection with current settings and save if successful."""
             try:
                 if current_provider_state is None:
-                    provider, init_msg = initialize_litellm_provider(provider_ui_value, api_key, model)
+                    provider, init_msg = initialize_litellm_provider(provider_ui_value, api_key, model, base_url)
                     if provider is None:
                         return init_msg, provider
                 else:
@@ -339,7 +395,10 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                         "Ollama (Local)": "ollama",
                         "Groq (High-Speed)": "groq",
                         "Perplexity (Search)": "perplexity",
-                        "xAI (Grok)": "xai"
+                        "xAI (Grok)": "xai",
+                        "llama.cpp": "llamacpp",
+                        "LM Studio": "lmstudio",
+                        "Lemonade": "lemonade"
                     }
                     internal_provider = provider_mapping.get(provider_ui_value, "openai")
                     
@@ -349,8 +408,20 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     save_env_var("RESUME_HELPER_LAST_PROVIDER", provider_ui_value)
                     if model:
                         save_env_var("RESUME_HELPER_LAST_MODEL", model)
+                    if base_url:
+                        save_env_var("CUSTOM_BASE_URL", base_url)
                     
-                    return f"✅ {result} (Settings saved)", provider
+                    # Check context window for local providers
+                    context_warning = ""
+                    if provider_ui_value in ["llama.cpp", "LM Studio", "Lemonade", "Ollama (Local)"]:
+                        try:
+                            ctx_size, ctx_msg = provider.check_context_window()
+                            if ctx_msg:
+                                context_warning = f"\n\n{ctx_msg}"
+                        except Exception as e:
+                            logger.debug(f"Could not check context window: {e}")
+                    
+                    return f"✅ {result} (Settings saved){context_warning}", provider
                 else:
                     return f"❌ {result}", provider
                 
@@ -1090,7 +1161,12 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
         def on_provider_change(provider_ui_value):
             """Handle provider selection change and save immediately."""
             try:
-                models_result = update_model_choices(provider_ui_value, None)
+                # Load saved base URL - use provider-specific environment variable
+                base_url_env_var = get_base_url_env_var(provider_ui_value)
+                saved_base_url = load_env_var(base_url_env_var, "")
+                
+                # Pass base_url to update_model_choices
+                models_result = update_model_choices(provider_ui_value, saved_base_url, None)
                 provider_mapping = {
                     "OpenAI": "openai",
                     "Anthropic (Claude)": "anthropic", 
@@ -1098,7 +1174,10 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     "Ollama (Local)": "ollama",
                     "Groq (High-Speed)": "groq",
                     "Perplexity (Search)": "perplexity",
-                    "xAI (Grok)": "xai"
+                    "xAI (Grok)": "xai",
+                    "llama.cpp": "llamacpp",
+                    "LM Studio": "lmstudio",
+                    "Lemonade": "lemonade"
                 }
                 internal_provider = provider_mapping.get(provider_ui_value, "openai")
                 env_key = f"{internal_provider.upper()}_API_KEY"
@@ -1106,14 +1185,35 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                 
                 save_env_var("RESUME_HELPER_LAST_PROVIDER", provider_ui_value)
                 
+                # Auto-configure default base URLs in background (hidden from user)
+                is_local_provider = provider_ui_value in ["llama.cpp", "LM Studio", "Ollama (Local)", "Lemonade"]
+                
+                # Auto-fill default base URLs silently
+                default_base_urls = {
+                    "llama.cpp": "http://localhost:8080/v1",
+                    "LM Studio": "http://localhost:1234/v1",
+                    "Lemonade": "http://localhost:8000/api/v1",
+                    "Ollama (Local)": "http://localhost:11434"
+                }
+                
+                # Load saved base URL or use default
+                if provider_ui_value in ["llama.cpp", "LM Studio", "Lemonade", "Ollama (Local)"] and not saved_base_url:
+                    saved_base_url = default_base_urls.get(provider_ui_value, "")
+                    # Auto-save the default silently to provider-specific env var
+                    if saved_base_url:
+                        save_env_var(base_url_env_var, saved_base_url)
+                
+                # Update base_url_input with the provider-specific value
                 return (
-                    models_result[0],
-                    gr.update(value=saved_key),
+                    models_result[0],  # model_selector update
+                    gr.update(value=saved_key),  # api_key_input update
+                    gr.update(value=saved_base_url),  # base_url_input update - always update with provider-specific URL
+                    gr.update(visible=is_local_provider)  # refresh_models_btn visibility
                 )
             except Exception as e:
-                return gr.update(), gr.update()
+                return gr.update(), gr.update(), gr.update(), gr.update()
         
-        def set_ai_configuration(provider_ui_value, api_key, model):
+        def set_ai_configuration(provider_ui_value, api_key, model, base_url):
             """Set AI configuration and update current AI status."""
             try:
                 provider_mapping = {
@@ -1123,11 +1223,19 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     "Ollama (Local)": "ollama",
                     "Groq (High-Speed)": "groq",
                     "Perplexity (Search)": "perplexity",
-                    "xAI (Grok)": "xai"
+                    "xAI (Grok)": "xai",
+                    "llama.cpp": "llamacpp",
+                    "LM Studio": "lmstudio",
+                    "Lemonade": "lemonade"
                 }
                 internal_provider = provider_mapping.get(provider_ui_value, "openai")
-                if internal_provider == "ollama":
-                    save_env_var("OLLAMA_API_KEY", "ollama-local-dummy-key")
+                # All local providers use the same dummy key format
+                if internal_provider in ["ollama", "llamacpp", "lmstudio", "lemonade"]:
+                    save_env_var(f"{internal_provider.upper()}_API_KEY", "sk-no-key-required")
+                    if base_url:
+                        # Save to provider-specific environment variable
+                        base_url_env_var = f"{internal_provider.upper()}_API_BASE"
+                        save_env_var(base_url_env_var, base_url)
                 elif api_key.strip():
                     env_key = f"{internal_provider.upper()}_API_KEY"
                     save_env_var(env_key, api_key)
@@ -1140,9 +1248,13 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
                     model=model,
                     api_key=api_key if api_key.strip() else None
                 )
+                resume_helper.litellm_provider.custom_base_url = base_url
+                if base_url and internal_provider in ["llamacpp", "lmstudio", "lemonade"]:
+                    resume_helper.litellm_provider._set_base_url(base_url)
+                
                 from Resume_Helper.workflows.resume_workflows import ResumeAIWorkflows
                 resume_helper.ai_workflows = ResumeAIWorkflows(resume_helper.get_litellm_provider())
-                test_result = test_api_connection(provider_ui_value, api_key, model, None)
+                test_result = test_api_connection(provider_ui_value, api_key, model, base_url, None)
                 current_model_display = model if model else "Default"
                 if "success" in test_result[0].lower() or "valid" in test_result[0].lower():
                     status_text = "✅ Ready"
@@ -1183,7 +1295,28 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
         provider_selector.change(
             fn=on_provider_change,
             inputs=[provider_selector],
-            outputs=[model_selector, api_key_input],
+            outputs=[model_selector, api_key_input, base_url_input, refresh_models_btn],
+        )
+        
+        # Refresh models button handler
+        def refresh_local_models(provider_ui_value, base_url):
+            """Refresh the list of models from local AI servers."""
+            try:
+                # Load saved base URL if not provided in input - use provider-specific env var
+                if not base_url:
+                    base_url_env_var = get_base_url_env_var(provider_ui_value)
+                    base_url = load_env_var(base_url_env_var, "")
+                
+                models_result = update_model_choices(provider_ui_value, base_url, None)
+                return models_result[0]  # Return model_selector update
+            except Exception as e:
+                logger.error(f"Error refreshing models: {e}")
+                return gr.update()
+        
+        refresh_models_btn.click(
+            fn=refresh_local_models,
+            inputs=[provider_selector, base_url_input],
+            outputs=[model_selector]
         )
         
         model_selector.change(
@@ -1194,7 +1327,7 @@ def create_ai_resume_helper_tab(resume_helper, all_tabs_components=None):
 
         set_btn.click(
             fn=set_ai_configuration,
-            inputs=[provider_selector, api_key_input, model_selector],
+            inputs=[provider_selector, api_key_input, model_selector, base_url_input],
             outputs=[current_ai_status],
         )
 
