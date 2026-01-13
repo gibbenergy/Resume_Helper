@@ -48,9 +48,7 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":7860" ^| findstr "LISTENING
 echo Waiting for ports to be released...
 timeout /t 3 /nobreak >nul
 
-:: Launch app (using venv's python)
+:: Launch app (using venv's python with explicit path)
 echo Starting app on port 53441...
-cd Resume_Helper
-python app.py --host 0.0.0.0 --port 53441
-cd ..
+.venv\Scripts\python.exe Resume_Helper\app.py --host 0.0.0.0 --port 53441
 pause
