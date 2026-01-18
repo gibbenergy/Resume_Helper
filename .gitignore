@@ -124,3 +124,10 @@ docs/
 # Testing documentation - deprecated, moved to docs/
 LLAMA_CPP_LM_STUDIO_TESTING.md
 LLAMA_CPP_LM_STUDIO_TESTING.html
+
+# Development/internal files - DO NOT PUBLISH
+RELEASE_v2.1.0_FIXED.md
+validate_release.py
+.pre-commit-config.yaml
+.editorconfig
+RECOVERY_STRATEGY.md
