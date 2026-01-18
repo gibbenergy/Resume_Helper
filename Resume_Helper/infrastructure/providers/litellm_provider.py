@@ -193,7 +193,7 @@ class LiteLLMProvider:
                 
                 # Fall back to default from config
                 if not base_url:
-                base_url = PROVIDER_MODELS.get(provider, {}).get("base_url", "")
+                    base_url = PROVIDER_MODELS.get(provider, {}).get("base_url", "")
                 
                 if base_url:
                     url = f"{base_url}/models"
@@ -223,14 +223,14 @@ class LiteLLMProvider:
         # All local providers use the same dummy key format
         if self.provider in ["ollama", "llamacpp", "lmstudio", "lemonade"]:
             # Set dummy key for LiteLLM (actual value doesn't matter for local providers)
-        if self.provider == "ollama":
+            if self.provider == "ollama":
                 os.environ["OLLAMA_API_KEY"] = "sk-no-key-required"
-            # Only set OLLAMA_API_BASE if not already set (preserve Harbor environment)
-            if "OLLAMA_API_BASE" not in os.environ:
-                os.environ["OLLAMA_API_BASE"] = "http://localhost:11434"
-                logger.info(f"Set default OLLAMA_API_BASE to http://localhost:11434")
-            else:
-                logger.info(f"Using existing OLLAMA_API_BASE: {os.environ['OLLAMA_API_BASE']}")
+                # Only set OLLAMA_API_BASE if not already set (preserve Harbor environment)
+                if "OLLAMA_API_BASE" not in os.environ:
+                    os.environ["OLLAMA_API_BASE"] = "http://localhost:11434"
+                    logger.info(f"Set default OLLAMA_API_BASE to http://localhost:11434")
+                else:
+                    logger.info(f"Using existing OLLAMA_API_BASE: {os.environ['OLLAMA_API_BASE']}")
             else:
                 # OpenAI-compatible local providers
                 os.environ["OPENAI_API_KEY"] = "sk-no-key-required"
@@ -259,11 +259,11 @@ class LiteLLMProvider:
         """Set the API key for the current provider."""
         # All local providers use the same dummy key format
         if self.provider in ["ollama", "llamacpp", "lmstudio", "lemonade"]:
-        if self.provider == "ollama":
+            if self.provider == "ollama":
                 os.environ["OLLAMA_API_KEY"] = "sk-no-key-required"
-            os.environ["OLLAMA_API_BASE"] = "http://localhost:11434"
+                os.environ["OLLAMA_API_BASE"] = "http://localhost:11434"
             else:
-            os.environ["OPENAI_API_KEY"] = api_key if api_key else "sk-no-key-required"
+                os.environ["OPENAI_API_KEY"] = api_key if api_key else "sk-no-key-required"
             return
         
         env_key_map = {
@@ -613,12 +613,12 @@ class LiteLLMProvider:
                 # Check for provider-specific environment variable if no custom URL
                 if not base_url:
                     env_map = {
-                    "llamacpp": "LLAMACPP_API_BASE",
+                        "llamacpp": "LLAMACPP_API_BASE",
                         "lmstudio": "LMSTUDIO_API_BASE",
                         "lemonade": "LEMONADE_API_BASE"
-                }
+                    }
                     env_var = env_map.get(self.provider)
-                base_url = os.getenv(env_var) if env_var else None
+                    base_url = os.getenv(env_var) if env_var else None
                 
                 # Fall back to default from config
                 if not base_url:
@@ -639,20 +639,20 @@ class LiteLLMProvider:
                         logger.info(f"Fetching models from {self.provider} at {url}")
                         response = requests.get(url, timeout=5)
                         
-                if response.status_code == 200:
-                    data = response.json()
-                    models = data.get("data", [])
+                        if response.status_code == 200:
+                            data = response.json()
+                            models = data.get("data", [])
                             
                             if models:
-                    model_list = [f"openai/{m.get('id', '')}" for m in models if m.get('id')]
-                    logger.info(f"Fetched {len(model_list)} models from {self.provider} at {base_url}")
-                    return model_list
+                                model_list = [f"openai/{m.get('id', '')}" for m in models if m.get('id')]
+                                logger.info(f"Fetched {len(model_list)} models from {self.provider} at {base_url}")
+                                return model_list
                             else:
                                 logger.warning(f"Empty models list from {url}")
                     except requests.exceptions.Timeout:
                         logger.warning(f"Timeout fetching from {url}")
                         continue
-        except requests.exceptions.RequestException as e:
+                    except requests.exceptions.RequestException as e:
                         logger.warning(f"Request failed for {url}: {e}")
                         continue
                 
