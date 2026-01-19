@@ -75,7 +75,7 @@ flowchart TD
 ## Quick Start (Windows)
 
 ```bash
-install_run_windows.bat
+start_react_ui.bat
 ```
 
 Or manually:
