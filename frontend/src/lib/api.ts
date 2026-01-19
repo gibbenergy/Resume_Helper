@@ -243,7 +243,7 @@ export const api = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/api/resume/load/json`, {
+    const response = await fetch(`${API_BASE_URL}/api/resume/load-from-json`, {
       method: 'POST',
       body: formData,
     });
@@ -261,7 +261,7 @@ export const api = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/api/resume/load/pdf`, {
+    const response = await fetch(`${API_BASE_URL}/api/resume/load-from-pdf`, {
       method: 'POST',
       body: formData,
     });
@@ -279,7 +279,7 @@ export const api = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/api/resume/load/docx`, {
+    const response = await fetch(`${API_BASE_URL}/api/resume/load-from-docx`, {
       method: 'POST',
       body: formData,
     });
@@ -339,7 +339,7 @@ export const api = {
 
   // Generate JSON export
   async generateJson(data: any) {
-    const response = await fetch(`${API_BASE_URL}/api/resume/export/json`, {
+    const response = await fetch(`${API_BASE_URL}/api/resume/generate-json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -357,12 +357,14 @@ export const api = {
 
   // Generate job analysis PDF
   async generateJobAnalysisPDF(analysisData: any) {
-    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-analysis`, {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-job-analysis`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(analysisData),
+      body: JSON.stringify({
+        analysis_data: analysisData
+      }),
     });
 
     if (!response.ok) {
@@ -375,12 +377,14 @@ export const api = {
 
   // Generate tailored resume PDF
   async generateTailoredResumePDF(data: any) {
-    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-tailored`, {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-tailored-resume`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        tailored_resume_data: data
+      }),
     });
 
     if (!response.ok) {
@@ -401,7 +405,7 @@ export const api = {
       body: JSON.stringify({
         resume_data: resumeData,
         cover_letter_data: coverLetterData,
-        job_analysis: jobAnalysis,
+        job_analysis_data: jobAnalysis,
       }),
     });
 
@@ -421,10 +425,10 @@ export const api = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        content,
+        suggestions_content: content,
         full_name: fullName,
-        company,
-        position,
+        company_name: company,
+        job_position: position,
       }),
     });
 
