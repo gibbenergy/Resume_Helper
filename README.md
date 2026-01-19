@@ -15,26 +15,9 @@
 
 ## 📺 App Demo
 
-<table>
-<tr>
-<td width="50%">
-
-**AI Resume Helper**
-
-https://github.com/user-attachments/assets/857c7162-8baa-4eda-854a-9f30fff3caf0
-
-</td>
-<td width="50%">
-
-**Application Tracking System**
-
-https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
-
-</td>
-</tr>
-</table>
-
----
+| AI Resume Helper | Application Tracking System |
+|:---:|:---:|
+| https://github.com/user-attachments/assets/857c7162-8baa-4eda-854a-9f30fff3caf0 | https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d |
 
 ---
 
@@ -71,14 +54,14 @@ flowchart TD
     D -->|append back| G
     G --> H[📄 Final Output<br/>Complete Document]
     
-    style A fill:#e1f5ff
-    style B fill:#d4c5f9
-    style C fill:#c8e6c9
-    style D fill:#ffcdd2
-    style E fill:#b3e5fc
-    style F fill:#90caf9
-    style G fill:#d4c5f9
-    style H fill:#e1f5ff
+    style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
+    style B fill:#6b21a8,stroke:#a855f7,color:#fff
+    style C fill:#166534,stroke:#22c55e,color:#fff
+    style D fill:#991b1b,stroke:#ef4444,color:#fff
+    style E fill:#0369a1,stroke:#38bdf8,color:#fff
+    style F fill:#1d4ed8,stroke:#60a5fa,color:#fff
+    style G fill:#6b21a8,stroke:#a855f7,color:#fff
+    style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
 ```
 
 **Before sending anything to AI, remove personal information. After getting the AI response, put it back.**
