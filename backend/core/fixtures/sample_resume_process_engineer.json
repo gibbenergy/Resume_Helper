@@ -1,0 +1,286 @@
+{
+  "name_prefix": "Dr.",
+  "email": "dr.chen@email.com",
+  "full_name": "Sarah Chen",
+  "phone": "555-123-6789",
+  "current_address": "456 Industrial Parkway",
+  "location": "Houston, TX",
+  "citizenship": "US Citizen",
+  "linkedin_url": "linkedin.com/in/sarahchen-pe",
+  "github_url": "",
+  "portfolio_url": "",
+  "summary": "Senior Process Engineer with 12+ years of experience in chemical process optimization, plant operations, and safety management. Holds multiple patents in catalytic processes and has published extensively in peer-reviewed journals. Expert in process simulation, hazard analysis, and regulatory compliance.",
+  "education": [
+    {
+      "institution": "Massachusetts Institute of Technology",
+      "degree": "Ph.D.",
+      "field_of_study": "Chemical Engineering",
+      "start_date": "2008",
+      "end_date": "2012",
+      "gpa": "3.9",
+      "description": "Dissertation: Advanced Catalytic Processes for Green Chemistry Applications"
+    },
+    {
+      "institution": "University of Texas at Austin",
+      "degree": "Bachelor of Science",
+      "field_of_study": "Chemical Engineering",
+      "start_date": "2004",
+      "end_date": "2008",
+      "gpa": "3.85",
+      "description": "Summa Cum Laude, Dean's Honor List"
+    }
+  ],
+  "experience": [
+    {
+      "company": "Global Petrochemicals Inc.",
+      "position": "Senior Process Engineer",
+      "location": "Houston, TX",
+      "start_date": "2018",
+      "end_date": "Present",
+      "description": "Lead process optimization initiatives for refinery operations",
+      "achievements": [
+        "Reduced energy consumption by 22% through process optimization, saving $4.5M annually",
+        "Led team of 8 engineers in major plant expansion project ($50M capital investment)",
+        "Implemented advanced process control systems reducing variability by 35%",
+        "Developed proprietary catalyst recovery process (Patent Pending)"
+      ]
+    },
+    {
+      "company": "ChemTech Solutions",
+      "position": "Process Engineer",
+      "location": "Baton Rouge, LA",
+      "start_date": "2012",
+      "end_date": "2018",
+      "description": "Process design and optimization for specialty chemical manufacturing",
+      "achievements": [
+        "Designed and commissioned new production line increasing capacity by 40%",
+        "Reduced waste generation by 28% through process modifications",
+        "Led HAZOP studies and Process Safety Management initiatives",
+        "Mentored 5 junior engineers in process simulation and safety analysis"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "category": "Process Simulation",
+      "name": "Aspen Plus",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Process Simulation",
+      "name": "HYSYS",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Process Simulation",
+      "name": "ChemCAD",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Safety Analysis",
+      "name": "HAZOP",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Safety Analysis",
+      "name": "LOPA",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Programming",
+      "name": "MATLAB",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Programming",
+      "name": "Python",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Process Control",
+      "name": "DCS Systems",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Process Control",
+      "name": "PLC Programming",
+      "proficiency": "Advanced"
+    },
+    {
+      "category": "Compliance",
+      "name": "EPA Regulations",
+      "proficiency": "Expert"
+    },
+    {
+      "category": "Compliance",
+      "name": "OSHA PSM",
+      "proficiency": "Expert"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Green Hydrogen Production Plant Design",
+      "description": "Led conceptual design and feasibility study for 50MW green hydrogen production facility using electrolysis technology",
+      "technologies": "Aspen Plus, HYSYS, Techno-Economic Analysis",
+      "url": "",
+      "start_date": "2023",
+      "end_date": "2024"
+    },
+    {
+      "name": "Catalytic Reformer Optimization",
+      "description": "Comprehensive optimization of catalytic reformer unit resulting in 15% yield improvement and extended catalyst life",
+      "technologies": "Process Simulation, Advanced Process Control, Statistical Analysis",
+      "url": "",
+      "start_date": "2021",
+      "end_date": "2022"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Professional Engineer (PE) - Chemical Engineering",
+      "issuer": "Texas Board of Professional Engineers",
+      "date_obtained": "2015",
+      "credential_id": "PE-123456",
+      "url": "https://pels.texas.gov/verify"
+    },
+    {
+      "name": "Certified Safety Professional (CSP)",
+      "issuer": "Board of Certified Safety Professionals",
+      "date_obtained": "2019",
+      "credential_id": "CSP-789012",
+      "url": "https://www.bcsp.org/Verify"
+    },
+    {
+      "name": "Six Sigma Black Belt",
+      "issuer": "American Society for Quality",
+      "date_obtained": "2017",
+      "credential_id": "SSBB-456789",
+      "url": ""
+    }
+  ],
+  "others": {
+    "Patents": [
+      {
+        "title": "Novel Catalyst Composition for Selective Oxidation Processes",
+        "organization": "US Patent and Trademark Office",
+        "date": "2023",
+        "location": "US Patent 11,234,567",
+        "description": "Co-inventor of improved catalyst formulation increasing selectivity by 25% and reducing operating temperature by 50°C",
+        "url": "https://patents.google.com/patent/US11234567"
+      },
+      {
+        "title": "Integrated Heat Recovery System for Chemical Processes",
+        "organization": "US Patent and Trademark Office",
+        "date": "2021",
+        "location": "US Patent 10,987,654",
+        "description": "Lead inventor of innovative heat integration system reducing energy consumption by 18%",
+        "url": "https://patents.google.com/patent/US10987654"
+      },
+      {
+        "title": "Advanced Process Control Method for Distillation Columns",
+        "organization": "US Patent and Trademark Office",
+        "date": "2019",
+        "location": "US Patent 10,543,210",
+        "description": "Developed model predictive control algorithm improving separation efficiency and reducing energy costs",
+        "url": "https://patents.google.com/patent/US10543210"
+      }
+    ],
+    "Publications": [
+      {
+        "title": "Optimization of Catalytic Cracking Processes Using Machine Learning Algorithms",
+        "organization": "Chemical Engineering Science",
+        "date": "2024",
+        "location": "Volume 285, Pages 119-134",
+        "description": "First author. Demonstrated 12% improvement in product yield prediction accuracy using ensemble ML models",
+        "url": "https://doi.org/10.1016/j.ces.2024.xxxxx"
+      },
+      {
+        "title": "Sustainable Process Design for Carbon Capture and Utilization",
+        "organization": "Industrial & Engineering Chemistry Research",
+        "date": "2023",
+        "location": "Volume 62, Issue 8, Pages 3456-3470",
+        "description": "Co-author. Techno-economic analysis of novel carbon capture technologies for industrial applications",
+        "url": "https://doi.org/10.1021/acs.iecr.xxxxx"
+      },
+      {
+        "title": "Advanced HAZOP Methodology for Complex Chemical Processes",
+        "organization": "Process Safety Progress",
+        "date": "2022",
+        "location": "Volume 41, Issue 3, Pages 289-302",
+        "description": "Lead author. Proposed systematic approach for HAZOP studies in multi-unit chemical plants",
+        "url": "https://doi.org/10.1002/prs.xxxxx"
+      },
+      {
+        "title": "Energy Integration in Petrochemical Complexes: A Case Study",
+        "organization": "Energy Journal",
+        "date": "2020",
+        "location": "Volume 195, Pages 116-127",
+        "description": "First author. Demonstrated potential for 30% energy reduction through process integration",
+        "url": "https://doi.org/10.1016/j.energy.2020.xxxxx"
+      }
+    ],
+    "Conference Presentations": [
+      {
+        "title": "Digital Twins for Process Optimization in Chemical Manufacturing",
+        "organization": "AIChE Annual Meeting",
+        "date": "November 2024",
+        "location": "San Diego, CA",
+        "description": "Keynote speaker. Presented implementation of digital twin technology reducing unplanned downtime by 40%",
+        "url": ""
+      },
+      {
+        "title": "Next-Generation Catalysts for Sustainable Chemical Production",
+        "organization": "International Congress of Chemical Engineering",
+        "date": "September 2023",
+        "location": "Barcelona, Spain",
+        "description": "Invited speaker. Discussed breakthrough catalyst developments and industrial applications",
+        "url": ""
+      },
+      {
+        "title": "Process Safety Management in the Era of Industry 4.0",
+        "organization": "Process Safety Symposium",
+        "date": "April 2023",
+        "location": "Houston, TX",
+        "description": "Panel moderator and presenter. Explored integration of IoT and AI in process safety systems",
+        "url": ""
+      }
+    ],
+    "Professional Memberships": [
+      {
+        "title": "Senior Member",
+        "organization": "American Institute of Chemical Engineers (AIChE)",
+        "date": "2015-Present",
+        "location": "New York, NY",
+        "description": "Active member of Process Development Division and Safety & Health Division",
+        "url": "https://www.aiche.org"
+      },
+      {
+        "title": "Member",
+        "organization": "American Chemical Society (ACS)",
+        "date": "2012-Present",
+        "location": "Washington, DC",
+        "description": "Member of Industrial & Engineering Chemistry Division",
+        "url": "https://www.acs.org"
+      }
+    ],
+    "Awards": [
+      {
+        "title": "Excellence in Process Innovation Award",
+        "organization": "Global Petrochemicals Inc.",
+        "date": "2023",
+        "location": "Houston, TX",
+        "description": "Recognized for breakthrough catalyst development project saving $4.5M annually",
+        "url": ""
+      },
+      {
+        "title": "Outstanding Young Chemical Engineer Award",
+        "organization": "American Institute of Chemical Engineers",
+        "date": "2018",
+        "location": "Pittsburgh, PA",
+        "description": "National recognition for contributions to process optimization and safety management",
+        "url": ""
+      }
+    ]
+  }
+}
+
