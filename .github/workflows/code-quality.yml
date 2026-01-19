@@ -26,8 +26,7 @@ jobs:
     - name: Check Python Syntax (py_compile)
       run: |
         echo "🔍 Checking Python syntax for all files..."
-        python -m py_compile Resume_Helper/**/*.py
-        python -m py_compile Resume_Helper/**/**/*.py
+        find Resume_Helper -name "*.py" -exec python -m py_compile {} \;
         echo "✅ All Python files have valid syntax!"
     
     - name: Test Imports
