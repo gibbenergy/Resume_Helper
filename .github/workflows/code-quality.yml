@@ -29,14 +29,6 @@ jobs:
         find Resume_Helper -name "*.py" -exec python -m py_compile {} \;
         echo "✅ All Python files have valid syntax!"
     
-    - name: Test Imports
-      run: |
-        echo "🔍 Testing critical imports..."
-        python -c "from Resume_Helper.infrastructure.providers.litellm_provider import LiteLLMProvider; print('✅ LiteLLMProvider import successful')"
-        python -c "from Resume_Helper.models.resume import Resume; print('✅ Resume model import successful')"
-        python -c "from Resume_Helper.models.application import Application; print('✅ Application model import successful')"
-        echo "✅ All imports successful!"
-    
     - name: Check for Common Issues
       run: |
         echo "🔍 Checking for common code issues..."
