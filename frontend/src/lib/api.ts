@@ -228,6 +228,16 @@ export const api = {
     return fetchAPI('/api/resume/data');
   },
 
+  // Load software developer example
+  async loadSoftwareDeveloperExample() {
+    return fetchAPI('/api/resume/example/software-developer');
+  },
+
+  // Load process engineer example
+  async loadProcessEngineerExample() {
+    return fetchAPI('/api/resume/example/process-engineer');
+  },
+
   /**
    * PDF Generation APIs
    */
