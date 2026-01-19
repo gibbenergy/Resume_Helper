@@ -187,9 +187,23 @@ async def load_from_json(
     try:
         # Save uploaded file temporarily
         import tempfile
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as tmp_file:
-            content = await file.read()
-            tmp_file.write(content.decode('utf-8'))
+        content = await file.read()
+        
+        # Try to decode with multiple encodings
+        text_content = None
+        encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1']
+        for encoding in encodings:
+            try:
+                text_content = content.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+        
+        if text_content is None:
+            raise HTTPException(status_code=400, detail="Could not decode file - unsupported encoding")
+        
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json', encoding='utf-8') as tmp_file:
+            tmp_file.write(text_content)
             tmp_path = tmp_file.name
         
         try:

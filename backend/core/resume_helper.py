@@ -242,8 +242,20 @@ class ResumeHelper:
             from models.resume import ResumeSchema
             from utils.constants import UIConstants
             from utils.logging_helpers import StandardLogger
-            with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+            
+            # Try multiple encodings
+            encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1']
+            data = None
+            for encoding in encodings:
+                try:
+                    with open(file_path, 'r', encoding=encoding) as f:
+                        data = json.load(f)
+                    break  # Success, stop trying
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    continue
+            
+            if data is None:
+                raise ValueError("Could not decode JSON file with any supported encoding")
             
             request_id = str(uuid.uuid4())
             SchemaEngine.log_schema_operation("load_resume_json", "ResumeSchema", len(data))
