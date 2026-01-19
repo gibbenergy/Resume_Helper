@@ -238,11 +238,200 @@ export const api = {
     return fetchAPI('/api/resume/example/process-engineer');
   },
 
+  // Load from JSON file
+  async loadFromJson(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/api/resume/load/json`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to load JSON' }));
+      throw new Error(error.detail);
+    }
+
+    return response.json();
+  },
+
+  // Load from PDF file
+  async loadFromPDF(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/api/resume/load/pdf`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to load PDF' }));
+      throw new Error(error.detail);
+    }
+
+    return response.json();
+  },
+
+  // Load from DOCX file
+  async loadFromDOCX(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/api/resume/load/docx`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to load DOCX' }));
+      throw new Error(error.detail);
+    }
+
+    return response.json();
+  },
+
   /**
    * PDF Generation APIs
    */
 
-  // Generate PDF
+  // Generate resume PDF
+  async generateResumePDF(data: any) {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-resume`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'PDF generation failed' }));
+      throw new Error(error.detail);
+    }
+
+    return response.blob();
+  },
+
+  // Generate resume DOCX
+  async generateResumeDOCX(data: any) {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-docx`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'DOCX generation failed' }));
+      throw new Error(error.detail);
+    }
+
+    return response.blob();
+  },
+
+  // Generate JSON export
+  async generateJson(data: any) {
+    const response = await fetch(`${API_BASE_URL}/api/resume/export/json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'JSON export failed' }));
+      throw new Error(error.detail);
+    }
+
+    return response.blob();
+  },
+
+  // Generate job analysis PDF
+  async generateJobAnalysisPDF(analysisData: any) {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-analysis`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(analysisData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Analysis PDF generation failed' }));
+      throw new Error(error.detail);
+    }
+
+    return response.blob();
+  },
+
+  // Generate tailored resume PDF
+  async generateTailoredResumePDF(data: any) {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-tailored`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Tailored resume PDF generation failed' }));
+      throw new Error(error.detail);
+    }
+
+    return response.blob();
+  },
+
+  // Generate cover letter PDF
+  async generateCoverLetterPDF(resumeData: any, coverLetterData: any, jobAnalysis: any) {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-cover-letter`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        resume_data: resumeData,
+        cover_letter_data: coverLetterData,
+        job_analysis: jobAnalysis,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Cover letter PDF generation failed' }));
+      throw new Error(error.detail);
+    }
+
+    return response.blob();
+  },
+
+  // Generate suggestions PDF
+  async generateSuggestionsPDF(content: string, fullName: string, company: string, position: string) {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-suggestions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content,
+        full_name: fullName,
+        company,
+        position,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Suggestions PDF generation failed' }));
+      throw new Error(error.detail);
+    }
+
+    return response.blob();
+  },
+
+  // Generate PDF (generic)
   async generatePDF(data: any) {
     const response = await fetch(`${API_BASE_URL}/api/pdf/generate`, {
       method: 'POST',
