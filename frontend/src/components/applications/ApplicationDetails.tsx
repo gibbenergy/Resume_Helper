@@ -16,10 +16,7 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog';
 import {
   Accordion,
@@ -29,7 +26,7 @@ import {
 } from '@/components/ui/accordion';
 import { Trash2, Calendar, FileText, Eye, Upload, Save, Edit, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
 import { InterviewManagement } from './InterviewManagement';
-import { toTitleCase, formatDate, formatLocation } from '@/lib/utils';
+import { toTitleCase, formatDate } from '@/lib/utils';
 import { api } from '@/lib/api';
 import type { Application } from '@/lib/types';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -71,7 +68,7 @@ export function ApplicationDetails({ appId, open, onClose, onEdit }: Application
 
   // Initialize edited data when application loads
   useEffect(() => {
-    if (open && selectedApplication && selectedApplication.id === appId) {
+    if (open && selectedApplication && String(selectedApplication.id) === appId) {
       setEditedData({
         company: selectedApplication.company,
         position: selectedApplication.position,
@@ -103,7 +100,7 @@ export function ApplicationDetails({ appId, open, onClose, onEdit }: Application
       return;
     }
     
-    if (selectedApplication && selectedApplication.id === appId && selectedApplication.description) {
+    if (selectedApplication && String(selectedApplication.id) === appId && selectedApplication.description) {
       setLoadingPdf(true);
       // Use cached PDF endpoint - it will generate if needed
       const pdfUrl = api.getJobDescriptionPDFUrl(appId);
@@ -172,7 +169,7 @@ export function ApplicationDetails({ appId, open, onClose, onEdit }: Application
     setIsEditing(false);
     setIsDirty(false);
     // Reset edited data to original
-    if (selectedApplication && selectedApplication.id === appId) {
+    if (selectedApplication && String(selectedApplication.id) === appId) {
       setEditedData({
         company: selectedApplication.company,
         position: selectedApplication.position,
@@ -224,7 +221,7 @@ export function ApplicationDetails({ appId, open, onClose, onEdit }: Application
 
   // Initialize editedData when dialog opens or application changes
   React.useEffect(() => {
-    if (open && selectedApplication && selectedApplication.id === appId) {
+    if (open && selectedApplication && String(selectedApplication.id) === appId) {
       setEditedData({
         company: selectedApplication.company,
         position: selectedApplication.position,
@@ -248,13 +245,13 @@ export function ApplicationDetails({ appId, open, onClose, onEdit }: Application
     }
   }, [open, selectedApplication, appId]);
 
-  if (!selectedApplication || selectedApplication.id !== appId) {
+  if (!selectedApplication || String(selectedApplication.id) !== appId) {
     fetchApplication(appId);
     return null;
   }
 
   const app = selectedApplication;
-  const documents = app.documents || [];
+  const documents = (app as any).documents || [];
 
   return (
     <Dialog open={open} onOpenChange={(newOpen) => {
@@ -553,7 +550,7 @@ export function ApplicationDetails({ appId, open, onClose, onEdit }: Application
                     {documents.length === 0 ? (
                       <p className="text-sm text-muted-foreground">No documents uploaded</p>
                     ) : (
-                      documents.map((doc) => (
+                      documents.map((doc: any) => (
                         <div
                           key={doc.id}
                           className="flex items-center justify-between p-3 bg-muted/30 rounded-md hover:bg-muted/50 transition-colors"

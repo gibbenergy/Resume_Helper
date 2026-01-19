@@ -1,6 +1,4 @@
-import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 interface PaginationProps {
@@ -18,7 +16,7 @@ export function Pagination({
   onPageChange,
   itemsPerPage,
   totalItems,
-  onItemsPerPageChange,
+  onItemsPerPageChange: _onItemsPerPageChange,
 }: PaginationProps) {
   const startItem = (currentPage - 1) * itemsPerPage + 1
   const endItem = Math.min(currentPage * itemsPerPage, totalItems)

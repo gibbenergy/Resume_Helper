@@ -24,7 +24,7 @@ export function ExperienceForm() {
   const { resumeData, addExperience, removeExperience, clearExperience, updateExperience } = useResumeStore();
   const { toast } = useToast();
   const { saveProfile } = useProfileSave();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ExperienceEntry>({
+  const { register, handleSubmit, reset } = useForm<ExperienceEntry>({
     defaultValues: {
       company: '',
       position: '',

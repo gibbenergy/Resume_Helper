@@ -3,13 +3,13 @@ import { useResumeStore } from '@/stores/resumeStore';
 import { useAIStore } from '@/stores/aiStore';
 import { useApplicationStore } from '@/stores/applicationStore';
 import { api } from '@/lib/api';
-import { formatAnalysisAsMarkdown, formatSuggestionsContent } from '@/lib/utils';
-import { buttonStyles, buttonVariants } from '@/lib/styles';
+import { formatAnalysisAsMarkdown } from '@/lib/utils';
+import { buttonStyles } from '@/lib/styles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -17,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, RefreshCw, Search, Target, Mail, Lightbulb, Plus, RotateCcw, Sparkles, Wand2, FileText, FolderPlus, CreditCard, Settings, CheckCircle2, UserCircle, Link, HelpCircle, Pencil, X, Terminal, Cpu, MessageSquare, Save } from 'lucide-react';
+import { Loader2, RefreshCw, Search, Lightbulb, Sparkles, Wand2, FileText, FolderPlus, CreditCard, Settings, CheckCircle2, Link, Pencil, X, MessageSquare, Save, Terminal, RotateCcw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { ResultPalette } from './ResultPalette';
 import { PDFViewerModal } from './PDFViewerModal';
@@ -36,7 +36,6 @@ export function AIResumeHelper() {
     apiKey,
     availableProviders,
     availableModels,
-    totalCost,
     costDisplay,
     jobAnalysis,
     tailoredResume,
@@ -45,10 +44,7 @@ export function AIResumeHelper() {
     matchScore,
     matchSummary,
     jobUrl: storeJobUrl,
-    pdfPaths,
     editedContent,
-    aiStatus,
-    processingStatus,
     analyzing,
     tailoring,
     generatingCoverLetter,
@@ -67,12 +63,9 @@ export function AIResumeHelper() {
     tailorResume: tailorResumeAction,
     generateCoverLetter: generateCoverLetterAction,
     getImprovementSuggestions,
-    setMatchScore,
-    setMatchSummary,
     setJobUrl,
     setJobDescription,
     setUserPrompt,
-    setPdfPath,
     setEditedContent,
     setProcessingStatus,
     updateAIStatus,
@@ -88,7 +81,7 @@ export function AIResumeHelper() {
   const [addToTrackerSuccess, setAddToTrackerSuccess] = useState(false);
   const jobDescriptionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [isJobDescriptionExpanded, setIsJobDescriptionExpanded] = useState(false);
-  const jobDescriptionDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const jobDescriptionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isJobUrlEditMode, setIsJobUrlEditMode] = useState(false);
   // User Prompt always shows as a pill (even when empty)
   // When editing, it opens an editor with a Save button
@@ -246,8 +239,8 @@ export function AIResumeHelper() {
     };
   }, [jobDescription]);
 
-  // Calculate word count
-  const jobDescriptionWordCount = jobDescription.trim() ? jobDescription.trim().split(/\s+/).filter(Boolean).length : 0;
+  // Word count calculation available if needed:
+  // const wordCount = jobDescription.trim() ? jobDescription.trim().split(/\s+/).filter(Boolean).length : 0;
 
   // Initialize userPromptEditValue when entering edit mode
   useEffect(() => {
@@ -437,7 +430,7 @@ export function AIResumeHelper() {
 
     // Get job details from analysis (matches Gradio's job_details_state - line 1437-1439)
     // job_details_state gets updated from analysis results (line 470: job_details.update(extracted_details))
-    const jobDetails = jobAnalysis?.analysis || {};
+    const jobDetails = (typeof jobAnalysis?.analysis === 'object' ? jobAnalysis.analysis : {}) as Record<string, any>;
     const company = jobDetails.company_name || 'Unknown Company';
     const position = jobDetails.position_title || 'Unknown Position';
     const location = jobDetails.location || '';
@@ -496,7 +489,7 @@ export function AIResumeHelper() {
       position: position,
       location: location,
       description: jobDescText.trim(),
-      match_score: scoreToUse ? parseInt(String(scoreToUse)) : null,
+      match_score: scoreToUse ? parseInt(String(scoreToUse)) : undefined,
       salary_min: salaryMin,
       salary_max: salaryMax,
       application_source: 'AI Analysis',
@@ -543,6 +536,9 @@ export function AIResumeHelper() {
 
   // Check if analysis has been completed successfully
   const hasAnalysisResults = !!jobAnalysis?.analysis;
+  
+  // Helper to safely access analysis data (could be string or object)
+  const analysisData = (typeof jobAnalysis?.analysis === 'object' ? jobAnalysis.analysis : null) as Record<string, any> | null;
 
   // Extract model name (remove provider prefix if present)
   const modelName = model ? (model.includes('/') ? model.split('/').pop() || model : model) : 'Default';
@@ -550,8 +546,7 @@ export function AIResumeHelper() {
   // Determine status (Ready/Not Ready)
   const isReady = provider === 'Ollama (Local)' || (provider !== 'Ollama (Local)' && apiKey);
 
-  // Detect LinkedIn URL for badge display
-  const isLinkedInUrl = storeJobUrl?.toLowerCase().includes('linkedin.com');
+  // URL validation
   const isValidUrl = storeJobUrl?.trim() && (storeJobUrl.startsWith('http://') || storeJobUrl.startsWith('https://'));
 
   return (
@@ -1131,7 +1126,7 @@ export function AIResumeHelper() {
               <Button
                 onClick={handleTailorResume}
                 disabled={!jobAnalysis || tailoring || !jobDescription.trim()}
-                variant={buttonVariants.secondary}
+                variant="secondary"
                 className={`flex-1 ${buttonStyles.secondary} ${
                   !jobAnalysis ? buttonStyles.disabled : ''
                 }`}
@@ -1148,7 +1143,7 @@ export function AIResumeHelper() {
               <Button
                 onClick={handleGenerateCoverLetter}
                 disabled={!jobAnalysis || generatingCoverLetter || !jobDescription.trim()}
-                variant={buttonVariants.secondary}
+                variant="secondary"
                 className={`flex-1 ${buttonStyles.secondary} ${
                   !jobAnalysis ? buttonStyles.disabled : ''
                 }`}
@@ -1165,7 +1160,7 @@ export function AIResumeHelper() {
               <Button
                 onClick={handleGetSuggestions}
                 disabled={!jobAnalysis || gettingSuggestions || !jobDescription.trim()}
-                variant={buttonVariants.secondary}
+                variant="secondary"
                 className={`flex-1 ${buttonStyles.secondary} ${
                   !jobAnalysis ? buttonStyles.disabled : ''
                 }`}
@@ -1265,58 +1260,58 @@ export function AIResumeHelper() {
                 </div>
 
                 {/* Detailed Match Breakdown */}
-                {(jobAnalysis?.analysis?.skills_match !== undefined || 
-                  jobAnalysis?.analysis?.experience_match !== undefined || 
-                  jobAnalysis?.analysis?.education_match !== undefined) && (
+                {(analysisData?.skills_match !== undefined || 
+                  analysisData?.experience_match !== undefined || 
+                  analysisData?.education_match !== undefined) && (
                   <div className="space-y-4 py-4 border-b">
                     <Label className="text-base font-semibold">Match Breakdown</Label>
                     <div className="space-y-3">
-                      {jobAnalysis?.analysis?.skills_match !== undefined && (
+                      {analysisData?.skills_match !== undefined && (
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">Skills Match</span>
-                            <span className="font-medium">{jobAnalysis.analysis.skills_match}%</span>
+                            <span className="font-medium">{analysisData.skills_match}%</span>
                           </div>
                           <div className="w-full bg-muted rounded-full h-2">
                             <div
                               className="h-2 rounded-full transition-all"
                               style={{
-                                width: `${jobAnalysis.analysis.skills_match}%`,
-                                backgroundColor: jobAnalysis.analysis.skills_match >= 80 ? '#22c55e' : jobAnalysis.analysis.skills_match >= 60 ? '#eab308' : '#ef4444',
+                                width: `${analysisData.skills_match}%`,
+                                backgroundColor: analysisData.skills_match >= 80 ? '#22c55e' : analysisData.skills_match >= 60 ? '#eab308' : '#ef4444',
                               }}
                             />
                           </div>
                         </div>
                       )}
-                      {jobAnalysis?.analysis?.experience_match !== undefined && (
+                      {analysisData?.experience_match !== undefined && (
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">Experience Match</span>
-                            <span className="font-medium">{jobAnalysis.analysis.experience_match}%</span>
+                            <span className="font-medium">{analysisData.experience_match}%</span>
                           </div>
                           <div className="w-full bg-muted rounded-full h-2">
                             <div
                               className="h-2 rounded-full transition-all"
                               style={{
-                                width: `${jobAnalysis.analysis.experience_match}%`,
-                                backgroundColor: jobAnalysis.analysis.experience_match >= 80 ? '#22c55e' : jobAnalysis.analysis.experience_match >= 60 ? '#eab308' : '#ef4444',
+                                width: `${analysisData.experience_match}%`,
+                                backgroundColor: analysisData.experience_match >= 80 ? '#22c55e' : analysisData.experience_match >= 60 ? '#eab308' : '#ef4444',
                               }}
                             />
                           </div>
                         </div>
                       )}
-                      {jobAnalysis?.analysis?.education_match !== undefined && (
+                      {analysisData?.education_match !== undefined && (
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">Education Match</span>
-                            <span className="font-medium">{jobAnalysis.analysis.education_match}%</span>
+                            <span className="font-medium">{analysisData.education_match}%</span>
                           </div>
                           <div className="w-full bg-muted rounded-full h-2">
                             <div
                               className="h-2 rounded-full transition-all"
                               style={{
-                                width: `${jobAnalysis.analysis.education_match}%`,
-                                backgroundColor: jobAnalysis.analysis.education_match >= 80 ? '#22c55e' : jobAnalysis.analysis.education_match >= 60 ? '#eab308' : '#ef4444',
+                                width: `${analysisData.education_match}%`,
+                                backgroundColor: analysisData.education_match >= 80 ? '#22c55e' : analysisData.education_match >= 60 ? '#eab308' : '#ef4444',
                               }}
                             />
                           </div>
@@ -1327,17 +1322,17 @@ export function AIResumeHelper() {
                 )}
 
                 {/* Estimated Salary Range */}
-                {jobAnalysis?.analysis?.estimated_salary_range && (
+                {analysisData?.estimated_salary_range && (
                   <div className="space-y-3 py-4 border-b">
                     <Label className="text-base font-semibold">Estimated Salary Range</Label>
                     <div className="p-4 bg-muted/50 rounded-lg border">
-                      {typeof jobAnalysis.analysis.estimated_salary_range === 'string' ? (
+                      {typeof analysisData.estimated_salary_range === 'string' ? (
                         <p className="text-lg font-medium text-foreground">
-                          {jobAnalysis.analysis.estimated_salary_range}
+                          {analysisData.estimated_salary_range}
                         </p>
-                      ) : typeof jobAnalysis.analysis.estimated_salary_range === 'object' ? (
+                      ) : typeof analysisData.estimated_salary_range === 'object' ? (
                         <div className="space-y-2">
-                          {Object.entries(jobAnalysis.analysis.estimated_salary_range).map(([key, value]) => (
+                          {Object.entries(analysisData.estimated_salary_range).map(([key, value]) => (
                             <div key={key}>
                               <span className="text-sm font-semibold text-muted-foreground capitalize">
                                 {key.replace(/_/g, ' ')}:{' '}
@@ -1350,7 +1345,7 @@ export function AIResumeHelper() {
                         </div>
                       ) : (
                         <p className="text-lg font-medium text-foreground">
-                          {String(jobAnalysis.analysis.estimated_salary_range)}
+                          {String(analysisData?.estimated_salary_range)}
                         </p>
                       )}
                     </div>
@@ -1360,10 +1355,10 @@ export function AIResumeHelper() {
                 {/* Result Palette */}
                 <ResultPalette
                   onResultClick={handleOpenPDFModal}
-                  jobAnalysis={jobAnalysis}
-                  tailoredResume={tailoredResume}
-                  coverLetter={coverLetter}
-                  improvementSuggestions={improvementSuggestions}
+                  jobAnalysis={jobAnalysis ?? undefined}
+                  tailoredResume={tailoredResume ?? undefined}
+                  coverLetter={coverLetter ?? undefined}
+                  improvementSuggestions={improvementSuggestions ?? undefined}
                 />
               </div>
             )}
@@ -1376,14 +1371,16 @@ export function AIResumeHelper() {
         onClose={() => setPdfModalOpen(false)}
         type={selectedResultType}
         data={
-          selectedResultType === 'summary' ? jobAnalysis :
+          (selectedResultType === 'summary' ? jobAnalysis :
           selectedResultType === 'tailored' ? tailoredResume :
           selectedResultType === 'cover-letter' ? coverLetter :
-          improvementSuggestions
+          improvementSuggestions) ?? undefined
         }
         resumeData={resumeData}
-        jobAnalysis={jobAnalysis}
-        editedContent={editedContent}
+        jobAnalysis={jobAnalysis ?? undefined}
+        editedContent={Object.fromEntries(
+          Object.entries(editedContent).map(([k, v]) => [k, v ?? ''])
+        )}
         onContentEdit={handleContentEdit}
       />
     </div>

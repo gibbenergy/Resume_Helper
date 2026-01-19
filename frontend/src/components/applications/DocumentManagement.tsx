@@ -41,12 +41,12 @@ export function DocumentManagement({ appId }: DocumentManagementProps) {
   const [docToDelete, setDocToDelete] = useState<ApplicationDocument | null>(null);
 
   useEffect(() => {
-    if (!selectedApplication || selectedApplication.id !== appId) {
+    if (!selectedApplication || String(selectedApplication.id) !== appId) {
       fetchApplication(appId);
     }
   }, [appId, selectedApplication, fetchApplication]);
 
-  const documents = selectedApplication?.documents || [];
+  const documents = (selectedApplication as any)?.documents || [];
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -123,11 +123,8 @@ export function DocumentManagement({ appId }: DocumentManagementProps) {
     }
   };
 
-  const getFileStatus = (doc: ApplicationDocument): string => {
-    // In a real implementation, we might check if file exists
-    // For now, assume all documents are available
-    return '✅ Available';
-  };
+  // Status helper - can be used if needed
+  // const getFileStatus = (doc: ApplicationDocument) => '✅ Available';
 
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -191,7 +188,7 @@ export function DocumentManagement({ appId }: DocumentManagementProps) {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {documents.map((doc) => (
+                        {documents.map((doc: any) => (
                           <TableRow
                             key={doc.id}
                             className={selectedDoc?.id === doc.id ? 'bg-muted' : ''}
@@ -205,7 +202,7 @@ export function DocumentManagement({ appId }: DocumentManagementProps) {
                             </TableCell>
                             <TableCell>{formatDate(doc.upload_date)}</TableCell>
                             <TableCell>{formatFileSize(doc.size)}</TableCell>
-                            <TableCell>{getFileStatus(doc)}</TableCell>
+                            <TableCell>✅ Available</TableCell>
                             <TableCell>
                               <div className="flex gap-1">
                                 <Button

@@ -28,10 +28,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, Trash2 } from 'lucide-react';
 import type { ApplicationCreateRequest } from '@/lib/types';
 import { ApplicationDetails } from './ApplicationDetails';
-import { toTitleCase, formatDate, formatLocation } from '@/lib/utils';
+import { toTitleCase, formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -43,7 +43,6 @@ interface ApplicationTrackerProps {
 export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps) {
   const {
     applications,
-    selectedApplication,
     loading,
     error,
     fetchApplications,
@@ -51,7 +50,6 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
     updateApplication,
     deleteApplication,
     setSelectedApplication,
-    clearError,
     settings,
     fetchSettings,
   } = useApplicationStore();
@@ -125,14 +123,14 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
       const status = roundData.status || 'not_started';
 
       if (status === 'scheduled') {
-        return roundName.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+        return roundName.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
       } else if (status === 'completed') {
         const outcome = roundData.outcome || '';
         if (outcome !== 'passed') {
-          return roundName.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+          return roundName.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
         }
       } else if (status === 'cancelled' || status === 'on_hold') {
-        return roundName.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+        return roundName.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
       }
     }
 
@@ -141,7 +139,7 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
       const firstRound = roundNames[0];
       const firstRoundData = pipeline[firstRound] || { status: 'not_started' };
       if (firstRoundData.status === 'not_started') {
-        return firstRound.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+        return firstRound.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
       }
     }
 
@@ -274,7 +272,7 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
 
   const handleOpenDialog = (app?: typeof applications[0]) => {
     if (app) {
-      setEditingApp(app.id);
+      setEditingApp(String(app.id));
       setFormData({
         job_url: app.job_url,
         company: app.company,
@@ -312,7 +310,7 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
 
   const handleViewDetails = (app: typeof applications[0]) => {
     setSelectedApplication(app);
-    setSelectedAppId(app.id);
+    setSelectedAppId(String(app.id));
   };
 
   const handleSave = async () => {
@@ -516,15 +514,15 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
                       <TableCell>{app.priority}</TableCell>
                       <TableCell className="whitespace-nowrap">{getCurrentRound(app)}</TableCell>
                       <TableCell>
-                        {app.documents && app.documents.length > 0
-                          ? `${app.documents.length}`
+                        {(app as any).documents && (app as any).documents.length > 0
+                          ? `${(app as any).documents.length}`
                           : '—'}
                       </TableCell>
                       <TableCell onClick={(e) => e.stopPropagation()} className="w-[80px]">
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDelete(app.id)}
+                          onClick={() => handleDelete(String(app.id))}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -666,7 +664,7 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
                       'Company Website',
                       'Referral',
                       'Other',
-                    ]).map((source) => (
+                    ]).map((source: string) => (
                       <SelectItem key={source} value={source}>
                         {source}
                       </SelectItem>
@@ -785,7 +783,7 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
             fetchApplications(); // Refresh after closing details
           }}
           onEdit={() => {
-            const app = applications.find((a) => a.id === selectedAppId);
+            const app = applications.find((a) => String(a.id) === selectedAppId);
             if (app) {
               setSelectedAppId(null);
               handleOpenDialog(app);

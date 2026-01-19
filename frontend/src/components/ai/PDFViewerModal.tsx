@@ -21,7 +21,7 @@ interface PDFViewerModalProps {
   data: JobAnalysisResult | TailoredResumeResult | CoverLetterResult | ImprovementSuggestionsResult | undefined;
   resumeData: ResumeData;
   jobAnalysis?: JobAnalysisResult;
-  editedContent?: Record<string, string>;
+  editedContent?: Record<string, string | null>;
   onContentEdit?: (type: string, content: string) => void;
 }
 
@@ -86,9 +86,10 @@ export function PDFViewerModal({
       switch (type) {
         case 'summary':
           if ('analysis' in data && data.analysis) {
-            // Parse edited markdown back to analysis object
-            let analysisData = contentToUse 
-              ? parseMarkdownToAnalysis(contentToUse, data.analysis)
+            // Parse edited markdown back to analysis object or use original
+            const originalAnalysis = typeof data.analysis === 'object' ? data.analysis : {};
+            const analysisData = contentToUse 
+              ? { ...originalAnalysis, sections: parseMarkdownToAnalysis(contentToUse).sections }
               : data.analysis;
             
             blob = await api.generateJobAnalysisPDF(analysisData);
@@ -158,8 +159,9 @@ export function PDFViewerModal({
         case 'suggestions':
           if ('content' in data && data.content) {
             const fullName = resumeData.personal_info?.full_name || '';
-            const company = jobAnalysis?.analysis?.company_name || 'company';
-            const jobPosition = jobAnalysis?.analysis?.position_title || '';
+            const analysisObj = typeof jobAnalysis?.analysis === 'object' ? jobAnalysis.analysis : {};
+            const company = (analysisObj as any)?.company_name || 'company';
+            const jobPosition = (analysisObj as any)?.position_title || '';
             const content = contentToUse || editedContent?.suggestions || formatSuggestionsContent(data.content);
             blob = await api.generateSuggestionsPDF(content, fullName, company, jobPosition);
           } else {
@@ -205,21 +207,23 @@ export function PDFViewerModal({
     const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
     let filename = '';
 
+    const analysisObj = typeof jobAnalysis?.analysis === 'object' ? jobAnalysis.analysis as any : {};
+    
     switch (type) {
       case 'summary':
         filename = `job_analysis_${timestamp}.pdf`;
         break;
       case 'tailored':
-        const company = ('tailored_resume' in data && data.tailored_resume?.company_name) || 'company';
-        filename = `${company.toLowerCase().replace(/\s+/g, '_')}_resume_${timestamp}.pdf`;
+        const company = (data && 'tailored_resume' in data && data.tailored_resume?.company_name) || 'company';
+        filename = `${String(company).toLowerCase().replace(/\s+/g, '_')}_resume_${timestamp}.pdf`;
         break;
       case 'cover-letter':
-        const coverCompany = ('company_name' in data && data.company_name) || 'company';
-        filename = `${coverCompany.toLowerCase().replace(/\s+/g, '_')}_cover_letter_${timestamp}.pdf`;
+        const coverCompany = (data && 'company_name' in data && (data as any).company_name) || 'company';
+        filename = `${String(coverCompany).toLowerCase().replace(/\s+/g, '_')}_cover_letter_${timestamp}.pdf`;
         break;
       case 'suggestions':
-        const suggCompany = jobAnalysis?.analysis?.company_name || 'company';
-        filename = `${suggCompany.toLowerCase().replace(/\s+/g, '_')}_suggestions_${timestamp}.pdf`;
+        const suggCompany = analysisObj?.company_name || 'company';
+        filename = `${String(suggCompany).toLowerCase().replace(/\s+/g, '_')}_suggestions_${timestamp}.pdf`;
         break;
     }
 

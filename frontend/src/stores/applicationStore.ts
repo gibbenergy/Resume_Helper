@@ -109,10 +109,10 @@ export const useApplicationStore = create<ApplicationStore>((set, get) => ({
         const updated = response.data;
         set((state) => ({
           applications: state.applications.map((app) =>
-            app.id === appId ? updated : app
+            String(app.id) === appId ? updated : app
           ),
           selectedApplication:
-            state.selectedApplication?.id === appId ? updated : state.selectedApplication,
+            String(state.selectedApplication?.id) === appId ? updated : state.selectedApplication,
           loading: false,
         }));
         return true;
@@ -135,9 +135,9 @@ export const useApplicationStore = create<ApplicationStore>((set, get) => ({
       const response = await api.deleteApplication(appId);
       if (response.success) {
         set((state) => ({
-          applications: state.applications.filter((app) => app.id !== appId),
+          applications: state.applications.filter((app) => String(app.id) !== appId),
           selectedApplication:
-            state.selectedApplication?.id === appId ? null : state.selectedApplication,
+            String(state.selectedApplication?.id) === appId ? null : state.selectedApplication,
           loading: false,
         }));
         return true;

@@ -67,26 +67,55 @@ export interface ResumeData {
   others?: Record<string, any>;
 }
 
+// Type aliases for form components
+export type EducationEntry = Education;
+export type ExperienceEntry = Experience;
+export type SkillEntry = Skill;
+export type ProjectEntry = Project;
+export type CertificationEntry = Certification;
+
 // AI result types
+export interface JobAnalysisData {
+  company_name?: string;
+  position_title?: string;
+  location?: string;
+  employment_type?: string;
+  experience_level?: string;
+  estimated_salary_range?: string;
+  match_score?: number;
+  match_summary?: string;
+  skills_match?: number;
+  experience_match?: number;
+  education_match?: number;
+  job_url?: string;
+  required_skills?: string[];
+  preferred_skills?: string[];
+  key_responsibilities?: string[];
+  [key: string]: any;
+}
+
 export interface JobAnalysisResult {
   success: boolean;
-  analysis: string;
+  analysis: JobAnalysisData | string;
   match_score?: number;
   summary?: string;
   model?: string;
   usage?: any;
+  error?: string;
 }
 
 export interface TailoredResumeResult {
   success: boolean;
-  content: string;
+  content?: string;
+  tailored_resume?: any;
   model?: string;
   usage?: any;
 }
 
 export interface CoverLetterResult {
   success: boolean;
-  content: string;
+  content?: string;
+  body_content?: string;
   model?: string;
   usage?: any;
 }
@@ -107,6 +136,41 @@ export interface ModelsInfo {
 }
 
 // Application tracker types
+export interface ApplicationDocument {
+  id: number;
+  name: string;
+  type: string;
+  url?: string;
+  uploaded_at?: string;
+}
+
+export interface InterviewRound {
+  status: string;
+  outcome?: string;
+  scheduled_date?: string;
+  notes?: string;
+}
+
+export interface ApplicationCreateRequest {
+  job_url: string;
+  company: string;
+  position: string;
+  location?: string;
+  salary_min?: number;
+  salary_max?: number;
+  date_applied?: string;
+  application_source?: string;
+  priority?: string;
+  status?: string;
+  description?: string;
+  notes?: string;
+  match_score?: number;
+  hr_contact?: string;
+  hiring_manager?: string;
+  recruiter?: string;
+  referral?: string;
+}
+
 export interface Application {
   id: number;
   job_url: string;
@@ -132,6 +196,15 @@ export interface Application {
   timeline?: Array<Record<string, any>>;
   next_actions?: string[];
   tags?: string[];
+  documents?: ApplicationDocument[];
+}
+
+export interface ApplicationSettings {
+  application_sources?: string[];
+  default_interview_rounds?: string[];
+  round_statuses?: string[];
+  round_outcomes?: string[];
+  [key: string]: any;
 }
 
 export interface Interview {

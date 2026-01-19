@@ -24,7 +24,7 @@ export function EducationForm() {
   const { resumeData, addEducation, removeEducation, clearEducation, updateEducation } = useResumeStore();
   const { toast } = useToast();
   const { saveProfile } = useProfileSave();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<EducationEntry>({
+  const { register, handleSubmit, reset } = useForm<EducationEntry>({
     defaultValues: {
       institution: '',
       degree: '',

@@ -5,7 +5,6 @@ import type {
   CoverLetterResult,
   ImprovementSuggestionsResult,
   ResumeData,
-  ModelsInfo,
 } from '@/lib/types';
 import { api } from '@/lib/api';
 import { formatAnalysisAsMarkdown, formatSuggestionsContent } from '@/lib/utils';
@@ -311,11 +310,12 @@ export const useAIStore = create<AIStore>((set, get) => ({
         const analysisResult = await api.analyzeJob(jobDescription, resumeData, model || undefined);
         if (analysisResult.success && analysisResult.analysis) {
           analysisData = analysisResult.analysis;
+          const analysisObj = typeof analysisData === 'object' ? analysisData as any : {};
           set({
             jobAnalysis: analysisResult,
-            matchScore: analysisData.match_score || 0,
-            matchSummary: analysisData.match_summary || '',
-            jobUrl: analysisData.job_url || get().jobUrl,
+            matchScore: analysisObj.match_score || 0,
+            matchSummary: analysisObj.match_summary || '',
+            jobUrl: analysisObj.job_url || get().jobUrl,
           });
           get().updateAIStatus();
         }

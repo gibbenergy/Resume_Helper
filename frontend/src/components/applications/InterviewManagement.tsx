@@ -12,16 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { X, Save, XCircle, CheckCircle2 } from 'lucide-react';
-import type { InterviewRound } from '@/lib/types';
+import { Save, XCircle, CheckCircle2 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 interface InterviewManagementProps {
@@ -30,7 +21,7 @@ interface InterviewManagementProps {
   dateApplied?: string;
 }
 
-export function InterviewManagement({ appId, onClose, dateApplied }: InterviewManagementProps) {
+export function InterviewManagement({ appId, onClose: _onClose, dateApplied }: InterviewManagementProps) {
   const {
     selectedApplication,
     settings,
@@ -42,7 +33,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
   } = useApplicationStore();
 
   const [roundFormVisible, setRoundFormVisible] = useState(false);
-  const [roundFormData, setRoundFormData] = useState<Partial<InterviewRound>>({
+  const [roundFormData, setRoundFormData] = useState<Record<string, any>>({
     status: 'not_started',
     date: new Date().toISOString().split('T')[0],
     time: '',
@@ -56,7 +47,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
     if (!settings) {
       fetchSettings();
     }
-    if (!selectedApplication || selectedApplication.id !== appId) {
+    if (!selectedApplication || String(selectedApplication.id) !== appId) {
       fetchApplication(appId);
     }
   }, [appId, settings, selectedApplication, fetchSettings, fetchApplication]);
@@ -147,7 +138,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
     if (success) {
       // Auto-advance: If status is completed and outcome is passed, automatically schedule next round
       if (roundFormData.status === 'completed' && roundFormData.outcome === 'passed') {
-        const currentIndex = defaultRounds.findIndex(r => r === selectedRound);
+        const currentIndex = defaultRounds.findIndex((r: string) => r === selectedRound);
         if (currentIndex >= 0 && currentIndex + 1 < defaultRounds.length) {
           const nextRoundName = defaultRounds[currentIndex + 1];
           const nextRoundData = interviewPipeline[nextRoundName] || {};
@@ -175,32 +166,11 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
   };
 
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return '✅';
-      case 'scheduled':
-        return '📅';
-      default:
-        return '⭕';
-    }
-  };
+  // Helper: getStatusIcon and getStatusText available if needed
+  // const getStatusIcon = (status: string) => status === 'completed' ? '✅' : status === 'scheduled' ? '📅' : '⭕';
+  // const getStatusText = (data: Record<string, any>) => ...
 
-  const getStatusText = (roundData: Partial<InterviewRound>) => {
-    const status = roundData.status || 'not_started';
-    if (status === 'completed') {
-      const outcome = roundData.outcome || '';
-      if (outcome && outcome !== 'pending') {
-        return `Completed - ${outcome.charAt(0).toUpperCase() + outcome.slice(1)}`;
-      }
-      return 'Completed';
-    } else if (status === 'scheduled') {
-      return 'Scheduled';
-    }
-    return 'Not Started';
-  };
-
-  const getRoundDetails = (roundData: Partial<InterviewRound>) => {
+  const getRoundDetails = (roundData: Record<string, any>) => {
     const parts: string[] = [];
     if (roundData.location) {
       parts.push(`📍 ${roundData.location}`);
@@ -234,7 +204,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
   // Create timeline nodes: Applied (first) + interview rounds
   const timelineNodes = [
     { name: 'Applied', key: 'applied', isFirst: true },
-    ...defaultRounds.map(roundName => ({ name: roundName, key: roundName, isFirst: false }))
+    ...defaultRounds.map((roundName: string) => ({ name: roundName, key: roundName, isFirst: false }))
   ];
 
   const getNodeState = (node: typeof timelineNodes[0], nodeIndex: number) => {
@@ -313,7 +283,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
               {/* Base gray line */}
               <div className="absolute inset-0 bg-muted" />
               {/* Green segments for completed connections */}
-              {timelineNodes.map((node, index) => {
+              {timelineNodes.map((_node, index) => {
                 if (index === 0) return null; // Skip first node
                 const prevNode = timelineNodes[index - 1];
                 const isPrevCompleted = isNodeCompleted(prevNode, index - 1);
@@ -354,9 +324,9 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
                 
                 const displayName = node.key === 'applied' 
                   ? 'Applied' 
-                  : node.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+                  : node.name.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
-                const details = roundData ? getRoundDetails(roundData as Partial<InterviewRound>) : null;
+                const details = roundData ? getRoundDetails(roundData as Record<string, any>) : null;
 
                 return (
                   <div 
@@ -415,7 +385,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
             <Card>
               <CardHeader>
                 <CardTitle>
-                  Edit {selectedRound.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                  Edit {selectedRound.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -467,7 +437,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
                     onValueChange={(value) =>
                       setRoundFormData({
                         ...roundFormData,
-                        status: value as InterviewRound['status'],
+                        status: value,
                       })
                     }
                   >
@@ -475,9 +445,9 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {roundStatuses.map((status) => (
+                      {roundStatuses.map((status: string) => (
                         <SelectItem key={status} value={status}>
-                          {status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                          {status.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -488,7 +458,7 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
                   <Select
                     value={roundFormData.outcome || 'pending'}
                     onValueChange={(value) => {
-                      const newOutcome = value as InterviewRound['outcome'];
+                      const newOutcome = value;
                       // Auto-set status to completed when outcome is passed or failed
                       const shouldComplete = newOutcome === 'passed' || newOutcome === 'failed';
                       setRoundFormData({
@@ -502,9 +472,9 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {roundOutcomes.map((outcome) => (
+                      {roundOutcomes.map((outcome: string) => (
                         <SelectItem key={outcome} value={outcome}>
-                          {outcome.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                          {outcome.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                         </SelectItem>
                       ))}
                     </SelectContent>
