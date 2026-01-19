@@ -54,10 +54,11 @@ Resume_Helper/temp/
 .pydevproject
 .settings/
 
-# All dot-prefixed folders (except .git which is handled by Git itself)
+# All dot-prefixed folders (except .git and .github which are needed)
 # This catches .cursor, .vscode, .idea, and any other IDE-specific folders
 .*/
 !/.gitignore
+!/.github/
 
 # OS files
 .DS_Store
@@ -124,3 +125,10 @@ docs/
 # Testing documentation - deprecated, moved to docs/
 LLAMA_CPP_LM_STUDIO_TESTING.md
 LLAMA_CPP_LM_STUDIO_TESTING.html
+
+# Development/internal files - DO NOT PUBLISH
+RELEASE_v2.1.0_FIXED.md
+validate_release.py
+.pre-commit-config.yaml
+.editorconfig
+RECOVERY_STRATEGY.md
