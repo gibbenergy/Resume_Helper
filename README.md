@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="Resume_Helper/assets/logo.jpg" alt="Resume Helper Logo" width="200"/>
+  <img src="assets/logo.jpg" alt="Resume Helper Logo" width="200"/>
   
 
   

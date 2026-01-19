@@ -52,7 +52,7 @@ jobs:
     - name: Check Python Syntax (py_compile)
       run: |
         echo "🔍 Checking Python syntax for all files..."
-        find Resume_Helper -name "*.py" -exec python -m py_compile {} \;
+        find backend -name "*.py" -exec python -m py_compile {} \;
         echo "✅ All Python files have valid syntax!"
     
     - name: Check for Common Issues
@@ -61,11 +61,11 @@ jobs:
         
         # Check for mixed indentation
         echo "Checking for mixed tabs/spaces..."
-        ! grep -r $'\t' Resume_Helper --include="*.py" && echo "✅ No tabs found (using spaces only)" || (echo "❌ Found tabs - please use spaces only" && exit 1)
+        ! grep -r $'\t' backend --include="*.py" && echo "✅ No tabs found (using spaces only)" || (echo "❌ Found tabs - please use spaces only" && exit 1)
         
         # Check for trailing whitespace
         echo "Checking for trailing whitespace..."
-        ! grep -r ' $' Resume_Helper --include="*.py" && echo "✅ No trailing whitespace" || echo "⚠️  Found trailing whitespace (non-critical)"
+        ! grep -r ' $' backend --include="*.py" && echo "✅ No trailing whitespace" || echo "⚠️  Found trailing whitespace (non-critical)"
         
         echo "✅ Code quality checks passed!"
     
@@ -74,6 +74,6 @@ jobs:
       run: |
         pip install flake8
         # Stop on syntax errors or undefined names
-        flake8 Resume_Helper --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 backend --count --select=E9,F63,F7,F82 --show-source --statistics
         # Check everything else (warnings only)
-        flake8 Resume_Helper --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 backend --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
