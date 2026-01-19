@@ -152,6 +152,13 @@ export const useAIStore = create<AIStore>((set, get) => ({
   setProvider: async (provider: string) => {
     set({ provider });
     await get().loadModels(provider);
+    // Silently sync the backend provider after models load
+    // Get the newly loaded default model and sync backend
+    const newModel = get().model;
+    if (newModel) {
+      // Call test-api-key in background to switch backend provider (no UI feedback)
+      api.testApiKey(provider, '', newModel).catch(() => {});
+    }
   },
 
   setModel: (model: string) => set({ model }),
@@ -160,29 +167,17 @@ export const useAIStore = create<AIStore>((set, get) => ({
 
   testApiKey: async () => {
     const { provider, apiKey, model } = get();
-    // #region agent log
-    fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:testApiKey',message:'Starting API key test',data:{provider,model,apiKeyLength:apiKey.length,apiKeyPrefix:apiKey.substring(0,10)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     set({ testingApiKey: true, error: null });
     try {
       // For Ollama, pass empty string - backend will handle it
       const keyToTest = provider === 'Ollama (Local)' ? '' : apiKey;
-      // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:testApiKey',message:'Calling API testApiKey',data:{provider,model,keyToTestLength:keyToTest.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       const response = await api.testApiKey(provider, keyToTest, model || undefined);
-      // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:testApiKey',message:'API response received',data:{success:response.success,message:response.message,provider:response.provider},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
-      // #endregion
       set({ testingApiKey: false });
       if (response.success) {
         await get().loadCost(); // Refresh cost after successful test
       }
       return response.success || false;
     } catch (error) {
-      // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:testApiKey',message:'API key test error',data:{errorMessage:error instanceof Error ? error.message : String(error)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
-      // #endregion
       set({
         error: error instanceof Error ? error.message : 'Failed to test API key',
         testingApiKey: false,
@@ -262,15 +257,7 @@ export const useAIStore = create<AIStore>((set, get) => ({
         return;
       }
       
-      // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:265',message:'Analyze job - request data',data:{model:model||'default',jobDescLength:jobDescription.length,jobDescPreview:jobDescription.substring(0,200),resumeName:resumeData.personal_info?.full_name||'N/A',resumeSummary:resumeData.personal_info?.summary?.substring(0,200)||'N/A',hasExperience:!!resumeData.experience_table?.length,hasEducation:!!resumeData.education_table?.length,hasSkills:!!resumeData.skills_table?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
-      
       const result = await api.analyzeJob(jobDescription, resumeData, model || undefined);
-      
-      // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:269',message:'Analyze job - response received',data:{success:result.success,hasAnalysis:!!result.analysis,error:result.error||'N/A',modelUsed:model||'null/undefined',matchScore:result.analysis?.match_score||null,hasMatchScore:result.analysis?.match_score!==undefined,hasSkillsMatch:result.analysis?.skills_match!==undefined,hasExperienceMatch:result.analysis?.experience_match!==undefined,hasEducationMatch:result.analysis?.education_match!==undefined,hasMatchSummary:result.analysis?.match_summary!==undefined,company:result.analysis?.company_name||'N/A',position:result.analysis?.position_title||'N/A'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       
       // Update match score and summary if analysis succeeded
       if (result.success && result.analysis) {
@@ -291,9 +278,6 @@ export const useAIStore = create<AIStore>((set, get) => ({
         });
         get().updateAIStatus();
       } else {
-        // #region agent log
-        fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:294',message:'Analyze job - failed',data:{error:result.error||'Unknown error',modelUsed:model||'null/undefined',hasAnalysis:!!result.analysis},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         set({ 
           jobAnalysis: result, 
           analyzing: false, 
@@ -344,12 +328,6 @@ export const useAIStore = create<AIStore>((set, get) => ({
         userPrompt,
         analysisData
       );
-      
-      // #region agent log
-      const originalSummary = resumeData.personal_info?.summary || 'N/A';
-      const tailoredSummary = result.tailored_resume?.summary || result.tailored_resume?.personal_info?.summary || 'N/A';
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'aiStore.ts:347',message:'Tailor resume - response received',data:{success:result.success,hasTailoredResume:!!result.tailored_resume,originalSummaryLength:originalSummary.length,originalSummaryPreview:originalSummary.substring(0,100),tailoredSummaryLength:tailoredSummary.length,tailoredSummaryPreview:tailoredSummary.substring(0,100),summaryChanged:originalSummary!==tailoredSummary,hasSummaryInTailored:!!result.tailored_resume?.summary,hasSummaryInPersonalInfo:!!result.tailored_resume?.personal_info?.summary},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
       
       if (result.success && result.tailored_resume) {
         const tailoredJson = JSON.stringify(result.tailored_resume, null, 2);

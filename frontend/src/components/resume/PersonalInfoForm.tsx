@@ -24,7 +24,6 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/lib/api';
-import { buttonStyles, buttonVariants } from '@/lib/styles';
 import { UserCircle, Save, RotateCcw, FileCode, Briefcase, X } from 'lucide-react';
 
 interface SavedProfile {
@@ -81,6 +80,7 @@ export function PersonalInfoForm() {
       prevPersonalInfoRef.current = personalInfoStr;
       const personalInfo = resumeData.personal_info || {};
       reset(personalInfo);
+      
       // Handle name_prefix conversion for the select
       if (!personalInfo.name_prefix) {
         setValue('name_prefix', 'none');
@@ -90,33 +90,51 @@ export function PersonalInfoForm() {
   }, [resumeData.personal_info]);
 
   const onSubmit = (data: any) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PersonalInfoForm.tsx:33',message:'Form submission - personal info data',data:{hasSummary:!!data.summary,summaryLength:data.summary?.length||0,summaryPreview:data.summary?.substring(0,100)||'',allFields:Object.keys(data)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     updatePersonalInfo(data);
     
     // Save complete resume profile to localStorage
     const profileName = data.full_name || 'Untitled Profile';
-    const profileId = `profile_${Date.now()}`;
-    const savedProfile: SavedProfile = {
-      id: profileId,
-      name: profileName,
-      timestamp: Date.now(),
-      data: {
-        ...resumeData,
-        personal_info: { ...resumeData.personal_info, ...data },
-      },
+    const updatedResumeData = {
+      ...resumeData,
+      personal_info: { ...resumeData.personal_info, ...data },
     };
     
-    const updatedProfiles = [...savedProfiles, savedProfile];
-    setSavedProfiles(updatedProfiles);
-    localStorage.setItem('resumeHelper_savedProfiles', JSON.stringify(updatedProfiles));
+    // Check if profile with same name exists
+    const existingIndex = savedProfiles.findIndex((p) => p.name === profileName);
     
-    toast({
-      title: 'Profile saved',
-      description: `"${profileName}" has been saved to your assets.`,
-      variant: 'success',
-    });
+    if (existingIndex >= 0) {
+      // Update existing profile
+      const updatedProfiles = [...savedProfiles];
+      updatedProfiles[existingIndex] = {
+        ...updatedProfiles[existingIndex],
+        timestamp: Date.now(),
+        data: updatedResumeData,
+      };
+      setSavedProfiles(updatedProfiles);
+      localStorage.setItem('resumeHelper_savedProfiles', JSON.stringify(updatedProfiles));
+      toast({
+        title: 'Profile updated',
+        description: `"${profileName}" has been updated.`,
+        variant: 'success',
+      });
+    } else {
+      // Create new profile
+      const profileId = `profile_${Date.now()}`;
+      const savedProfile: SavedProfile = {
+        id: profileId,
+        name: profileName,
+        timestamp: Date.now(),
+        data: updatedResumeData,
+      };
+      const updatedProfiles = [...savedProfiles, savedProfile];
+      setSavedProfiles(updatedProfiles);
+      localStorage.setItem('resumeHelper_savedProfiles', JSON.stringify(updatedProfiles));
+      toast({
+        title: 'Profile saved',
+        description: `"${profileName}" has been saved to your assets.`,
+        variant: 'success',
+      });
+    }
   };
 
   const loadSavedProfile = (profile: SavedProfile) => {
@@ -338,10 +356,9 @@ export function PersonalInfoForm() {
         });
       }
     } catch (error) {
-      console.error('[DEBUG] Failed to load example:', error);
       toast({
         title: 'Error loading example',
-        description: 'Failed to load example. Please check the console for details.',
+        description: 'Failed to load example data from server.',
         variant: 'destructive',
       });
     }
@@ -466,16 +483,14 @@ export function PersonalInfoForm() {
           <div className="flex justify-center gap-2 pt-4">
             <Button 
               type="submit"
-              className={buttonStyles.primary}
             >
               <Save className="mr-2 h-4 w-4" />
               Save
             </Button>
             <Button 
               type="button" 
-              variant={buttonVariants.destructive}
+              variant="destructive"
               onClick={handleClear}
-              className={buttonStyles.destructive}
             >
               <RotateCcw className="mr-2 h-4 w-4" />
               Clear
@@ -493,18 +508,16 @@ export function PersonalInfoForm() {
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
-                variant={buttonVariants.secondary}
+                variant="secondary"
                 onClick={() => loadExample('software')}
-                className={buttonStyles.secondary}
               >
                 <FileCode className="mr-2 h-4 w-4" />
                 Software Engineer Example
               </Button>
               <Button
                 type="button"
-                variant={buttonVariants.secondary}
+                variant="secondary"
                 onClick={() => loadExample('process')}
-                className={buttonStyles.secondary}
               >
                 <Briefcase className="mr-2 h-4 w-4" />
                 Process Engineer Example
@@ -521,9 +534,8 @@ export function PersonalInfoForm() {
                   <div key={profile.id} className="flex items-center gap-1">
                     <Button
                       type="button"
-                      variant={buttonVariants.secondary}
+                      variant="secondary"
                       onClick={() => loadSavedProfile(profile)}
-                      className={buttonStyles.secondary}
                     >
                       <UserCircle className="mr-2 h-4 w-4" />
                       {profile.name}

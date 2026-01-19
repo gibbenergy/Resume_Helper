@@ -35,6 +35,14 @@ export const buttonVariants = cva(
 );
 
 /**
- * Export buttonStyles for backward compatibility
+ * Static button style classes for use in className
+ * These are for cases where you need to dynamically construct class strings
  */
-export const buttonStyles = buttonVariants;
+export const buttonStyles = {
+  primary: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+  destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+  secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+  outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+  ghost: "hover:bg-accent hover:text-accent-foreground",
+  disabled: "opacity-50 pointer-events-none",
+};

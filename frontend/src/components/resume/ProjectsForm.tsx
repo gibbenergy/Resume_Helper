@@ -7,13 +7,23 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { useProfileSave } from '@/lib/useProfileSave';
 import type { ProjectEntry } from '@/lib/types';
-import { FolderKanban, RotateCcw, Trash2, Plus, Pencil } from 'lucide-react';
+import { FolderKanban, RotateCcw, Trash2, Plus, Pencil, Save } from 'lucide-react';
 
 export function ProjectsForm() {
   const { resumeData, addProject, removeProject, clearProjects, updateProject } = useResumeStore();
   const { toast } = useToast();
+  const { saveProfile } = useProfileSave();
   const { register, handleSubmit, reset } = useForm<ProjectEntry>({
     defaultValues: {
       name: '',
@@ -25,6 +35,7 @@ export function ProjectsForm() {
     },
   });
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showClearDialog, setShowClearDialog] = useState(false);
 
   // Populate form when editing
   useEffect(() => {
@@ -82,21 +93,28 @@ export function ProjectsForm() {
     });
   };
 
-  const handleResetForm = () => {
-    reset();
-    setSelectedIndex(null);
-    toast({
-      title: 'Form reset',
-      description: 'All form fields have been cleared.',
-    });
-  };
-
   const handleEdit = (index: number) => {
     setSelectedIndex(index);
     const formElement = document.getElementById('projects-form');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleClear = () => {
+    setShowClearDialog(true);
+  };
+
+  const confirmClear = () => {
+    clearProjects();
+    reset();
+    setSelectedIndex(null);
+    setShowClearDialog(false);
+    toast({
+      title: 'Projects cleared',
+      description: 'All project entries have been cleared.',
+      variant: 'destructive',
+    });
   };
 
 
@@ -122,24 +140,6 @@ export function ProjectsForm() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>{selectedIndex !== null ? 'Update entry' : 'Add to History'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleResetForm}
-                  className="h-8 w-8"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Reset form</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -193,6 +193,25 @@ export function ProjectsForm() {
               Technologies
             </Label>
             <Input id="technologies" className="text-sm" {...register('technologies')} />
+          </div>
+
+          {/* Save & Clear Buttons - Centered */}
+          <div className="flex justify-center gap-2 pt-4">
+            <Button 
+              type="button"
+              onClick={saveProfile}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save
+            </Button>
+            <Button 
+              type="button" 
+              variant="destructive"
+              onClick={handleClear}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Clear
+            </Button>
           </div>
         </form>
 
@@ -285,6 +304,33 @@ export function ProjectsForm() {
           )}
         </div>
       </CardContent>
+
+      <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear Projects</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to clear all project entries? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowClearDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmClear}
+            >
+              Clear Projects
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

@@ -487,12 +487,16 @@ export function InterviewManagement({ appId, onClose, dateApplied }: InterviewMa
                   <Label htmlFor="round-outcome">Outcome</Label>
                   <Select
                     value={roundFormData.outcome || 'pending'}
-                    onValueChange={(value) =>
+                    onValueChange={(value) => {
+                      const newOutcome = value as InterviewRound['outcome'];
+                      // Auto-set status to completed when outcome is passed or failed
+                      const shouldComplete = newOutcome === 'passed' || newOutcome === 'failed';
                       setRoundFormData({
                         ...roundFormData,
-                        outcome: value as InterviewRound['outcome'],
-                      })
-                    }
+                        outcome: newOutcome,
+                        status: shouldComplete ? 'completed' : roundFormData.status,
+                      });
+                    }}
                   >
                     <SelectTrigger id="round-outcome">
                       <SelectValue />

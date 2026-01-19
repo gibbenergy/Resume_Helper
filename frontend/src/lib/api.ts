@@ -3,7 +3,7 @@
  * Base URL is configured via environment variable VITE_API_URL
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
  * Generic fetch wrapper with error handling
@@ -109,8 +109,8 @@ export const api = {
 
   // Get improvement suggestions
   async getImprovementSuggestions(
-    job_description: string,
     resume_data: any,
+    job_description: string,
     model?: string,
     job_analysis_data?: any
   ) {
@@ -135,7 +135,7 @@ export const api = {
   },
 
   // Get single application
-  async getApplication(appId: number) {
+  async getApplication(appId: string) {
     return fetchAPI(`/api/applications/${appId}`);
   },
 
@@ -148,7 +148,7 @@ export const api = {
   },
 
   // Update application
-  async updateApplication(appId: number, data: any) {
+  async updateApplication(appId: string, data: any) {
     return fetchAPI(`/api/applications/${appId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -156,7 +156,7 @@ export const api = {
   },
 
   // Delete application
-  async deleteApplication(appId: number) {
+  async deleteApplication(appId: string) {
     return fetchAPI(`/api/applications/${appId}`, {
       method: 'DELETE',
     });
@@ -168,15 +168,15 @@ export const api = {
   },
 
   // Update interview round
-  async updateInterviewRound(appId: number, roundName: string, roundData: any) {
-    return fetchAPI(`/api/applications/${appId}/interview/${roundName}`, {
-      method: 'PUT',
+  async updateInterviewRound(appId: string, roundName: string, roundData: any) {
+    return fetchAPI(`/api/applications/${appId}/interview-rounds/${roundName}`, {
+      method: 'POST',
       body: JSON.stringify(roundData),
     });
   },
 
   // Upload document
-  async uploadDocument(appId: number, file: File) {
+  async uploadDocument(appId: string, file: File) {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -194,8 +194,8 @@ export const api = {
   },
 
   // Download document
-  async downloadDocument(appId: number, docId: number) {
-    const response = await fetch(`${API_BASE_URL}/api/applications/${appId}/documents/${docId}`);
+  async downloadDocument(appId: string, docId: number) {
+    const response = await fetch(`${API_BASE_URL}/api/applications/${appId}/documents/${docId}/download`);
     
     if (!response.ok) {
       throw new Error('Download failed');
@@ -205,7 +205,7 @@ export const api = {
   },
 
   // Delete document
-  async deleteDocument(appId: number, docId: number) {
+  async deleteDocument(appId: string, docId: number) {
     return fetchAPI(`/api/applications/${appId}/documents/${docId}`, {
       method: 'DELETE',
     });
@@ -404,6 +404,7 @@ export const api = {
       },
       body: JSON.stringify({
         resume_data: resumeData,
+        pdf_type: 'cover_letter',
         cover_letter_data: coverLetterData,
         job_analysis_data: jobAnalysis,
       }),
@@ -456,5 +457,10 @@ export const api = {
     }
 
     return response.blob();
+  },
+
+  // Get job description PDF URL for an application
+  getJobDescriptionPDFUrl(appId: string): string {
+    return `${API_BASE_URL}/api/pdf/job-description/${appId}`;
   },
 };

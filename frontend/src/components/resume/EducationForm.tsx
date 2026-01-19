@@ -7,13 +7,23 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { useProfileSave } from '@/lib/useProfileSave';
 import type { EducationEntry } from '@/lib/types';
-import { GraduationCap, RotateCcw, Trash2, Plus, Pencil, MoreVertical } from 'lucide-react';
+import { GraduationCap, RotateCcw, Trash2, Plus, Pencil, Save } from 'lucide-react';
 
 export function EducationForm() {
   const { resumeData, addEducation, removeEducation, clearEducation, updateEducation } = useResumeStore();
   const { toast } = useToast();
+  const { saveProfile } = useProfileSave();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<EducationEntry>({
     defaultValues: {
       institution: '',
@@ -26,6 +36,7 @@ export function EducationForm() {
     },
   });
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showClearDialog, setShowClearDialog] = useState(false);
 
   // Populate form when editing
   useEffect(() => {
@@ -84,15 +95,6 @@ export function EducationForm() {
     });
   };
 
-  const handleResetForm = () => {
-    reset();
-    setSelectedIndex(null);
-    toast({
-      title: 'Form reset',
-      description: 'All form fields have been cleared.',
-    });
-  };
-
   const handleEdit = (index: number) => {
     setSelectedIndex(index);
     // Scroll to form if needed
@@ -100,6 +102,22 @@ export function EducationForm() {
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleClear = () => {
+    setShowClearDialog(true);
+  };
+
+  const confirmClear = () => {
+    clearEducation();
+    reset();
+    setSelectedIndex(null);
+    setShowClearDialog(false);
+    toast({
+      title: 'Education cleared',
+      description: 'All education entries have been cleared.',
+      variant: 'destructive',
+    });
   };
 
 
@@ -125,24 +143,6 @@ export function EducationForm() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>Add to History</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleResetForm}
-                  className="h-8 w-8"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Reset form</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -230,6 +230,25 @@ export function EducationForm() {
               className="text-sm"
               {...register('description')}
             />
+          </div>
+
+          {/* Save & Clear Buttons - Centered */}
+          <div className="flex justify-center gap-2 pt-4">
+            <Button 
+              type="button"
+              onClick={saveProfile}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save
+            </Button>
+            <Button 
+              type="button" 
+              variant="destructive"
+              onClick={handleClear}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Clear
+            </Button>
           </div>
         </form>
 
@@ -321,6 +340,33 @@ export function EducationForm() {
           )}
         </div>
       </CardContent>
+
+      <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear Education</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to clear all education entries? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowClearDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmClear}
+            >
+              Clear Education
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

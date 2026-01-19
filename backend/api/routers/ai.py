@@ -2,9 +2,14 @@
 AI workflow router - job analysis, resume tailoring, cover letters, etc.
 """
 
+import json
+import logging
+import requests
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
+
+logger = logging.getLogger(__name__)
 
 from backend.api.dependencies import get_resume_helper
 from backend.api.models import (
@@ -147,6 +152,7 @@ async def get_improvement_suggestions(
 ) -> Dict[str, Any]:
     """Get improvement suggestions for resume."""
     try:
+        logger.info(f"Improvement suggestions request received - model: {request.model}, has_job_analysis: {request.job_analysis_data is not None}")
         resume_dict = request.resume_data.dict()
         # Use the workflow directly to pass job_analysis_data
         result = resume_helper.ai_workflows.get_improvement_suggestions(
@@ -363,6 +369,58 @@ async def get_models(provider: str) -> Dict[str, Any]:
     }
     mapped_provider = provider_mapping.get(provider, provider.lower())
     
+    # For local providers, try to dynamically fetch available models
+    if mapped_provider in ["ollama", "llamacpp", "lmstudio", "lemonade"]:
+        try:
+            provider_urls = {
+                "ollama": "http://localhost:11434/api/tags",
+                "llamacpp": "http://localhost:8080/v1/models",
+                "lmstudio": "http://localhost:1234/v1/models",
+                "lemonade": "http://localhost:8000/api/v1/models"
+            }
+            
+            url = provider_urls.get(mapped_provider)
+            if url:
+                logger.info(f"Attempting to fetch models from {mapped_provider} at {url}")
+                response = requests.get(url, timeout=5)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"Successfully fetched data from {mapped_provider}: {len(data.get('models', data.get('data', [])))} models")
+                    
+                    # Parse models based on provider's response format
+                    models = []
+                    if mapped_provider == "ollama":
+                        # Ollama format: {"models": [{"name": "..."}, ...]}
+                        models = [f"ollama/{m['name']}" for m in data.get('models', [])]
+                    else:
+                        # OpenAI-compatible format (llamacpp, lmstudio, lemonade): {"data": [{"id": "..."}, ...]}
+                        # Use 'openai/' prefix - LiteLLM will route to custom base_url set via env vars
+                        all_models = data.get('data', [])
+                        for m in all_models:
+                            model_id = m.get('id', '')
+                            # Skip embedding models and other non-chat models
+                            if 'embed' not in model_id.lower() and 'whisper' not in model_id.lower():
+                                # Use openai/ prefix for OpenAI-compatible providers
+                                # The custom base URL (localhost:1234, localhost:8080, etc) is set via env vars
+                                models.append(f"openai/{model_id}")
+                    
+                    if models:
+                        default = models[0]
+                        logger.info(f"Returning {len(models)} models from {mapped_provider}: {models}")
+                        return {
+                            "success": True,
+                            "models": models,
+                            "default": default
+                        }
+                    else:
+                        logger.warning(f"No models found in response from {mapped_provider}")
+                else:
+                    logger.warning(f"Got status code {response.status_code} from {mapped_provider}")
+        except Exception as e:
+            logger.warning(f"Could not fetch models dynamically from {mapped_provider}: {e}. Falling back to hardcoded list.")
+    
+    # Fallback to hardcoded models for cloud providers or if dynamic fetch fails
     provider_config = PROVIDER_MODELS.get(mapped_provider, {})
     models = provider_config.get("models", [])
     default = provider_config.get("default", models[0] if models else None)

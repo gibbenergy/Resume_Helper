@@ -168,7 +168,7 @@ class ResumeHelper:
     def process_with_ai(self, job_description: str, resume_json: str, model: Optional[str] = None) -> StandardResponse:
         """Process resume with AI features."""
         try:
-            from infrastructure.frameworks.response_types import StandardResponse
+            from backend.core.infrastructure.frameworks.response_types import StandardResponse
             
             if not job_description or not resume_json:
                 return StandardResponse.error_response(
@@ -238,10 +238,10 @@ class ResumeHelper:
             raise FileNotFoundError(f"File not found: {file_path}")
             
         try:
-            from infrastructure.frameworks.schema_engine import SchemaEngine
-            from models.resume import ResumeSchema
-            from utils.constants import UIConstants
-            from utils.logging_helpers import StandardLogger
+            from backend.core.infrastructure.frameworks.schema_engine import SchemaEngine
+            from backend.core.models.resume import ResumeSchema
+            from backend.core.utils.constants import UIConstants
+            from backend.core.utils.logging_helpers import StandardLogger
             
             # Try multiple encodings
             encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1']
@@ -261,7 +261,15 @@ class ResumeHelper:
             SchemaEngine.log_schema_operation("load_resume_json", "ResumeSchema", len(data))
             
             result = []
-            personal_info = SchemaEngine.extract_fields(data, ResumeSchema.PERSONAL_INFO)
+            
+            # Check if data is in nested format (with 'personal_info' key) or flat format (PDF/DOCX)
+            if 'personal_info' in data:
+                # Nested format (JSON files)
+                personal_info = SchemaEngine.extract_fields(data.get('personal_info', {}), ResumeSchema.PERSONAL_INFO)
+            else:
+                # Flat format (PDF/DOCX metadata) - personal info fields are at root level
+                personal_info = SchemaEngine.extract_fields(data, ResumeSchema.PERSONAL_INFO)
+            
             personal_order = ResumeSchema.get_field_order('personal_info')
             result.extend([personal_info.get(field, '') for field in personal_order])
             result.append("")
@@ -324,8 +332,8 @@ class ResumeHelper:
             return result
             
         except Exception as e:
-            from utils.logging_helpers import StandardLogger
-            from infrastructure.frameworks.schema_engine import SchemaEngine
+            from backend.core.utils.logging_helpers import StandardLogger
+            from backend.core.infrastructure.frameworks.schema_engine import SchemaEngine
             
             request_id = str(uuid.uuid4())
             StandardLogger.log_operation_error("load_resume_json", request_id, e)

@@ -61,8 +61,7 @@ class CostTracker:
         """Calculate cost from LiteLLM response."""
         try:
             if not LITELLM_COST_AVAILABLE:
-                logger.warning("⚠️ WARNING: LiteLLM cost calculator not available - cost tracking disabled. Install/update litellm package for accurate cost tracking.")
-                print("⚠️ WARNING: LiteLLM cost calculator not available - cost tracking disabled. Install/update litellm package for accurate cost tracking.")
+                logger.warning("LiteLLM cost calculator not available - cost tracking disabled. Install/update litellm package for accurate cost tracking.")
                 return {"cost": 0.0}
             
             usage = llm_response.get("usage", {})
@@ -83,12 +82,10 @@ class CostTracker:
                         )
                         cost = (prompt_cost or 0.0) + (completion_cost_val or 0.0)
                     else:
-                        logger.warning(f"⚠️ WARNING: cost_per_token function not available for model '{model_used}' - cost tracking disabled.")
-                        print(f"⚠️ WARNING: cost_per_token function not available for model '{model_used}' - cost tracking disabled.")
+                        logger.warning(f"cost_per_token function not available for model '{model_used}' - cost tracking disabled.")
                         return {"cost": 0.0}
                 except Exception as e:
-                    logger.warning(f"⚠️ WARNING: Failed to calculate cost for model '{model_used}' (error: {e}) - cost tracking disabled.")
-                    print(f"⚠️ WARNING: Failed to calculate cost for model '{model_used}' (error: {e}) - cost tracking disabled.")
+                    logger.warning(f"Failed to calculate cost for model '{model_used}' (error: {e}) - cost tracking disabled.")
                     return {"cost": 0.0}
             
             return {"cost": cost}

@@ -7,6 +7,7 @@
   
   [![License: BSL 1.1](https://img.shields.io/badge/License-BSL%201.1-blue.svg)](LICENSE)
   [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+  [![Code Quality](https://github.com/gibbenergy/Resume_Helper/actions/workflows/code-quality.yml/badge.svg)](https://github.com/gibbenergy/Resume_Helper/actions/workflows/code-quality.yml)
   
   📖 [Usage Guide](USAGE_GUIDE.md) | 📄 [License](LICENSE)
   
@@ -14,11 +15,24 @@
 
 ## 📺 App Demo
 
-<div align="center">
+<table>
+<tr>
+<td width="50%">
 
-[![Resume Helper Demo](https://img.youtube.com/vi/SQgfXfSYLac/0.jpg)](https://www.youtube.com/watch?v=SQgfXfSYLac)
+**AI Resume Helper**
 
-</div>
+https://github.com/user-attachments/assets/857c7162-8baa-4eda-854a-9f30fff3caf0
+
+</td>
+<td width="50%">
+
+**Application Tracking System**
+
+https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -39,6 +53,37 @@
 🔌 **Multi-AI Support** - OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio, Lemonade
 
 📄 **PDF Generation** - Export professional resumes and cover letters
+
+🔒 **Privacy-Preserving Workflow** - Personal information is stripped before sending to AI and restored after processing
+
+### Privacy-Preserving Workflow
+
+<div align="center">
+
+```mermaid
+flowchart TD
+    A[📄 Resume<br/>Original Document] --> B[🔒 Strip Info<br/>Remove Personal Data]
+    B -->|send| C[📝 Work Content<br/>Anonymized Resume]
+    B -->|remove| D[👤 Personal Info<br/>Stored Locally]
+    C --> E[☁️ Cloud AI<br/>Process Content]
+    E --> F[📊 AI Results<br/>Resume, Cover Letter,<br/>Suggestions, Skill Gaps]
+    F --> G[🔒 Restore Info<br/>Merge Personal Data]
+    D -->|append back| G
+    G --> H[📄 Final Output<br/>Complete Document]
+    
+    style A fill:#e1f5ff
+    style B fill:#d4c5f9
+    style C fill:#c8e6c9
+    style D fill:#ffcdd2
+    style E fill:#b3e5fc
+    style F fill:#90caf9
+    style G fill:#d4c5f9
+    style H fill:#e1f5ff
+```
+
+**Before sending anything to AI, remove personal information. After getting the AI response, put it back.**
+
+</div>
 
 ## Quick Start (Windows)
 

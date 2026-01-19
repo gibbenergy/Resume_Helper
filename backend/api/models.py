@@ -65,7 +65,7 @@ class CertificationEntry(BaseModel):
 
 
 class ResumeData(BaseModel):
-    personal_info: PersonalInfo
+    personal_info: Optional[PersonalInfo] = None
     education: List[EducationEntry] = []
     experience: List[ExperienceEntry] = []
     skills: List[SkillEntry] = []

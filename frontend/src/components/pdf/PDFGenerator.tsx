@@ -65,6 +65,7 @@ export function PDFGenerator() {
       if (response.success && response.data) {
         // Update the resume store with imported data
         setResumeData(response.data);
+        
         toast({
           title: 'Resume imported',
           description: 'Resume data has been imported successfully.',
@@ -142,10 +143,6 @@ export function PDFGenerator() {
           variant: 'success',
         });
       } else if (exportFormat === 'pdf') {
-        // #region agent log
-        const summaryValue = resumeData.personal_info?.summary || '';
-        fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PDFGenerator.tsx:64',message:'Frontend - sending resume data for PDF',data:{hasPersonalInfo:!!resumeData.personal_info,hasSummary:!!summaryValue,summaryLength:summaryValue.length,summaryPreview:summaryValue.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         const blob = await api.generateResumePDF(resumeData);
         const url = URL.createObjectURL(blob);
         setDownloadUrl(url);

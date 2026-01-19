@@ -184,6 +184,16 @@ export function AIResumeHelper() {
     prevGettingSuggestions.current = gettingSuggestions;
   }, [gettingSuggestions, improvementSuggestions, error, toast]);
 
+  // Sync backend provider with frontend on initial load (once model is available)
+  const initialSyncDone = useRef(false);
+  useEffect(() => {
+    if (provider && model && !initialSyncDone.current) {
+      initialSyncDone.current = true;
+      // Silently sync backend to match frontend's provider/model
+      api.testApiKey(provider, '', model).catch(() => {});
+    }
+  }, [provider, model]);
+
   useEffect(() => {
     if (provider) {
       loadModels(provider);
@@ -281,20 +291,21 @@ export function AIResumeHelper() {
   };
 
   const handleTestApiKey = async () => {
-    // For Ollama, skip API key requirement
-    if (provider === 'Ollama (Local)') {
+    // For local providers (Ollama, llama.cpp, LM Studio, Lemonade), skip API key requirement
+    const localProviders = ['Ollama (Local)', 'llama.cpp', 'LM Studio', 'Lemonade'];
+    if (localProviders.includes(provider)) {
       setApiKey(''); // Clear any entered key
       const success = await testApiKey();
       if (success) {
         toast({
           title: "Connection Successful",
-          description: "Ollama connection successful! Make sure Ollama is running on localhost:11434",
+          description: `${provider} connection successful! Make sure the service is running locally.`,
           variant: "success",
         });
       } else {
         toast({
           title: "Connection Failed",
-          description: "Ollama connection failed. Please ensure Ollama is installed and running on localhost:11434",
+          description: `${provider} connection failed. Please ensure the service is installed and running locally.`,
           variant: "destructive",
         });
       }
@@ -674,7 +685,7 @@ export function AIResumeHelper() {
                       Refresh
                     </Button>
                   </div>
-                  {provider !== 'Ollama (Local)' && (
+                  {!['Ollama (Local)', 'llama.cpp', 'LM Studio', 'Lemonade'].includes(provider) && (
                     <div className="space-y-2 flex-1 min-w-0">
                       <Label htmlFor="api-key">API Key</Label>
                       <div className="flex gap-3">
@@ -703,6 +714,27 @@ export function AIResumeHelper() {
                           )}
                         </Button>
                       </div>
+                    </div>
+                  )}
+                  {['Ollama (Local)', 'llama.cpp', 'LM Studio', 'Lemonade'].includes(provider) && (
+                    <div className="space-y-2 flex-1 min-w-0">
+                      <Label>Connection Test</Label>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleTestApiKey}
+                        disabled={testingApiKey}
+                        className="w-full"
+                      >
+                        {testingApiKey ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Testing Connection...
+                          </>
+                        ) : (
+                          'Test Connection'
+                        )}
+                      </Button>
                     </div>
                   )}
                 </div>

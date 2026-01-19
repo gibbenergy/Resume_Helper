@@ -128,13 +128,39 @@
         }
         
         .improvement-list {
-            margin: 0.5rem 0;
-            padding-left: 1.25rem;
+            margin: 0.25rem 0;
+            padding-left: 1.5rem;
+            list-style-type: disc;
         }
         
         .improvement-list li {
             margin-bottom: 0.4rem;
-            line-height: 1.4;
+            line-height: 1.5;
+            padding-left: 0.25rem;
+        }
+        
+        .improvement-list li::marker {
+            color: #28a745;
+            font-size: 12pt;
+        }
+        
+        /* Bold section headers from markdown */
+        strong {
+            color: #28a745;
+            font-size: 13pt;
+            display: inline-block;
+            margin-top: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Paragraph spacing */
+        p {
+            margin: 0.25rem 0;
+        }
+        
+        /* Section spacing */
+        .section {
+            margin-bottom: 0.5rem;
         }
         
         .key-recommendations {

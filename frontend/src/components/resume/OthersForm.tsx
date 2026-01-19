@@ -14,9 +14,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { useProfileSave } from '@/lib/useProfileSave';
 import { Pagination } from '@/components/ui/pagination';
-import { Layers, RotateCcw, Trash2, Plus, Pencil } from 'lucide-react';
+import { Layers, RotateCcw, Trash2, Plus, Pencil, Save } from 'lucide-react';
 
 const COMMON_SECTIONS = [
   'Awards & Honors',
@@ -45,12 +54,14 @@ interface OtherItem {
 export function OthersForm() {
   const { resumeData, updateOthers } = useResumeStore();
   const { toast } = useToast();
+  const { saveProfile } = useProfileSave();
   const [selectedSection, setSelectedSection] = useState<string>(COMMON_SECTIONS[0]);
   const [customSectionName, setCustomSectionName] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [editingItem, setEditingItem] = useState<{ sectionName: string; index: number } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Pagination appears when total items > 10
+  const [showClearDialog, setShowClearDialog] = useState(false);
   
   const { register, handleSubmit, reset } = useForm<OtherItem>({
     defaultValues: {
@@ -155,15 +166,6 @@ export function OthersForm() {
     });
   };
 
-  const handleResetForm = () => {
-    reset();
-    setEditingItem(null);
-    toast({
-      title: 'Form reset',
-      description: 'All form fields have been cleared.',
-    });
-  };
-
   const handleEdit = (sectionName: string, index: number) => {
     setEditingItem({ sectionName, index });
     const formElement = document.getElementById('others-form');
@@ -192,6 +194,22 @@ export function OthersForm() {
 
   const allSections = [...COMMON_SECTIONS, '➕ Create New Section...'];
 
+  const handleClearResume = () => {
+    setShowClearDialog(true);
+  };
+
+  const confirmClear = () => {
+    updateOthers({});
+    reset();
+    setEditingItem(null);
+    setShowClearDialog(false);
+    toast({
+      title: 'Others cleared',
+      description: 'All other section entries have been cleared.',
+      variant: 'destructive',
+    });
+  };
+
   return (
     <Card className="bg-slate-900/50 border-border/50">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -214,24 +232,6 @@ export function OthersForm() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>{editingItem !== null ? 'Update entry' : 'Add to History'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleResetForm}
-                  className="h-8 w-8"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Reset form</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -308,6 +308,25 @@ export function OthersForm() {
               </Label>
               <Input id="url" type="url" className="text-sm" {...register('url')} />
             </div>
+          </div>
+
+          {/* Save & Clear Buttons - Centered */}
+          <div className="flex justify-center gap-2 pt-4">
+            <Button 
+              type="button"
+              onClick={saveProfile}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save
+            </Button>
+            <Button 
+              type="button" 
+              variant="destructive"
+              onClick={handleClearResume}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Clear
+            </Button>
           </div>
         </form>
 
@@ -440,6 +459,33 @@ export function OthersForm() {
           })()}
         </div>
       </CardContent>
+
+      <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear Other Sections</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to clear all entries in Other Sections? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowClearDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmClear}
+            >
+              Clear Others
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

@@ -21,7 +21,7 @@ export function MainLayout() {
         <div className="flex items-center justify-center gap-3 mb-8">
           <h1 className="text-4xl font-bold">Resume Helper</h1>
           <Badge variant="outline" className="text-xs px-2 py-1">
-            v1.0
+            v3.0
           </Badge>
         </div>
         

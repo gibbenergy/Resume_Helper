@@ -83,10 +83,6 @@ export function PDFViewerModal({
     try {
       let blob: Blob;
 
-      // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PDFViewerModal.tsx:generatePDF',message:'PDF generation started',data:{type,hasContentToUse:!!contentToUse,contentToUseLength:contentToUse?.length||0,contentToUsePreview:contentToUse?.substring(0,100)||'N/A'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
-
       switch (type) {
         case 'summary':
           if ('analysis' in data && data.analysis) {
@@ -94,10 +90,6 @@ export function PDFViewerModal({
             let analysisData = contentToUse 
               ? parseMarkdownToAnalysis(contentToUse, data.analysis)
               : data.analysis;
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PDFViewerModal.tsx:generatePDF:summary',message:'Using analysis data for PDF',data:{hasEditedContent:!!contentToUse,experienceLevelOriginal:data.analysis.experience_level,experienceLevelUpdated:analysisData.experience_level,allFields:Object.keys(analysisData)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-            // #endregion
             
             blob = await api.generateJobAnalysisPDF(analysisData);
           } else {
@@ -192,10 +184,6 @@ export function PDFViewerModal({
   const handleRegeneratePDF = async () => {
     setIsRegenerating(true);
     try {
-      // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/a649b190-bc06-4efa-b7e0-5e4ae66cb67c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PDFViewerModal.tsx:handleRegeneratePDF',message:'Regenerate PDF called',data:{type,editContentLength:editContent.length,editContentPreview:editContent.substring(0,200),hasExperienceLevel:editContent.includes('Experience Level'),experienceLevelMatch:editContent.match(/Experience Level[\s\S]{0,100}/)?.[0]},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
-      
       // Revoke old PDF URL before generating new one
       if (pdfUrl) {
         URL.revokeObjectURL(pdfUrl);

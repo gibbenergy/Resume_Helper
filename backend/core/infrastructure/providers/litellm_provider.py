@@ -126,15 +126,22 @@ class LiteLLMProvider:
     through a single unified interface powered by LiteLLM.
     """
     
-    def __init__(self, provider: str = "openai", model: Optional[str] = None, api_key: Optional[str] = None):
+    def __init__(self, provider: str = "openai", model: Optional[str] = None, api_key: Optional[str] = None, base_url: Optional[str] = None):
         """Initialize the LiteLLM Provider."""
         self.provider = provider.lower()
+        self.custom_base_url = base_url  # Set this BEFORE _get_default_model so it can use it
         self.current_model = model or self._get_default_model(self.provider)
         
         if api_key:
             self._set_provider_api_key(api_key)
         else:
             self._load_api_key_from_env()
+        
+        # Set custom base URL if provided or use default for provider
+        if base_url:
+            self._set_base_url(base_url)
+        else:
+            self._set_default_base_url()
         
         litellm.drop_params = True
         
@@ -173,34 +180,77 @@ class LiteLLMProvider:
     
     def _set_local_provider_config(self):
         """Set configuration for local providers."""
-        local_configs = {
-            "ollama": {
-                "api_key_env": "OLLAMA_API_KEY",
-                "api_base_env": "OLLAMA_API_BASE",
-                "base_url": "http://localhost:11434"
-            },
-            "llamacpp": {
-                "api_key_env": "LLAMACPP_API_KEY",
-                "api_base_env": "LLAMACPP_API_BASE",
-                "base_url": "http://localhost:8080/v1"
-            },
-            "lmstudio": {
-                "api_key_env": "LMSTUDIO_API_KEY",
-                "api_base_env": "LMSTUDIO_API_BASE",
-                "base_url": "http://localhost:1234/v1"
-            },
-            "lemonade": {
-                "api_key_env": "LEMONADE_API_KEY",
-                "api_base_env": "LEMONADE_API_BASE",
-                "base_url": "http://localhost:8000/api/v1"
+        if self.provider == "ollama":
+            os.environ["OLLAMA_API_KEY"] = "sk-no-key-required"
+            if "OLLAMA_API_BASE" not in os.environ:
+                os.environ["OLLAMA_API_BASE"] = "http://localhost:11434"
+        elif self.provider in ["llamacpp", "lmstudio", "lemonade"]:
+            # OpenAI-compatible local providers - set OPENAI_API_KEY and litellm.api_base
+            os.environ["OPENAI_API_KEY"] = "sk-no-key-required"
+            base_urls = {
+                "llamacpp": "http://localhost:8080/v1",
+                "lmstudio": "http://localhost:1234/v1",
+                "lemonade": "http://localhost:8000/api/v1"
             }
+            base_url = base_urls.get(self.provider)
+            if base_url:
+                self.custom_base_url = base_url
+                litellm.api_base = base_url
+                logger.info(f"Set litellm.api_base for {self.provider}: {base_url}")
+    
+    def _set_base_url(self, base_url: str):
+        """Set custom base URL for OpenAI-compatible providers."""
+        self.custom_base_url = base_url
+        if self.provider in ["llamacpp", "lmstudio", "lemonade"]:
+            litellm.api_base = base_url
+            logger.info(f"Set custom base URL for {self.provider}: {base_url}")
+        else:
+            # Clear litellm.api_base for other providers to avoid pollution
+            if hasattr(litellm, 'api_base') and litellm.api_base is not None:
+                litellm.api_base = None
+                logger.info(f"Cleared litellm.api_base for {self.provider}")
+    
+    def _set_default_base_url(self):
+        """Set default base URL based on provider."""
+        # Check for environment variables first
+        env_map = {
+            "ollama": "OLLAMA_API_BASE",
+            "llamacpp": "LLAMACPP_API_BASE",
+            "lmstudio": "LMSTUDIO_API_BASE",
+            "lemonade": "LEMONADE_API_BASE"
         }
         
-        config = local_configs.get(self.provider)
-        if config:
-            os.environ[config["api_key_env"]] = "sk-no-key-required"
-            os.environ[config["api_base_env"]] = config["base_url"]
+        url_set = False
+        env_var = env_map.get(self.provider)
+        if env_var:
+            env_url = os.getenv(env_var)
+            if env_url:
+                self.custom_base_url = env_url
+                if self.provider in ["llamacpp", "lmstudio", "lemonade"]:
+                    litellm.api_base = env_url
+                logger.info(f"Using env base URL for {self.provider}: {env_url}")
+                url_set = True
+        
+        # Fall back to default configuration if not set from env
+        if not url_set:
+            provider_config = PROVIDER_MODELS.get(self.provider)
+            if provider_config and "base_url" in provider_config:
+                default_url = provider_config["base_url"]
+                self.custom_base_url = default_url
+                if self.provider in ["llamacpp", "lmstudio", "lemonade"]:
+                    litellm.api_base = default_url
+                    logger.info(f"Set default base URL for {self.provider}: {default_url}")
+        
+        # ALWAYS clear litellm.api_base for providers that don't need it (Ollama uses OLLAMA_API_BASE)
+        if self.provider not in ["llamacpp", "lmstudio", "lemonade"]:
+            if hasattr(litellm, 'api_base') and litellm.api_base is not None:
+                litellm.api_base = None
+                logger.info(f"Cleared litellm.api_base for {self.provider}")
     
+    def get_base_url(self) -> Optional[str]:
+        """Get the current base URL."""
+        return self.custom_base_url
+
     def _set_provider_api_key(self, api_key: str):
         """Set the API key for the current provider."""
         # Local providers don't need real API keys
@@ -280,14 +330,103 @@ class LiteLLMProvider:
         try:
             model_to_use = model or self.current_model
             
+            # Add custom base URL for llamacpp, lmstudio, and lemonade
+            if self.provider in ["llamacpp", "lmstudio", "lemonade"] and self.custom_base_url:
+                kwargs["api_base"] = self.custom_base_url
+                logger.info(f"Using custom base URL: {self.custom_base_url}")
             
-            if self.provider == "ollama" and "response_format" in kwargs:
-                logger.info("Ollama detected - removing response_format parameter and adding JSON instruction to prompt")
+            # Remove response_format for local providers that don't support it
+            if self.provider in ["ollama", "llamacpp", "lmstudio", "lemonade"] and "response_format" in kwargs:
+                logger.info(f"{self.provider} detected - removing response_format parameter and adding JSON instruction to prompt")
                 kwargs.pop("response_format")
                 if messages and len(messages) > 0:
                     last_msg = messages[-1]["content"]
                     if "JSON" in last_msg or "json" in last_msg:
                         messages[-1]["content"] = last_msg + "\n\nIMPORTANT: Return ONLY valid JSON, no other text or explanation."
+            
+            # Use raw HTTP client for Lemonade to bypass LiteLLM response parsing issues
+            if self.provider == "lemonade" and self.custom_base_url:
+                import requests
+                url = f"{self.custom_base_url}/chat/completions"
+                # Strip any provider prefix (openai/, ollama/, etc.) from model name for actual API call
+                api_model = model_to_use
+                for prefix in ["openai/", "ollama/", "lemonade/"]:
+                    if api_model.startswith(prefix):
+                        api_model = api_model[len(prefix):]
+                        break
+                payload = {
+                    "model": api_model,
+                    "messages": messages,
+                    **{k: v for k, v in kwargs.items() if k not in ["api_base", "custom_llm_provider"]}
+                }
+                
+                logger.info(f"Direct API call to Lemonade: {url} with model {api_model}")
+                logger.info(f"Payload: {len(messages)} messages, max_tokens: {payload.get('max_tokens', 'not set')}")
+                resp = requests.post(url, json=payload, timeout=300)
+                resp.raise_for_status()
+                data = resp.json()
+                logger.info(f"Lemonade response status: {resp.status_code}")
+                
+                # Check for error in response body (Lemonade returns 200 with error in body)
+                if "error" in data:
+                    error_info = data["error"]
+                    error_msg = error_info.get("message", str(error_info))
+                    error_details = error_info.get("details", {}).get("response", {}).get("error", {})
+                    if error_details.get("type") == "exceed_context_size_error":
+                        n_ctx = error_details.get("n_ctx", "unknown")
+                        n_prompt = error_details.get("n_prompt_tokens", "unknown")
+                        error_msg = (
+                            f"❌ CONTEXT SIZE ERROR: Model has {n_ctx} tokens but your prompt needs {n_prompt} tokens.\n\n"
+                            f"📋 TO FIX: Run this command in your terminal:\n\n"
+                            f"    lemonade-server serve --ctx-size 8192\n\n"
+                            f"This will restart Lemonade with 8192 token context (enough for Resume Helper)."
+                        )
+                    logger.error(f"Lemonade error: {error_msg}")
+                    return None, error_msg
+                
+                # Extract content, handling reasoning_content for DeepSeek-R1 models
+                content = ""
+                finish_reason = None
+                if "choices" in data and len(data["choices"]) > 0:
+                    choice = data["choices"][0]
+                    message_data = choice.get("message", {})
+                    content = message_data.get("content", "")
+                    finish_reason = choice.get("finish_reason")
+                    
+                    # Handle reasoning models - use reasoning_content if content is empty
+                    if not content and "reasoning_content" in message_data and message_data["reasoning_content"]:
+                        content = message_data["reasoning_content"]
+                        logger.info(f"Using reasoning_content as fallback (content was empty), length: {len(content)}")
+                    elif "reasoning_content" in message_data and message_data["reasoning_content"]:
+                        # Reasoning is separate, just use final content
+                        logger.info("DeepSeek-R1 reasoning model detected with separate reasoning")
+                    
+                    logger.info(f"Extracted content length: {len(content)}")
+                else:
+                    logger.error(f"No choices in response! Data: {data}")
+                    return None, f"Lemonade returned empty response. Check server logs."
+                
+                # Check if hit token limit
+                if finish_reason == "length":
+                    usage = data.get("usage", {})
+                    prompt_tokens = usage.get("prompt_tokens", 0)
+                    total_tokens = usage.get("total_tokens", 0)
+                    
+                    # If we got some content despite hitting limit, use it
+                    if content and len(content) > 0:
+                        logger.warning(f"⚠️ Token limit reached but got partial response ({len(content)} chars). Prompt: {prompt_tokens} tokens, Total: {total_tokens} tokens")
+                    else:
+                        # No content at all - this is a real error
+                        error_msg = f"❌ Token limit reached with no usable response. Model context: {total_tokens} tokens (prompt: {prompt_tokens}). Try a model with larger context or reduce prompt size."
+                        logger.error(error_msg)
+                        return None, error_msg
+                
+                result = {
+                    "choices": [{"message": {"content": content}}],
+                    "model": data.get("model", model_to_use),
+                    "usage": data.get("usage", {})
+                }
+                return result, None
             
             response = completion(model=model_to_use, messages=messages, **kwargs)
             
@@ -395,15 +534,15 @@ class LiteLLMProvider:
     def test_api_key(self, api_key: str, model: str) -> str:
         """Test if an API key is valid."""
         try:
-            # For Ollama, skip API key test and just test connection
-            if self.provider == "ollama":
-                logger.info("Testing Ollama connection...")
+            # For all local providers, skip API key test and just test connection
+            if self.provider in ["ollama", "llamacpp", "lmstudio", "lemonade"]:
+                logger.info(f"Testing {self.provider} connection...")
                 test_messages = [{"role": "user", "content": "test"}]
                 response, error = self._call_litellm_completion(test_messages, model or self.current_model, max_tokens=5)
                 if response:
-                    return "✅ Ollama connection successful"
+                    return f"✅ {self.provider} connection successful"
                 else:
-                    return f"❌ Ollama connection failed: {error}"
+                    return f"❌ {self.provider} connection failed: {error}"
             
             old_key = os.environ.get(f"{self.provider.upper()}_API_KEY")
             self._set_provider_api_key(api_key)

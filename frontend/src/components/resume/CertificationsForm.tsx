@@ -6,13 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { useProfileSave } from '@/lib/useProfileSave';
 import type { CertificationEntry } from '@/lib/types';
-import { Award, RotateCcw, Trash2, Plus, Pencil } from 'lucide-react';
+import { Award, RotateCcw, Trash2, Plus, Pencil, Save } from 'lucide-react';
 
 export function CertificationsForm() {
   const { resumeData, addCertification, removeCertification, clearCertifications, updateCertification } = useResumeStore();
   const { toast } = useToast();
+  const { saveProfile } = useProfileSave();
   const { register, handleSubmit, reset } = useForm<CertificationEntry>({
     defaultValues: {
       name: '',
@@ -23,6 +33,7 @@ export function CertificationsForm() {
     },
   });
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showClearDialog, setShowClearDialog] = useState(false);
 
   // Populate form when editing
   useEffect(() => {
@@ -79,21 +90,28 @@ export function CertificationsForm() {
     });
   };
 
-  const handleResetForm = () => {
-    reset();
-    setSelectedIndex(null);
-    toast({
-      title: 'Form reset',
-      description: 'All form fields have been cleared.',
-    });
-  };
-
   const handleEdit = (index: number) => {
     setSelectedIndex(index);
     const formElement = document.getElementById('certifications-form');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleClear = () => {
+    setShowClearDialog(true);
+  };
+
+  const confirmClear = () => {
+    clearCertifications();
+    reset();
+    setSelectedIndex(null);
+    setShowClearDialog(false);
+    toast({
+      title: 'Certifications cleared',
+      description: 'All certification entries have been cleared.',
+      variant: 'destructive',
+    });
   };
 
 
@@ -119,24 +137,6 @@ export function CertificationsForm() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>{selectedIndex !== null ? 'Update entry' : 'Add to History'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleResetForm}
-                  className="h-8 w-8"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Reset form</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -183,6 +183,25 @@ export function CertificationsForm() {
               </Label>
               <Input id="url" type="url" className="text-sm" {...register('url')} />
             </div>
+          </div>
+
+          {/* Save & Clear Buttons - Centered */}
+          <div className="flex justify-center gap-2 pt-4">
+            <Button 
+              type="button"
+              onClick={saveProfile}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save
+            </Button>
+            <Button 
+              type="button" 
+              variant="destructive"
+              onClick={handleClear}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Clear
+            </Button>
           </div>
         </form>
 
@@ -275,6 +294,33 @@ export function CertificationsForm() {
           )}
         </div>
       </CardContent>
+
+      <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear Certifications</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to clear all certification entries? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowClearDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmClear}
+            >
+              Clear Certifications
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

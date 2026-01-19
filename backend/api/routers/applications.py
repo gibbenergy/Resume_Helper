@@ -138,6 +138,14 @@ async def get_application_settings(
     try:
         settings = workflows.get_settings()
         return {"success": True, "data": settings}
+    except FileNotFoundError:
+        # Return default settings if file doesn't exist yet
+        default_settings = {
+            "interview_rounds": ["Phone Screen", "Technical", "Behavioral", "Final"],
+            "statuses": ["Not Started", "Applied", "Interview", "Offer", "Rejected", "Withdrawn"],
+            "priorities": ["Low", "Medium", "High"]
+        }
+        return {"success": True, "data": default_settings}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting settings: {str(e)}")
 

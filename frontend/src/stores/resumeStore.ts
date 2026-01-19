@@ -255,7 +255,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
-  setResumeData: (data) =>
+  setResumeData: (data) => {
     set({
       resumeData: {
         personal_info: data.personal_info || {},
@@ -266,7 +266,8 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         certifications: Array.isArray(data.certifications) ? data.certifications : [],
         others: data.others || {},
       },
-    }),
+    });
+  },
 
   resetResume: () =>
     set({

@@ -25,10 +25,21 @@ def _slug(text: str, default: str = "document") -> str:
 
 
 def _format_markdown(content: str) -> str:
-    """Format markdown content for HTML display."""
+    """Format markdown content for HTML display with proper styling."""
     if not content:
         return ""
-    return markdown2.markdown(content)
+    
+    # Convert markdown to HTML
+    html = markdown2.markdown(content)
+    
+    # Post-process to add CSS classes for better styling
+    # Wrap <ul> tags with the improvement-list class
+    html = html.replace('<ul>', '<ul class="improvement-list">')
+    
+    # Remove excessive spacing by consolidating multiple paragraph breaks
+    html = html.replace('</p>\n\n<p>', '</p>\n<p>')
+    
+    return html
 
 
 def generate_job_analysis_pdf(

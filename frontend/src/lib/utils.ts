@@ -6,20 +6,52 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Format job analysis as markdown
-export function formatAnalysisAsMarkdown(analysis: string): string {
-  if (!analysis) return '';
+export function formatAnalysisAsMarkdown(analysis: any): string {
+  if (!analysis || typeof analysis !== 'object') return '';
   
-  // If it's already formatted markdown, return it
-  if (analysis.includes('##') || analysis.includes('**')) {
-    return analysis;
+  // Convert analysis object to formatted markdown
+  let markdown = '';
+  
+  // Add position and company
+  if (analysis.position_title) {
+    markdown += `## ${analysis.position_title}\n\n`;
+  }
+  if (analysis.company_name) {
+    markdown += `**Company:** ${analysis.company_name}\n\n`;
   }
   
-  // Otherwise, do basic formatting
-  return analysis
-    .split('\n\n')
-    .map(paragraph => paragraph.trim())
-    .filter(p => p.length > 0)
-    .join('\n\n');
+  // Add match summary
+  if (analysis.match_summary) {
+    markdown += `### Match Summary\n\n${analysis.match_summary}\n\n`;
+  }
+  
+  // Add required skills
+  if (analysis.required_skills && Array.isArray(analysis.required_skills)) {
+    markdown += `### Required Skills\n\n${analysis.required_skills.map((s: string) => `- ${s}`).join('\n')}\n\n`;
+  } else if (analysis.required_skills && typeof analysis.required_skills === 'string') {
+    markdown += `### Required Skills\n\n${analysis.required_skills}\n\n`;
+  }
+  
+  // Add strategic application tips
+  if (analysis.strategic_application_tips) {
+    markdown += `### Strategic Application Tips\n\n`;
+    if (Array.isArray(analysis.strategic_application_tips)) {
+      markdown += analysis.strategic_application_tips.map((tip: string) => `- ${tip}`).join('\n') + '\n\n';
+    } else if (typeof analysis.strategic_application_tips === 'string') {
+      markdown += `${analysis.strategic_application_tips}\n\n`;
+    }
+  }
+  
+  // Add other relevant sections as needed
+  if (analysis.role_insights) {
+    markdown += `### Role Insights\n\n${analysis.role_insights}\n\n`;
+  }
+  
+  if (analysis.company_culture_indicators) {
+    markdown += `### Company Culture\n\n${analysis.company_culture_indicators}\n\n`;
+  }
+  
+  return markdown || JSON.stringify(analysis, null, 2);
 }
 
 // Format improvement suggestions content

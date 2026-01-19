@@ -548,31 +548,32 @@ async def generate_job_analysis_pdf(
         # Format analysis as markdown (similar to Gradio)
         formatted_content = ""
         if isinstance(analysis_data, dict):
-            # Format the analysis data as markdown
-            if "position_title" in analysis_data:
-                formatted_content += f"# {analysis_data.get('position_title', 'Job Analysis')}\n\n"
+            # Format the analysis data as markdown with proper line breaks
+            # DON'T include position_title in markdown - it's already in the template header
             if "company_name" in analysis_data:
-                formatted_content += f"**Company:** {analysis_data.get('company_name', 'Not Specified')}\n\n"
+                formatted_content += f"**Company:**\n\n{analysis_data.get('company_name', 'Not Specified')}\n\n"
             if "location" in analysis_data:
-                formatted_content += f"**Location:** {analysis_data.get('location', 'Not Specified')}\n\n"
+                formatted_content += f"**Location:**\n\n{analysis_data.get('location', 'Not Specified')}\n\n"
             if "match_score" in analysis_data:
-                formatted_content += f"## Match Score: {analysis_data.get('match_score', 0)}%\n\n"
+                formatted_content += f"**Match Score:**\n\n{analysis_data.get('match_score', 0)}%\n\n"
             if "match_summary" in analysis_data:
-                formatted_content += f"**Summary:** {analysis_data.get('match_summary', '')}\n\n"
+                formatted_content += f"**Summary:**\n\n{analysis_data.get('match_summary', '')}\n\n"
             
-            # Add all other fields
+            # Add all other fields - position_title is already in template header
             for key, value in analysis_data.items():
                 if key not in ["position_title", "company_name", "location", "match_score", "match_summary"]:
-                    if isinstance(value, list):
-                        formatted_content += f"### {key.replace('_', ' ').title()}\n\n"
+                    if isinstance(value, list) and value:
+                        formatted_content += f"**{key.replace('_', ' ').title()}:**\n\n"
                         for item in value:
-                            formatted_content += f"- {item}\n\n"
-                    elif isinstance(value, dict):
-                        formatted_content += f"### {key.replace('_', ' ').title()}\n\n"
+                            formatted_content += f"- {item}\n"
+                        formatted_content += "\n"
+                    elif isinstance(value, dict) and value:
+                        formatted_content += f"**{key.replace('_', ' ').title()}:**\n\n"
                         for k, v in value.items():
-                            formatted_content += f"- **{k.replace('_', ' ').title()}:** {v}\n\n"
-                    else:
-                        formatted_content += f"### {key.replace('_', ' ').title()}\n\n{value}\n\n"
+                            formatted_content += f"- **{k.replace('_', ' ').title()}:** {v}\n"
+                        formatted_content += "\n"
+                    elif value:  # Only add if value is not empty
+                        formatted_content += f"**{key.replace('_', ' ').title()}:**\n\n{value}\n\n"
         else:
             formatted_content = str(analysis_data)
         

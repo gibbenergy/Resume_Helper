@@ -10,6 +10,7 @@ import re
 import hashlib
 from typing import Dict, List, Optional, Any
 import logging
+from backend.core.infrastructure.providers.local_provider_config import get_max_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +126,17 @@ class ResumeAIWorkflows:
         Provide thorough, insightful analysis - not just data extraction. Be specific and actionable.
         """
         
+        # Get appropriate max_tokens for this provider and operation
+        provider_name = self.llm_provider.provider
+        max_tokens = get_max_tokens(provider_name, "job_analysis")
+        
         messages = [{"role": "user", "content": prompt}]
-        result = self.llm_provider.prompt_function(messages, model=model, response_format={"type": "json_object"})
+        result = self.llm_provider.prompt_function(
+            messages, 
+            model=model, 
+            response_format={"type": "json_object"},
+            max_tokens=max_tokens
+        )
         
         if result["success"]:
             try:
@@ -384,8 +394,17 @@ class ResumeAIWorkflows:
         
         prompt += "\n\nReturn ONLY valid JSON."
         
+        # Get appropriate max_tokens for this provider and operation
+        provider_name = self.llm_provider.provider
+        max_tokens = get_max_tokens(provider_name, "resume_tailoring")
+        
         messages = [{"role": "user", "content": prompt}]
-        result = self.llm_provider.prompt_function(messages, model=model, response_format={"type": "json_object"})
+        result = self.llm_provider.prompt_function(
+            messages, 
+            model=model, 
+            response_format={"type": "json_object"},
+            max_tokens=max_tokens
+        )
         
         if result["success"]:
             try:
@@ -568,6 +587,15 @@ class ResumeAIWorkflows:
             "cultural_fit": ["suggestion 1", "suggestion 2", ...]
         }}
         
+        CRITICAL FORMATTING REQUIREMENTS:
+        - Each suggestion MUST be a single, concise bullet point (1-2 sentences maximum)
+        - Do NOT combine multiple suggestions into one long paragraph
+        - Do NOT use semicolons, colons, or dashes to separate ideas within a suggestion
+        - Each distinct idea should be its own array element
+        - Start each suggestion with an action verb (e.g., "Enroll in", "Add", "Rewrite", "Include", "Highlight")
+        - Be specific with course names, tools, metrics, and examples
+        - Aim for 3-5 suggestions per category
+        
         Guidelines:
         - skills_enhancement: Compare against required_skills and preferred_skills, provide specific skill recommendations based on gaps
         - experience_optimization: How to better align with responsibilities and role_insights, keywords from keywords_for_ats to incorporate
@@ -579,8 +607,17 @@ class ResumeAIWorkflows:
         Make each suggestion specific and actionable. Focus on improvements that will increase the match score with this particular job.
         """
         
+        # Get appropriate max_tokens for this provider and operation
+        provider_name = self.llm_provider.provider
+        max_tokens = get_max_tokens(provider_name, "suggestions")
+        
         messages = [{"role": "user", "content": prompt}]
-        result = self.llm_provider.prompt_function(messages, model=model, response_format={"type": "json_object"})
+        result = self.llm_provider.prompt_function(
+            messages, 
+            model=model, 
+            response_format={"type": "json_object"},
+            max_tokens=max_tokens
+        )
         
         if result["success"]:
             try:
@@ -604,10 +641,11 @@ class ResumeAIWorkflows:
                         suggestions = suggestions_json[key]
                         if isinstance(suggestions, list) and suggestions:
                             formatted_sections.append(f"**{header}:**")
+                            formatted_sections.append("")  # Blank line for markdown list parsing
                             for suggestion in suggestions:
                                 if suggestion:
                                     formatted_sections.append(f"- {suggestion}")
-                            formatted_sections.append("")
+                            formatted_sections.append("")  # Blank line between sections
                 
                 content = "\n".join(formatted_sections).strip()
                 
