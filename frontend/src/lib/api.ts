@@ -303,7 +303,10 @@ export const api = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        resume_data: data,
+        pdf_type: 'resume'
+      }),
     });
 
     if (!response.ok) {
@@ -316,12 +319,14 @@ export const api = {
 
   // Generate resume DOCX
   async generateResumeDOCX(data: any) {
-    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-docx`, {
+    const response = await fetch(`${API_BASE_URL}/api/pdf/generate-resume-docx`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        resume_data: data
+      }),
     });
 
     if (!response.ok) {
