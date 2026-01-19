@@ -15,9 +15,13 @@
 
 ## 📺 App Demo
 
-| AI Resume Helper | Application Tracking System |
-|:---:|:---:|
-| https://github.com/user-attachments/assets/857c7162-8baa-4eda-854a-9f30fff3caf0 | https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d |
+### AI Resume Helper
+
+https://github.com/user-attachments/assets/857c7162-8baa-4eda-854a-9f30fff3caf0
+
+### Application Tracking System
+
+https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 
 ---
 
