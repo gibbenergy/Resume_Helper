@@ -404,11 +404,9 @@ class SQLApplicationRepository:
         finally:
             session.close()
     
-    # ========== BACKWARD COMPATIBILITY ==========
-    
     def load_applications(self) -> Dict[str, Any]:
         """
-        Load applications in old JSON format for backward compatibility.
+        Load applications in JSON format.
         
         Returns:
             Dict with 'applications' and 'metadata' keys
@@ -426,10 +424,8 @@ class SQLApplicationRepository:
     
     def save_applications(self, data: Dict[str, Any]) -> StandardResponse:
         """
-        Save applications from old JSON format (for backward compatibility).
-        Not recommended - use create/update methods instead.
+        Save applications. Use create_application or update_application instead.
         """
-        logger.warning("save_applications called - this is legacy method, use create/update instead")
         return StandardResponse.success_response(
             data={"message": "Use create_application or update_application instead"},
             operation="save_applications"

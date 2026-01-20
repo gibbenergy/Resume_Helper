@@ -151,7 +151,7 @@ class SchemaEngine:
             field_order: Order of fields for table columns
             
         Returns:
-            List of lists suitable for Gradio DataFrame
+            List of lists suitable for table display
         """
         result = []
         

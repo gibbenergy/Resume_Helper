@@ -340,7 +340,7 @@ export function AIResumeHelper() {
       return;
     }
     
-    // Ensure resume is synced before analysis (matches Gradio behavior)
+    // Ensure resume is synced before analysis
     if (!isResumeSynced) {
       handleUpdateResume();
     }
@@ -418,7 +418,7 @@ export function AIResumeHelper() {
   };
 
   const handleAddToApplicationTracker = async () => {
-    // Validate job URL is present (matches Gradio behavior - line 1434)
+    // Validate job URL is present
     if (!storeJobUrl || !storeJobUrl.trim()) {
       toast({
         title: "Error",
@@ -428,7 +428,7 @@ export function AIResumeHelper() {
       return;
     }
 
-    // Get job details from analysis (matches Gradio's job_details_state - line 1437-1439)
+    // Get job details from analysis
     // job_details_state gets updated from analysis results (line 470: job_details.update(extracted_details))
     const jobDetails = (typeof jobAnalysis?.analysis === 'object' ? jobAnalysis.analysis : {}) as Record<string, any>;
     const company = jobDetails.company_name || 'Unknown Company';
@@ -474,15 +474,14 @@ export function AIResumeHelper() {
       }
     }
     
-    // Use the formatted markdown text from the analysis tab as description (matches Gradio's job_analysis textbox - line 1452)
-    // In Gradio, job_analysis is the Textbox containing the formatted markdown, not the original job description
+    // Use the formatted markdown text from the analysis tab as description
     // This is the editable content from the analysis tab
     const jobDescText = editedContent.jobAnalysis || (jobAnalysis?.analysis ? formatAnalysisAsMarkdown(jobAnalysis.analysis) : jobDescription.trim());
     
-    // Use match_score from the editable input (matches Gradio's match_score_display - line 1452)
+    // Use match_score from the editable input
     const scoreToUse = matchScore || jobDetails.match_score || null;
 
-    // Matches Gradio's add_to_application_tracker function (line 585-599)
+    // Add to application tracker
     const appData = {
       job_url: storeJobUrl.trim(),
       company: company,
@@ -663,7 +662,7 @@ export function AIResumeHelper() {
                       onClick={async () => {
                         // Refresh model list first
                         await loadModels(provider);
-                        // Then switch/apply the selected model (like Gradio's "Set" button)
+                        // Switch/apply the selected model
                         // This switches the model without showing test alerts
                         const { provider: currentProvider, apiKey: currentApiKey, model: currentModel } = useAIStore.getState();
                         const keyToUse = currentProvider === 'Ollama (Local)' ? '' : currentApiKey;

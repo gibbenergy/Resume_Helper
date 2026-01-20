@@ -33,7 +33,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # CORS middleware - configure appropriately for your deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Restrict to specific origins in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

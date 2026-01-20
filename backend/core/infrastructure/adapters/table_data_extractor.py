@@ -15,7 +15,7 @@ class TableDataExtractor:
     @staticmethod
     def extract_table_data(table: Any) -> List[List[Any]]:
         """
-        Extract data from various table formats (Gradio DataFrame, pandas DataFrame, list).
+        Extract data from various table formats (DataFrame, list).
         
         Args:
             table: Table data in various formats
@@ -31,7 +31,7 @@ class TableDataExtractor:
             if hasattr(table, 'values') and hasattr(table, 'to_dict'):
                 return table.values.tolist()
             
-            # If it's a dict with 'data' key (Gradio DataFrame format)
+            # If it's a dict with 'data' key
             if isinstance(table, dict) and 'data' in table:
                 return table['data']
             

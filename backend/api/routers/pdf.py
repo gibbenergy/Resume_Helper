@@ -142,7 +142,7 @@ async def generate_resume_pdf(
 
 
 def _generate_docx_resume(profile_data: dict, output_path: str) -> bool:
-    """Generate DOCX resume from profile data (same logic as Gradio UI)."""
+    """Generate DOCX resume from profile data."""
     try:
         from docx import Document
         from docx.shared import Inches
@@ -448,8 +448,7 @@ async def generate_cover_letter_pdf(
         resume_dict = request.resume_data.dict()
         cover_letter_data = request.cover_letter_data
         
-        # Flatten personal_info to top level for generator (generator expects top-level fields)
-        # This matches what Gradio passes directly - a dict with flattened fields
+        # Flatten personal_info to top level for generator
         personal_info = resume_dict.get("personal_info", {})
         if personal_info:
             resume_dict["full_name"] = personal_info.get("full_name", "")
@@ -545,7 +544,7 @@ async def generate_job_analysis_pdf(
         
         analysis_data = request["analysis_data"]
         
-        # Format analysis as markdown (similar to Gradio)
+        # Format analysis as markdown
         formatted_content = ""
         if isinstance(analysis_data, dict):
             # Format the analysis data as markdown with proper line breaks
@@ -629,8 +628,7 @@ async def generate_tailored_resume_pdf(
         
         tailored_resume = request["tailored_resume_data"]
         
-        # Flatten personal_info to top level for generator (generator expects top-level fields)
-        # This matches what Gradio passes directly
+        # Flatten personal_info to top level for generator
         if isinstance(tailored_resume, dict):
             personal_info = tailored_resume.get("personal_info", {})
             if personal_info:
@@ -873,7 +871,7 @@ async def generate_job_description_pdf(
     request: Dict[str, Any],
     resume_helper: ResumeHelper = Depends(get_resume_helper)
 ) -> FileResponse:
-    """Generate job description PDF (legacy endpoint for on-demand generation)."""
+    """Generate job description PDF."""
     try:
         from backend.core.infrastructure.generators.analysis_pdf_generator import generate_job_analysis_pdf
         import datetime as dt
