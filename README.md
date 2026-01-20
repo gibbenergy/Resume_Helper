@@ -9,11 +9,11 @@
   [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
   [![Code Quality](https://github.com/gibbenergy/Resume_Helper/actions/workflows/code-quality.yml/badge.svg)](https://github.com/gibbenergy/Resume_Helper/actions/workflows/code-quality.yml)
   
-  📖 [Usage Guide](USAGE_GUIDE.md) | 📄 [License](LICENSE)
+  [Usage Guide](USAGE_GUIDE.md) | [License](LICENSE)
   
 </div>
 
-## 📺 App Demo
+## App Demo
 
 ### AI Resume Helper
 
@@ -25,23 +25,23 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 
 ---
 
-## ✨ Features
+## Features
 
-🎯 **Resume Building** - Create resumes with personal info, education, experience, skills, projects, certifications
+**Resume Building** - Create resumes with personal info, education, experience, skills, projects, certifications
 
-🤖 **AI Resume Tailoring** - Adapt your resume to match job descriptions
+**AI Resume Tailoring** - Adapt your resume to match job descriptions
 
-✉️ **AI Cover Letters** - Generate personalized cover letters
+**AI Cover Letters** - Generate personalized cover letters
 
-📊 **Job Analysis** - Analyze job postings with AI insights
+**Job Analysis** - Analyze job postings with AI insights
 
-📋 **Application Tracker** - Track applications, interviews, and outcomes
+**Application Tracker** - Track applications, interviews, and outcomes
 
-🔌 **Multi-AI Support** - OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio, Lemonade
+**Multi-AI Support** - OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio, Lemonade
 
-📄 **PDF Generation** - Export professional resumes and cover letters
+**PDF Generation** - Export professional resumes and cover letters
 
-🔒 **Privacy-Preserving Workflow** - Personal information is stripped before sending to AI and restored after processing
+**Privacy-Preserving Workflow** - Personal information is stripped before sending to AI and restored after processing
 
 ### Privacy-Preserving Workflow
 
@@ -49,14 +49,14 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 
 ```mermaid
 flowchart TD
-    A[📄 Resume<br/>Original Document] --> B[🔒 Strip Info<br/>Remove Personal Data]
-    B -->|send| C[📝 Work Content<br/>Anonymized Resume]
-    B -->|remove| D[👤 Personal Info<br/>Stored Locally]
-    C --> E[☁️ Cloud AI<br/>Process Content]
-    E --> F[📊 AI Results<br/>Resume, Cover Letter,<br/>Suggestions, Skill Gaps]
-    F --> G[🔒 Restore Info<br/>Merge Personal Data]
+    A[Resume<br/>Original Document] --> B[Strip Info<br/>Remove Personal Data]
+    B -->|send| C[Work Content<br/>Anonymized Resume]
+    B -->|remove| D[Personal Info<br/>Stored Locally]
+    C --> E[Cloud AI<br/>Process Content]
+    E --> F[AI Results<br/>Resume, Cover Letter,<br/>Suggestions, Skill Gaps]
+    F --> G[Restore Info<br/>Merge Personal Data]
     D -->|append back| G
-    G --> H[📄 Final Output<br/>Complete Document]
+    G --> H[Final Output<br/>Complete Document]
     
     style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
     style B fill:#6b21a8,stroke:#a855f7,color:#fff
@@ -84,11 +84,18 @@ python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 playwright install chromium
-cd Resume_Helper
-python app.py
+cd backend
+uvicorn backend.api.main:app --host 0.0.0.0 --port 5000
 ```
 
-Access at: `http://localhost:53441`
+In another terminal:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Access at: `http://localhost:5173`
 
 ## Configuration
 
@@ -102,7 +109,7 @@ Keys are auto-saved and remembered for next session.
 
 ## Supported AI Models
 
-**🦙 Recommended: Local Models (Free)**
+**Recommended: Local Models (Free)**
 
 **Ollama** - Easiest local setup
 - **gpt-oss** - OpenAI's open-weight model (14GB, 128K context) - best for reasoning
@@ -125,7 +132,7 @@ Keys are auto-saved and remembered for next session.
 - Default: `http://localhost:8000/v1`
 - **Recommended:** Use `--ctx-size 8192` or higher for job analysis
 
-**☁️ Cloud Providers (API key required)**
+**Cloud Providers (API key required)**
 - **OpenAI**: GPT-4.1, GPT-5, GPT-5-mini
 - **Anthropic**: Claude Opus 4, Claude 3.5 Sonnet
 - **Google**: Gemini 2.5 Pro, Gemini 2.5 Flash
@@ -137,10 +144,10 @@ Keys are auto-saved and remembered for next session.
 
 - Windows 10/11
 - Python 3.11+
+- Node.js 18+ (for frontend)
 - For Ollama: ~14GB disk space for gpt-oss model
 
 ## License
 
 Business Source License 1.1 - See LICENSE file
 Free for personal/educational use. Commercial use requires a license.
-
