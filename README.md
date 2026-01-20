@@ -28,36 +28,70 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 ## Features
 
 ```mermaid
-%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#4a90d9', 'primaryTextColor': '#fff', 'primaryBorderColor': '#4a90d9', 'lineColor': '#6b7280', 'secondaryColor': '#22c55e', 'tertiaryColor': '#8b5cf6'}}}%%
-mindmap
-  root((Resume Helper))
-    )Resume Building(
-      Personal Info
-      Education
-      Experience
-      Skills
-      Projects
-      Certifications
-    ))AI Features((
-      Job Analysis
-      Resume Tailoring
-      Cover Letters
-      Suggestions
-    )Application Tracker(
-      Track Applications
-      Interview Management
-      Outcome Tracking
-    ))Multi-AI Support((
-      Cloud Providers
-      Local Providers
-    )PDF Generation(
-      Resume PDF
-      Cover Letter PDF
-      Analysis PDF
-    ))Privacy Protection((
-      Strip Personal Data
-      Process with AI
-      Restore Data
+flowchart LR
+    R[Resume Helper]
+    
+    R --> A[Resume Building]
+    A --> A1[Personal Info]
+    A --> A2[Education]
+    A --> A3[Experience]
+    A --> A4[Skills]
+    A --> A5[Projects]
+    A --> A6[Certifications]
+    
+    R --> B[AI Features]
+    B --> B1[Job Analysis]
+    B --> B2[Resume Tailoring]
+    B --> B3[Cover Letters]
+    B --> B4[Suggestions]
+    
+    R --> C[Application Tracker]
+    C --> C1[Track Applications]
+    C --> C2[Interview Management]
+    C --> C3[Outcome Tracking]
+    
+    R --> D[Multi-AI Support]
+    D --> D1[Cloud Providers]
+    D --> D2[Local Providers]
+    
+    R --> E[PDF Generation]
+    E --> E1[Resume PDF]
+    E --> E2[Cover Letter PDF]
+    E --> E3[Analysis PDF]
+    
+    R --> F[Privacy Protection]
+    F --> F1[Strip Personal Data]
+    F --> F2[Process with AI]
+    F --> F3[Restore Data]
+    
+    style R fill:#0ea5e9,stroke:#0ea5e9,color:#fff
+    style A fill:#3b82f6,stroke:#3b82f6,color:#fff
+    style B fill:#8b5cf6,stroke:#8b5cf6,color:#fff
+    style C fill:#f59e0b,stroke:#f59e0b,color:#fff
+    style D fill:#10b981,stroke:#10b981,color:#fff
+    style E fill:#ef4444,stroke:#ef4444,color:#fff
+    style F fill:#ec4899,stroke:#ec4899,color:#fff
+    style A1 fill:#60a5fa,stroke:#60a5fa,color:#fff
+    style A2 fill:#60a5fa,stroke:#60a5fa,color:#fff
+    style A3 fill:#60a5fa,stroke:#60a5fa,color:#fff
+    style A4 fill:#60a5fa,stroke:#60a5fa,color:#fff
+    style A5 fill:#60a5fa,stroke:#60a5fa,color:#fff
+    style A6 fill:#60a5fa,stroke:#60a5fa,color:#fff
+    style B1 fill:#a78bfa,stroke:#a78bfa,color:#fff
+    style B2 fill:#a78bfa,stroke:#a78bfa,color:#fff
+    style B3 fill:#a78bfa,stroke:#a78bfa,color:#fff
+    style B4 fill:#a78bfa,stroke:#a78bfa,color:#fff
+    style C1 fill:#fbbf24,stroke:#fbbf24,color:#000
+    style C2 fill:#fbbf24,stroke:#fbbf24,color:#000
+    style C3 fill:#fbbf24,stroke:#fbbf24,color:#000
+    style D1 fill:#34d399,stroke:#34d399,color:#000
+    style D2 fill:#34d399,stroke:#34d399,color:#000
+    style E1 fill:#f87171,stroke:#f87171,color:#fff
+    style E2 fill:#f87171,stroke:#f87171,color:#fff
+    style E3 fill:#f87171,stroke:#f87171,color:#fff
+    style F1 fill:#f472b6,stroke:#f472b6,color:#fff
+    style F2 fill:#f472b6,stroke:#f472b6,color:#fff
+    style F3 fill:#f472b6,stroke:#f472b6,color:#fff
 ```
 
 ### Privacy-Preserving Workflow
