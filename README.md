@@ -28,7 +28,7 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 ## Features
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#3b82f6', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#3b82f6', 'lineColor': '#94a3b8', 'secondaryColor': '#8b5cf6', 'tertiaryColor': '#10b981', 'background': '#1e293b', 'mainBkg': '#1e293b', 'nodeBkg': '#3b82f6', 'nodeBorder': '#3b82f6', 'clusterBkg': '#334155', 'clusterBorder': '#475569', 'titleColor': '#ffffff', 'nodeTextColor': '#ffffff'}}}%%
+%%{init: {'theme': 'dark'}}%%
 mindmap
   root((Resume Helper))
     Resume Building
