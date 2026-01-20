@@ -207,11 +207,6 @@ Attach documents to applications:
    ```
 4. In Resume Helper: Select **Ollama (Local)**, leave API key empty
 
-**Recommended models:**
-- `llama3.2` - Fast, good quality
-- `qwen2.5:7b` - Strong reasoning
-- `mistral` - Balanced performance
-
 ### llama.cpp (High Performance)
 
 1. Download from: https://github.com/ggerganov/llama.cpp/releases
