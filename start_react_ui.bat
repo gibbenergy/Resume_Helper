@@ -102,7 +102,7 @@ echo.
 
 REM Start FastAPI backend in a new window using UV
 echo Starting FastAPI backend server on port %BACKEND_PORT%...
-start "Resume Helper - FastAPI Backend" cmd /k "cd /d %~dp0 && uv run uvicorn backend.api.main:app --host 127.0.0.1 --port %BACKEND_PORT% --reload --reload-exclude .venv"
+start "Resume Helper - FastAPI Backend" cmd /k "cd /d %~dp0 && uv run uvicorn backend.api.main:app --host 127.0.0.1 --port %BACKEND_PORT%"
 
 REM Wait for backend to start
 echo Waiting for backend to start...
