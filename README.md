@@ -31,12 +31,6 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
   <img src="assets/mindmap.svg" alt="Resume Helper Features"/>
 </div>
 
-### Privacy-Preserving Workflow
-
-<div align="center">
-  <img src="assets/privacy-workflow.svg" alt="Privacy Workflow"/>
-</div>
-
 ## Supported AI Providers
 
 <div align="center">
