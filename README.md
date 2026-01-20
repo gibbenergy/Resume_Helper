@@ -27,122 +27,16 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 
 ## Features
 
-<div align="center">
-
-```mermaid
-flowchart TB
-    subgraph Core["Core Features"]
-        A[Resume Building]
-        A1[Personal Info]
-        A2[Education]
-        A3[Experience]
-        A4[Skills]
-        A5[Projects]
-        A6[Certifications]
-        A --> A1
-        A --> A2
-        A --> A3
-        A --> A4
-        A --> A5
-        A --> A6
-    end
-    
-    subgraph AI["AI-Powered Features"]
-        B[Job Analysis]
-        C[Resume Tailoring]
-        D[Cover Letter Generation]
-        E[Improvement Suggestions]
-    end
-    
-    subgraph Tracking["Application Management"]
-        F[Application Tracker]
-        F1[Track Applications]
-        F2[Interview Management]
-        F3[Outcome Tracking]
-        F --> F1
-        F --> F2
-        F --> F3
-    end
-    
-    subgraph Providers["Multi-AI Support"]
-        G[Cloud Providers]
-        G1[OpenAI]
-        G2[Anthropic Claude]
-        G3[Google Gemini]
-        G4[Groq]
-        G5[Perplexity]
-        G6[xAI Grok]
-        G --> G1
-        G --> G2
-        G --> G3
-        G --> G4
-        G --> G5
-        G --> G6
-        
-        H[Local Providers]
-        H1[Ollama]
-        H2[llama.cpp]
-        H3[LM Studio]
-        H4[Lemonade]
-        H --> H1
-        H --> H2
-        H --> H3
-        H --> H4
-    end
-    
-    subgraph Output["Export & Generation"]
-        I[PDF Generation]
-        I1[Resume PDF]
-        I2[Cover Letter PDF]
-        I3[Job Analysis PDF]
-        I --> I1
-        I --> I2
-        I --> I3
-    end
-    
-    subgraph Privacy["Privacy Protection"]
-        J[Privacy-Preserving Workflow]
-        J1[Strip Personal Data]
-        J2[AI Processing]
-        J3[Restore Personal Data]
-        J --> J1
-        J1 --> J2
-        J2 --> J3
-    end
-    
-    A --> B
-    A --> C
-    A --> D
-    B --> C
-    B --> D
-    C --> I
-    D --> I
-    B --> F
-    C --> F
-    D --> F
-    B --> G
-    B --> H
-    C --> G
-    C --> H
-    D --> G
-    D --> H
-    B --> J
-    C --> J
-    D --> J
-    
-    style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
-    style B fill:#166534,stroke:#22c55e,color:#fff
-    style C fill:#166534,stroke:#22c55e,color:#fff
-    style D fill:#166534,stroke:#22c55e,color:#fff
-    style E fill:#166534,stroke:#22c55e,color:#fff
-    style F fill:#7c2d12,stroke:#f97316,color:#fff
-    style G fill:#0369a1,stroke:#38bdf8,color:#fff
-    style H fill:#0369a1,stroke:#38bdf8,color:#fff
-    style I fill:#6b21a8,stroke:#a855f7,color:#fff
-    style J fill:#991b1b,stroke:#ef4444,color:#fff
-```
-
-</div>
+| Feature | Description |
+|---------|-------------|
+| **Resume Building** | Create resumes with personal info, education, experience, skills, projects, certifications |
+| **AI Resume Tailoring** | Adapt your resume to match job descriptions |
+| **AI Cover Letters** | Generate personalized cover letters |
+| **Job Analysis** | Analyze job postings with AI insights |
+| **Application Tracker** | Track applications, interviews, and outcomes |
+| **Multi-AI Support** | OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio, Lemonade |
+| **PDF Generation** | Export professional resumes and cover letters |
+| **Privacy-Preserving** | Personal information is stripped before sending to AI and restored after |
 
 ### Privacy-Preserving Workflow
 
