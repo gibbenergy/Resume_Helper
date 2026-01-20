@@ -27,16 +27,37 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| **Resume Building** | Create resumes with personal info, education, experience, skills, projects, certifications |
-| **AI Resume Tailoring** | Adapt your resume to match job descriptions |
-| **AI Cover Letters** | Generate personalized cover letters |
-| **Job Analysis** | Analyze job postings with AI insights |
-| **Application Tracker** | Track applications, interviews, and outcomes |
-| **Multi-AI Support** | OpenAI, Anthropic, Google, Groq, Ollama, Perplexity, xAI, llama.cpp, LM Studio, Lemonade |
-| **PDF Generation** | Export professional resumes and cover letters |
-| **Privacy-Preserving** | Personal information is stripped before sending to AI and restored after |
+```mermaid
+mindmap
+  root((Resume Helper))
+    Resume Building
+      Personal Info
+      Education
+      Experience
+      Skills
+      Projects
+      Certifications
+    AI Features
+      Job Analysis
+      Resume Tailoring
+      Cover Letters
+      Suggestions
+    Application Tracker
+      Track Applications
+      Interview Management
+      Outcome Tracking
+    Multi-AI Support
+      Cloud: OpenAI, Anthropic, Google, Groq, Perplexity, xAI
+      Local: Ollama, llama.cpp, LM Studio, Lemonade
+    PDF Generation
+      Resume PDF
+      Cover Letter PDF
+      Analysis PDF
+    Privacy Protection
+      Strip Personal Data
+      Process with AI
+      Restore Data
+```
 
 ### Privacy-Preserving Workflow
 
