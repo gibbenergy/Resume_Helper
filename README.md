@@ -91,40 +91,33 @@ flowchart TD
 
 <div align="center">
 
-| Cloud Providers | | | | | |
-|:---:|:---:|:---:|:---:|:---:|:---:|
-| <img src="https://cdn.simpleicons.org/openai/white" width="40"/><br/>OpenAI | <img src="https://cdn.simpleicons.org/anthropic/white" width="40"/><br/>Anthropic | <img src="https://cdn.simpleicons.org/google/white" width="40"/><br/>Google | <img src="https://cdn.simpleicons.org/perplexity/white" width="40"/><br/>Perplexity | <img src="https://cdn.simpleicons.org/x/white" width="40"/><br/>xAI | <img src="https://groq.com/wp-content/uploads/2024/03/PBG-mark1-color.svg" width="40"/><br/>Groq |
+**Cloud Providers**
 
-| Local Providers | | | |
-|:---:|:---:|:---:|:---:|
-| <img src="https://ollama.com/public/ollama.png" width="40"/><br/>Ollama | <img src="https://cdn.simpleicons.org/llama/white" width="40"/><br/>llama.cpp | <img src="https://lmstudio.ai/favicon.ico" width="40"/><br/>LM Studio | <img src="https://cdn.simpleicons.org/lemon/white" width="40"/><br/>Lemonade |
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
+[![Anthropic](https://img.shields.io/badge/Anthropic-191919?style=for-the-badge&logo=anthropic&logoColor=white)](https://anthropic.com)
+[![Google](https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
+[![Perplexity](https://img.shields.io/badge/Perplexity-1FB8CD?style=for-the-badge&logo=perplexity&logoColor=white)](https://perplexity.ai)
+[![xAI](https://img.shields.io/badge/xAI_Grok-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.ai)
+[![Groq](https://img.shields.io/badge/Groq-F55036?style=for-the-badge&logoColor=white)](https://groq.com)
+
+**Local Providers**
+
+[![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logoColor=white)](https://ollama.com)
+[![llama.cpp](https://img.shields.io/badge/llama.cpp-00ADD8?style=for-the-badge&logoColor=white)](https://github.com/ggml-org/llama.cpp)
+[![LM Studio](https://img.shields.io/badge/LM_Studio-6366F1?style=for-the-badge&logoColor=white)](https://lmstudio.ai)
+[![Lemonade](https://img.shields.io/badge/Lemonade-FBBF24?style=for-the-badge&logoColor=black)](https://github.com/lemonade-hq/lemonade)
 
 </div>
 
 ## Quick Start (Windows)
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/gibbenergy/Resume_Helper.git
-cd Resume_Helper
-
-# 2. Create virtual environment
-python -m venv .venv
-.venv\Scripts\activate
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Start backend (Terminal 1)
-uvicorn backend.api.main:app --host 0.0.0.0 --port 5000
-
-# 5. Start frontend (Terminal 2)
-cd frontend
-npm install
-npm run dev
+start_react_ui.bat
 ```
 
 Access at: `http://localhost:5173`
+
+For manual setup, see [Usage Guide](USAGE_GUIDE.md).
 
 ## Requirements
 
