@@ -85,28 +85,40 @@ flowchart TD
     style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
 ```
 
-**Before sending anything to AI, remove personal information. After getting the AI response, put it back.**
+</div>
+
+## Supported AI Providers
+
+<div align="center">
+
+| Cloud Providers | | | | | |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| <img src="https://cdn.simpleicons.org/openai/white" width="40"/><br/>OpenAI | <img src="https://cdn.simpleicons.org/anthropic/white" width="40"/><br/>Anthropic | <img src="https://cdn.simpleicons.org/google/white" width="40"/><br/>Google | <img src="https://cdn.simpleicons.org/perplexity/white" width="40"/><br/>Perplexity | <img src="https://cdn.simpleicons.org/x/white" width="40"/><br/>xAI | <img src="https://groq.com/wp-content/uploads/2024/03/PBG-mark1-color.svg" width="40"/><br/>Groq |
+
+| Local Providers | | | |
+|:---:|:---:|:---:|:---:|
+| <img src="https://ollama.com/public/ollama.png" width="40"/><br/>Ollama | <img src="https://cdn.simpleicons.org/llama/white" width="40"/><br/>llama.cpp | <img src="https://lmstudio.ai/favicon.ico" width="40"/><br/>LM Studio | <img src="https://cdn.simpleicons.org/lemon/white" width="40"/><br/>Lemonade |
 
 </div>
 
 ## Quick Start (Windows)
 
 ```bash
-start_react_ui.bat
-```
+# 1. Clone repository
+git clone https://github.com/gibbenergy/Resume_Helper.git
+cd Resume_Helper
 
-Or manually:
-```bash
+# 2. Create virtual environment
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
-playwright install chromium
-cd backend
-uvicorn backend.api.main:app --host 0.0.0.0 --port 5000
-```
 
-In another terminal:
-```bash
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Start backend (Terminal 1)
+uvicorn backend.api.main:app --host 0.0.0.0 --port 5000
+
+# 5. Start frontend (Terminal 2)
 cd frontend
 npm install
 npm run dev
@@ -114,57 +126,12 @@ npm run dev
 
 Access at: `http://localhost:5173`
 
-## Configuration
-
-API keys are configured directly in the app:
-1. Launch the app
-2. Go to "AI Resume Helper" tab
-3. Expand "AI Configuration" 
-4. Select provider, enter API key, click "Set"
-
-Keys are auto-saved and remembered for next session.
-
-## Supported AI Models
-
-**Recommended: Local Models (Free)**
-
-**Ollama** - Easiest local setup
-- **gpt-oss** - OpenAI's open-weight model (14GB, 128K context) - best for reasoning
-- Qwen2.5, Llama 3.3, DeepSeek-R1 - smaller alternatives
-
-**llama.cpp** - High-performance C++ inference
-- Run any GGUF model with OpenAI-compatible API
-- Lower memory usage, faster inference
-- Default: `http://localhost:8080/v1`
-
-**LM Studio** - User-friendly GUI
-- Easy model downloads and management
-- Built-in OpenAI-compatible server
-- Default: `http://localhost:1234/v1`
-
-**Lemonade** - Advanced LLM router/proxy
-- Route requests to multiple local backends
-- Smart model selection and load balancing
-- OpenAI-compatible API with extended features
-- Default: `http://localhost:8000/v1`
-- **Recommended:** Use `--ctx-size 8192` or higher for job analysis
-
-**Cloud Providers (API key required)**
-- **OpenAI**: GPT-4.1, GPT-5, GPT-5-mini
-- **Anthropic**: Claude Opus 4, Claude 3.5 Sonnet
-- **Google**: Gemini 2.5 Pro, Gemini 2.5 Flash
-- **Groq**: Llama 3.3
-- **Perplexity**: Sonar Pro, Sonar Reasoning
-- **xAI**: Grok 4, Grok 3
-
 ## Requirements
 
 - Windows 10/11
 - Python 3.11+
-- Node.js 18+ (for frontend)
-- For Ollama: ~14GB disk space for gpt-oss model
+- Node.js 18+
 
 ## License
 
 Business Source License 1.1 - See LICENSE file
-Free for personal/educational use. Commercial use requires a license.

@@ -1,347 +1,297 @@
 # Resume Helper Usage Guide
 
-This guide explains how to download, install, and use the Resume Helper application.
+Complete guide for downloading, installing, configuring, and using the Resume Helper application.
 
-## 1. Download the Application
+## Table of Contents
 
-First, download the application code from the GitHub repository:
+1. [Download](#1-download)
+2. [Installation](#2-installation)
+3. [Configuration](#3-configuration)
+4. [Resume Building](#4-resume-building)
+5. [AI Features](#5-ai-features)
+6. [Application Tracker](#6-application-tracker)
+7. [Local AI Setup](#7-local-ai-setup)
+8. [Cloud AI Setup](#8-cloud-ai-setup)
+
+---
+
+## 1. Download
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/gibbenergy/Resume_Helper.git
 cd Resume_Helper
 ```
 
-Alternatively, you can download the repository as a ZIP file from the GitHub page (https://github.com/gibbenergy/Resume_Helper) and extract it to a folder on your computer. Navigate into the extracted folder using your terminal or command prompt.
-
-## 2. Installation and Running the Application
-
-The application includes scripts to simplify the installation and running process. Choose the script appropriate for your operating system.
-
-### Windows Users
-
-1.  Navigate to the `Resume_Helper` folder you downloaded or extracted.
-2.  Double-click the `install_run_windows.bat` file.
-3.  This script will:
-    *   Check if Python 3.11+ is installed. If not found, it will display an error message and exit.
-    *   Ensure `pip` (Python package installer) is available.
-    *   Create a Python virtual environment (`.venv`) if it doesn't exist.
-    *   Install the required dependencies listed in `requirements.txt`.
-    *   Install Playwright Chromium browser.
-    *   Check if the default port (53441) is busy and attempt to free it if necessary.
-    *   Start the Resume Helper application.
-4.  Your default web browser should automatically open to `http://localhost:53441`, displaying the application interface.
-
-## 3. Using the Application Interface
-
-The application uses a tabbed interface to organize resume sections:
-
-*   **Personal Info:** Enter your name, contact details, summary, and links (LinkedIn, GitHub, Portfolio). You can also load an example profile from here.
-*   **Educations:** Add details about your educational background (institution, degree, dates, GPA, description).
-*   **Experiences:** Add your work history (company, position, dates, description, achievements). Use bullet points (starting with `- `) for achievements.
-*   **Skills:** List your skills, categorized (e.g., Programming, Framework) with proficiency levels.
-*   **Projects:** Detail personal or professional projects (title, description, technologies, URL, dates).
-*   **Certifications:** Add any relevant certifications (name, issuer, date, ID, URL).
-
-**Common Actions in Tabs:**
-
-*   **Add:** Fill in the fields and click "Add" to add an entry to the list/table below.
-*   **Remove Selected:** Select one or more rows in the table and click "Remove Selected" to delete them.
-*   **Clear All:** Click "Clear All" to remove all entries from the current section's table.
-*   **Reset Fields:** Click "Reset" to clear the input fields in the current section.
-
-**Saving and Loading:**
-
-*   Use the "Generate JSON" and "Download JSON" buttons (in the "Import & Export" tab) to save all your entered data to a `.json` file.
-*   Use the "Load from JSON" button (in the "Import & Export" tab) to load data from a previously saved `.json` file.
-
-## 4. Generating Your Resume
-
-1.  Navigate to the **Import & Export** tab.
-2.  Click the **Generate Resume (PDF)** button.
-3.  A PDF file of your resume will be generated and saved. Click the **Download PDF** button to download the file.
-
-## 4.5 Setting Up Local AI Models (Recommended - Free) 🦙
-
-You have **three options** for running AI models locally on your computer - no API key, no cost, no internet required after setup.
-
-### Option 1: Ollama (Easiest - Recommended for Beginners)
-
-Ollama is the easiest way to get started with local AI models.
-
-#### Step 1: Install Ollama
-
-1. Go to: https://ollama.com/download
-2. Download the **Windows** installer
-3. Run the installer and follow the prompts
-4. Ollama will start automatically as a background service
-
-#### Step 2: Download a Model
-
-Open **Command Prompt** or **PowerShell** and run:
-
-```bash
-ollama pull gpt-oss
-```
-
-This downloads OpenAI's open-weight model (~14GB). It has 128K context and is designed for reasoning tasks - perfect for resume tailoring.
-
-**Alternative models** (smaller/faster):
-```bash
-ollama pull qwen2.5:7b      # ~4GB, fast
-ollama pull llama3.3        # ~4GB, good quality
-ollama pull deepseek-r1:8b  # ~5GB, strong reasoning
-```
-
-#### Step 3: Verify Ollama is Running
-
-```bash
-ollama list
-```
-
-You should see your downloaded model(s) listed.
-
-#### Step 4: Use in Resume Helper
-
-1. Launch Resume Helper
-2. Go to **AI Resume Helper** tab
-3. Select **Ollama (Local)** as the provider
-4. Leave the API key field **empty**
-5. Select **gpt-oss:latest** (or your downloaded model) from the Model dropdown
-6. Click **Set**
+Or download as ZIP from the [GitHub releases page](https://github.com/gibbenergy/Resume_Helper/releases).
 
 ---
 
-### Option 2: llama.cpp (High Performance)
+## 2. Installation
 
-llama.cpp provides the fastest inference with the lowest memory usage. Perfect if you want maximum performance.
+### Windows (Recommended)
 
-#### Step 1: Install llama.cpp
-
-**Option A: Pre-built Binary (Easiest)**
-1. Go to: https://github.com/ggerganov/llama.cpp/releases
-2. Download the latest `llama-cpp-windows-xxx.zip` for your system
-3. Extract to a folder (e.g., `C:\llama.cpp`)
-
-**Option B: Build from Source**
+**Option A: One-Click Start**
 ```bash
-git clone https://github.com/ggerganov/llama.cpp
-cd llama.cpp
-cmake -B build
-cmake --build build --config Release
+start_react_ui.bat
 ```
 
-#### Step 2: Download a GGUF Model
+**Option B: Manual Setup**
 
-Download models from HuggingFace (GGUF format):
-- **Recommended**: [TheBloke/Llama-2-7B-Chat-GGUF](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF)
-- Or search "GGUF" on HuggingFace for any model
-
-Save the `.gguf` file to your llama.cpp folder.
-
-#### Step 3: Start the Server
-
-Open **Command Prompt** in your llama.cpp folder:
-
+Terminal 1 (Backend):
 ```bash
-# For CPU (works on any PC)
-.\build\bin\Release\server.exe -m your-model.gguf --host 0.0.0.0 --port 8080
-
-# For NVIDIA GPU (faster)
-.\build\bin\Release\server.exe -m your-model.gguf --host 0.0.0.0 --port 8080 -ngl 32
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn backend.api.main:app --host 0.0.0.0 --port 5000
 ```
 
-**Parameters**:
-- `-m` = path to your GGUF model file
-- `--port` = server port (default: 8080)
-- `-ngl` = number of GPU layers (for GPU acceleration)
-- `-c` = context size (e.g., `-c 8192`)
+Terminal 2 (Frontend):
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-#### Step 4: Use in Resume Helper
-
-1. Launch Resume Helper
-2. Go to **AI Resume Helper** tab
-3. Select **llama.cpp** as the provider
-4. Leave the API key field **empty**
-5. **Custom Base URL**: `http://localhost:8080/v1` (or your custom port)
-6. Click **Set**
+Access the app at: `http://localhost:5173`
 
 ---
 
-### Option 3: LM Studio (User-Friendly GUI)
+## 3. Configuration
 
-LM Studio provides the easiest way to download, manage, and run models with a beautiful interface.
+### AI Provider Setup
 
-#### Step 1: Install LM Studio
+1. Launch the app and navigate to **AI Resume Helper** tab
+2. Expand **AI Configuration** section
+3. Select your provider from the dropdown
+4. For cloud providers: Enter your API key
+5. For local providers: Leave API key empty
+6. Select a model from the Model dropdown
+7. Click **Test Connection** to verify
 
-1. Go to: https://lmstudio.ai/
-2. Download **LM Studio** for Windows
-3. Install and launch the application
+API keys are automatically saved for future sessions.
 
-#### Step 2: Download a Model
+### Supported Providers
 
-1. In LM Studio, click **🔍 Search** (or "Discover" tab)
-2. Search for models (recommended):
-   - `TheBloke/Llama-2-7B-Chat-GGUF`
-   - `TheBloke/Mistral-7B-Instruct-v0.2-GGUF`
-   - `TheBloke/Qwen2.5-7B-Instruct-GGUF`
-3. Click **Download** on your chosen model
-4. Wait for download to complete
-
-#### Step 3: Start the Local Server
-
-1. In LM Studio, click **↔️ Local Server** (left sidebar)
-2. Select your downloaded model from the dropdown
-3. Click **Start Server**
-4. Server will start at `http://localhost:1234` by default
-5. Keep LM Studio running while using Resume Helper
-
-#### Step 4: Use in Resume Helper
-
-1. Launch Resume Helper
-2. Go to **AI Resume Helper** tab
-3. Select **LM Studio** as the provider
-4. Leave the API key field **empty**
-5. **Custom Base URL**: `http://localhost:1234/v1` (default)
-6. Click **Set**
+| Provider | Type | API Key Required |
+|----------|------|------------------|
+| OpenAI | Cloud | Yes |
+| Anthropic | Cloud | Yes |
+| Google Gemini | Cloud | Yes |
+| Groq | Cloud | Yes |
+| Perplexity | Cloud | Yes |
+| xAI | Cloud | Yes |
+| Ollama | Local | No |
+| llama.cpp | Local | No |
+| LM Studio | Local | No |
+| Lemonade | Local | No |
 
 ---
 
-## 4.6 Getting API Keys (Cloud Providers) 🔑
+## 4. Resume Building
 
-> **Prefer cloud AI instead of local?**  
-> You can obtain API keys from any of the supported providers:
-> - **OpenAI**: https://platform.openai.com/api-keys
-> - **Anthropic**: https://console.anthropic.com/
-> - **Google**: https://aistudio.google.com/apikey
-> - **Groq**: https://console.groq.com/keys
-> - **Perplexity**: https://www.perplexity.ai/settings/api
-> - **xAI**: https://console.x.ai/
+The app uses a tabbed interface for resume sections:
 
-## 5. Using AI Features (Optional)
+### Personal Info
+- Name, contact details, summary
+- LinkedIn, GitHub, Portfolio URLs
+- Load example profiles or saved profiles
 
-The **AI Resume Helper** tab lets you refine your résumé (and draft a cover-letter) with any of the supported AI models (OpenAI, Anthropic, Google, Groq, Ollama, llama.cpp, LM Studio, Perplexity, or xAI).
+### Education
+- Institution, degree, field of study
+- GPA, dates, description
 
-1. **Configure AI**
+### Experience
+- Company, position, location
+- Start/end dates, description
+- Achievements (use bullet points)
 
-   - Choose the provider (OpenAI, Anthropic, Google, Groq, **Ollama**, **llama.cpp**, **LM Studio**, Perplexity, or xAI).
-   - **For local providers** (Ollama/llama.cpp/LM Studio): Leave API key empty
-   - **For llama.cpp/LM Studio**: Enter the custom base URL (e.g., `http://localhost:8080/v1`)
-   - **For cloud providers**: Paste your API key
-   - Click **Set**.
-   - Pick the desired model in **Model**.
+### Skills
+- Category (Programming, Framework, etc.)
+- Skill name and proficiency level
 
-2. **Paste the Job Description**
+### Projects
+- Project name and description
+- Technologies used, URL
+- Start/end dates
 
-   Insert the full posting into **Job Description** so the model knows what you're targeting.
+### Certifications
+- Certification name and issuer
+- Date obtained, credential ID, URL
 
-3. **Load Your Latest Résumé**
+### Saving Profiles
 
-   Click **🔄 Update Resume**.  
-   This pulls the most-recent data from the other tabs into *Current Resume JSON*.
+Profiles are saved to the database (not browser storage):
+- Click **Save** in any section to save the entire profile
+- Profiles persist across browsers on the same computer
+- Load saved profiles from the **Assets** panel
 
-4. **(Optional) Add a User Prompt**
+---
 
-   Expand **➕ Optional User Prompt** and supply stylistic guidance or focus areas, e.g.
+## 5. AI Features
 
-   > *I.e., Use a results-driven tone and emphasise on certain achievement.*
+### Workflow
 
-5. **Process with AI**
+1. **Update Resume** - Sync your current resume data
+2. **Paste Job Description** - Enter the full job posting
+3. **Analyze Job** - Extract requirements and get match score
+4. **Tailor Resume** - Adapt resume to job requirements
+5. **Generate Cover Letter** - Create personalized cover letter
+6. **Get Suggestions** - Receive improvement recommendations
 
-   | Button | Action |
-   | ------ | ------ |
-   | **🔍 Analyze Job** | Extract key skills / requirements from the job description |
-   | **🎯 Tailor Resume** | Produce a résumé JSON aligned to those requirements (no invented skills) |
-   | **✉️ Cover Letter** | Draft a cover letter based on the tailored résumé & job description |
-   | **💡 Suggestions** | Provide targeted advice for further improvements |
+### AI Operations
 
-6. **Generate a PDF**
+| Button | Action |
+|--------|--------|
+| Analyze Job | Extract skills, requirements, calculate match score |
+| Tailor Resume | Rewrite resume aligned to job requirements |
+| Cover Letter | Generate personalized cover letter |
+| Suggestions | Get targeted improvement advice |
 
-   - In **Select PDF Type** choose **Tailored Resume** *or* **Cover Letter**.  
-   - Click **Generate PDF** → then **Download PDF** to save the file.
+### PDF Generation
 
-7. **Review the Outputs**
+After AI processing:
+1. Click **Preview** on any result card
+2. Review the content
+3. Click **Download PDF** to save
 
-   Check each output tab, copy or tweak content as needed, and you're ready to apply!
+---
 
+## 6. Application Tracker
 
-## 6. Application Tracker 📋
+### Adding Applications
 
-The **Application Tracker** tab helps you manage and track all your job applications in one place.
-
-### Adding a New Application
-
-1. Click **➕ Add Application**
-2. Fill in the required fields:
-   - **Job URL** - Link to the job posting
-   - **Company** - Company name
-   - **Position** - Job title
-3. Optional fields:
-   - **Location** - Job location (remote, city, etc.)
-   - **Date Applied** - Defaults to today
-   - **Status** - Applied, Offer, Accepted, Rejected, Withdrawn
-   - **Priority** - High, Medium, Low
-   - **Application Source** - LinkedIn, Indeed, Company Website, Referral, etc.
-   - **Salary Range** - Min/Max expected salary
-   - **Match Score** - How well you match (0-100%)
-   - **Job Description** - Full job posting text
-   - **Notes** - Personal notes
-   - **Contact Information** - HR, Hiring Manager, Recruiter, Referral contacts
-4. Click **💾 Save Application**
+1. Click **Add Application**
+2. Fill required fields: Job URL, Company, Position
+3. Optional: Location, salary, match score, notes
+4. Click **Save**
 
 ### Managing Applications
 
 | Action | How To |
 |--------|--------|
-| **View Details** | Click any row in the applications table |
-| **Edit** | Click row → **✏️ Edit** |
-| **Delete** | Click row → **🗑️ Delete** |
-| **Search** | Type in the search box (searches company & position) |
-| **Sort** | Use the "Sort By" dropdown (date, company, match score, status, priority) |
-| **Filter** | Use "Filter by Status" to show only specific statuses |
+| View | Click any row |
+| Edit | Click row, then Edit button |
+| Delete | Click row, then Delete button |
+| Search | Use search box |
+| Filter | Use status filter dropdown |
+| Sort | Use sort dropdown |
 
-### Interview Pipeline Management 🎯
+### Interview Management
 
-Track your progress through multiple interview rounds:
+1. Open application details
+2. Click **Manage Interviews**
+3. Track rounds: Phone Screen, Technical, Panel, etc.
+4. Update status: Scheduled, Completed, Passed, Failed
 
-1. Click on an application row to view details
-2. Click **📅 Manage Interviews**
-3. You'll see all interview rounds with their status:
-   - ⭕ Not Started
-   - 📅 Scheduled
-   - ✅ Completed
+### Documents
 
-**To edit a round:** Click on any round row to open the details form:
-- Date & Time
-- Location (Office, Zoom, Phone, etc.)
-- Interviewer name
-- Status (scheduled, completed, cancelled, rescheduled)
-- Outcome (pending, passed, failed, needs_follow_up)
-- Notes (preparation, feedback, next steps)
-
-**Navigation:**
-- **⏭️ Advance** - Mark current round as passed and move to next
-- **⬅️ Go Back** - Revert to previous round
-
-### Document Management 📁
-
-Attach documents to each application (resume versions, cover letters, portfolios, etc.):
-
-1. Open application details (click a row)
-2. Expand the **📁 Documents** section
-3. **Upload:** Drag & drop or click to upload files
-4. **Download:** Click a document → **⬇️ Download**
-5. **Delete:** Click a document → **🗑️ Delete**
-
-Supported file types: PDF, DOC, DOCX, TXT, images, code files, archives, and more.
+Attach documents to applications:
+- Resume versions
+- Cover letters
+- Portfolios
+- Reference letters
 
 ---
 
-## 7. Stopping the Application
+## 7. Local AI Setup
 
-To stop the Resume Helper application:
+### Ollama (Recommended for Beginners)
 
-*   Go back to the terminal or command prompt window where you ran the installation script (`.bat` or `.py`).
-*   Press `Ctrl + C`.
-*   Close the terminal window.
+1. Download from: https://ollama.com/download
+2. Install and run Ollama
+3. Download a model:
+   ```bash
+   ollama pull llama3.2
+   ```
+4. In Resume Helper: Select **Ollama (Local)**, leave API key empty
 
-This concludes the usage guide for the Resume Helper application.
+**Recommended models:**
+- `llama3.2` - Fast, good quality
+- `qwen2.5:7b` - Strong reasoning
+- `mistral` - Balanced performance
+
+### llama.cpp (High Performance)
+
+1. Download from: https://github.com/ggerganov/llama.cpp/releases
+2. Download a GGUF model from HuggingFace
+3. Start the server:
+   ```bash
+   llama-server -m model.gguf --port 8080
+   ```
+4. In Resume Helper: Select **llama.cpp**, use `http://localhost:8080/v1`
+
+### LM Studio (User-Friendly GUI)
+
+1. Download from: https://lmstudio.ai/
+2. Install and open LM Studio
+3. Download a model from the Discover tab
+4. Go to **Local Server** tab, start server
+5. In Resume Helper: Select **LM Studio**, use `http://localhost:1234/v1`
+
+### Lemonade (AMD GPU / Advanced)
+
+Lemonade is an LLM server optimized for AMD GPUs with advanced features.
+
+1. Install Lemonade:
+   ```bash
+   pip install lemonade-server
+   ```
+
+2. Start the server:
+   ```bash
+   lemonade-server serve --ctx-size 8192
+   ```
+   
+   **Important:** Use `--ctx-size 8192` or higher for job analysis (default 4096 may be too small).
+
+3. In Resume Helper: Select **Lemonade**, use `http://localhost:8000/api/v1`
+
+**Features:**
+- AMD GPU optimization (ROCm)
+- Smart caching and batching
+- OpenAI-compatible API
+
+**Troubleshooting:**
+- If you see "context size exceeded" error, restart with larger context:
+  ```bash
+  lemonade-server serve --ctx-size 16384
+  ```
+
+---
+
+## 8. Cloud AI Setup
+
+### Getting API Keys
+
+| Provider | Get API Key |
+|----------|-------------|
+| OpenAI | https://platform.openai.com/api-keys |
+| Anthropic | https://console.anthropic.com/ |
+| Google | https://aistudio.google.com/apikey |
+| Groq | https://console.groq.com/keys |
+| Perplexity | https://www.perplexity.ai/settings/api |
+| xAI | https://console.x.ai/ |
+
+### Recommended Models
+
+| Provider | Models |
+|----------|--------|
+| OpenAI | GPT-4o, GPT-4o-mini |
+| Anthropic | Claude 3.5 Sonnet, Claude 3 Opus |
+| Google | Gemini 2.0 Flash, Gemini 1.5 Pro |
+| Groq | Llama 3.3 70B |
+| Perplexity | Sonar Pro |
+| xAI | Grok 2 |
+
+---
+
+## Stopping the Application
+
+- Press `Ctrl+C` in each terminal window
+- Or close the terminal windows
+
+---
+
+This concludes the Resume Helper usage guide.
