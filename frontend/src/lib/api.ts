@@ -463,4 +463,33 @@ export const api = {
   getJobDescriptionPDFUrl(appId: string): string {
     return `${API_BASE_URL}/api/pdf/job-description/${appId}`;
   },
+
+  /**
+   * Profile APIs - Server-side profile storage
+   */
+
+  // Get all saved profiles
+  async getProfiles() {
+    return fetchAPI('/api/profiles');
+  },
+
+  // Get a specific profile
+  async getProfile(profileId: string) {
+    return fetchAPI(`/api/profiles/${profileId}`);
+  },
+
+  // Save or update a profile
+  async saveProfile(name: string, data: any, id?: string) {
+    return fetchAPI('/api/profiles', {
+      method: 'POST',
+      body: JSON.stringify({ name, data, id }),
+    });
+  },
+
+  // Delete a profile
+  async deleteProfile(profileId: string) {
+    return fetchAPI(`/api/profiles/${profileId}`, {
+      method: 'DELETE',
+    });
+  },
 };

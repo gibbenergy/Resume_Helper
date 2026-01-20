@@ -42,18 +42,20 @@ export function PersonalInfoForm() {
     defaultValues: resumeData.personal_info,
   });
 
-  // Load saved profiles from localStorage on mount
+  // Load saved profiles from database on mount
   useEffect(() => {
-    const saved = localStorage.getItem('resumeHelper_savedProfiles');
-    if (saved) {
+    const loadProfiles = async () => {
       try {
-        const profiles = JSON.parse(saved);
-        setSavedProfiles(Array.isArray(profiles) ? profiles : []);
+        const response = await api.getProfiles();
+        if (response.success && Array.isArray(response.profiles)) {
+          setSavedProfiles(response.profiles);
+        }
       } catch (e) {
         console.error('Error loading saved profiles:', e);
         setSavedProfiles([]);
       }
-    }
+    };
+    loadProfiles();
   }, []);
 
   // Sync form with store when personal_info changes (e.g., after reset)
@@ -89,50 +91,49 @@ export function PersonalInfoForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeData.personal_info]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     updatePersonalInfo(data);
     
-    // Save complete resume profile to localStorage
+    // Save complete resume profile to database
     const profileName = data.full_name || 'Untitled Profile';
     const updatedResumeData = {
       ...resumeData,
       personal_info: { ...resumeData.personal_info, ...data },
     };
     
-    // Check if profile with same name exists
-    const existingIndex = savedProfiles.findIndex((p) => p.name === profileName);
-    
-    if (existingIndex >= 0) {
-      // Update existing profile
-      const updatedProfiles = [...savedProfiles];
-      updatedProfiles[existingIndex] = {
-        ...updatedProfiles[existingIndex],
-        timestamp: Date.now(),
-        data: updatedResumeData,
-      };
-      setSavedProfiles(updatedProfiles);
-      localStorage.setItem('resumeHelper_savedProfiles', JSON.stringify(updatedProfiles));
+    try {
+      // Check if profile with same name exists
+      const existingProfile = savedProfiles.find((p) => p.name === profileName);
+      
+      const response = await api.saveProfile(
+        profileName,
+        updatedResumeData,
+        existingProfile?.id
+      );
+      
+      if (response.success) {
+        // Refresh profiles from database
+        const profilesResponse = await api.getProfiles();
+        if (profilesResponse.success) {
+          setSavedProfiles(profilesResponse.profiles);
+        }
+        
+        toast({
+          title: existingProfile ? 'Profile updated' : 'Profile saved',
+          description: existingProfile 
+            ? `"${profileName}" has been updated.`
+            : `"${profileName}" has been saved.`,
+          variant: 'success',
+        });
+      } else {
+        throw new Error(response.message || 'Failed to save profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
       toast({
-        title: 'Profile updated',
-        description: `"${profileName}" has been updated.`,
-        variant: 'success',
-      });
-    } else {
-      // Create new profile
-      const profileId = `profile_${Date.now()}`;
-      const savedProfile: SavedProfile = {
-        id: profileId,
-        name: profileName,
-        timestamp: Date.now(),
-        data: updatedResumeData,
-      };
-      const updatedProfiles = [...savedProfiles, savedProfile];
-      setSavedProfiles(updatedProfiles);
-      localStorage.setItem('resumeHelper_savedProfiles', JSON.stringify(updatedProfiles));
-      toast({
-        title: 'Profile saved',
-        description: `"${profileName}" has been saved to your assets.`,
-        variant: 'success',
+        title: 'Error saving profile',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
       });
     }
   };
@@ -160,15 +161,33 @@ export function PersonalInfoForm() {
     });
   };
 
-  const deleteSavedProfile = (profileId: string) => {
-    const updated = savedProfiles.filter(p => p.id !== profileId);
-    setSavedProfiles(updated);
-    localStorage.setItem('resumeHelper_savedProfiles', JSON.stringify(updated));
-    toast({
-      title: 'Profile deleted',
-      description: 'The saved profile has been removed.',
-      variant: 'destructive',
-    });
+  const deleteSavedProfile = async (profileId: string) => {
+    try {
+      const response = await api.deleteProfile(profileId);
+      
+      if (response.success) {
+        // Refresh profiles from database
+        const profilesResponse = await api.getProfiles();
+        if (profilesResponse.success) {
+          setSavedProfiles(profilesResponse.profiles);
+        }
+        
+        toast({
+          title: 'Profile deleted',
+          description: 'The saved profile has been removed.',
+          variant: 'destructive',
+        });
+      } else {
+        throw new Error(response.message || 'Failed to delete profile');
+      }
+    } catch (error) {
+      console.error('Error deleting profile:', error);
+      toast({
+        title: 'Error deleting profile',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleClear = () => {

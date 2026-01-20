@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from backend.api.routers import resume, ai, applications, pdf
+from backend.api.routers import resume, ai, applications, pdf, profiles
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +44,7 @@ app.include_router(resume.router)
 app.include_router(ai.router)
 app.include_router(applications.router)
 app.include_router(pdf.router)
+app.include_router(profiles.router)
 
 
 @app.get("/")

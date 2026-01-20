@@ -1,7 +1,6 @@
 import { useToast } from '@/components/ui/use-toast';
 import { useResumeStore } from '@/stores/resumeStore';
-
-const STORAGE_KEY = 'resumeHelper_savedProfiles';
+import { api } from '@/lib/api';
 
 export interface SavedProfile {
   id: string;
@@ -14,49 +13,30 @@ export function useProfileSave() {
   const { resumeData } = useResumeStore();
   const { toast } = useToast();
 
-  const saveProfile = () => {
+  const saveProfile = async () => {
     const profileName = resumeData.personal_info?.full_name || 'Untitled Profile';
     
-    // Load existing profiles
-    const saved = localStorage.getItem(STORAGE_KEY);
-    let profiles: SavedProfile[] = [];
     try {
-      profiles = saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      profiles = [];
-    }
-    
-    // Check if profile with same name exists
-    const existingIndex = profiles.findIndex((p) => p.name === profileName);
-    
-    if (existingIndex >= 0) {
-      // Update existing profile
-      profiles[existingIndex] = {
-        ...profiles[existingIndex],
-        timestamp: Date.now(),
-        data: resumeData,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+      const response = await api.saveProfile(profileName, resumeData);
+      
+      if (response.success) {
+        const isUpdate = response.profile?.updated_at !== response.profile?.created_at;
+        toast({
+          title: isUpdate ? 'Profile updated' : 'Profile saved',
+          description: isUpdate 
+            ? `"${profileName}" has been updated.`
+            : `"${profileName}" has been saved.`,
+          variant: 'success',
+        });
+      } else {
+        throw new Error(response.message || 'Failed to save profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
       toast({
-        title: 'Profile updated',
-        description: `"${profileName}" has been updated.`,
-        variant: 'success',
-      });
-    } else {
-      // Create new profile
-      const profileId = `profile_${Date.now()}`;
-      const savedProfile: SavedProfile = {
-        id: profileId,
-        name: profileName,
-        timestamp: Date.now(),
-        data: resumeData,
-      };
-      const updatedProfiles = [...profiles, savedProfile];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProfiles));
-      toast({
-        title: 'Profile saved',
-        description: `"${profileName}" has been saved to your assets.`,
-        variant: 'success',
+        title: 'Error saving profile',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
       });
     }
   };
