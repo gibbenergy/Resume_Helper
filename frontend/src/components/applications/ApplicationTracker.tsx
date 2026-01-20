@@ -807,3 +807,4 @@ export function ApplicationTracker({ isActive = true }: ApplicationTrackerProps)
   );
 }
 
+ 

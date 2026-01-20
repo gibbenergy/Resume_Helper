@@ -217,4 +217,4 @@ class PrivacyAwareWorkflowMixin:
                 else:
                     sanitized_data.pop(violation, None)
         
-        return sanitized_data, personal_info 
+        return sanitized_data, personal_info  

@@ -111,3 +111,4 @@ async def delete_profile(profile_id: str) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error deleting profile {profile_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+ 

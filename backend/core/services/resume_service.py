@@ -283,3 +283,4 @@ class ResumeService:
             summary, education_table, experience_table, skills_table,
             projects_table, certifications_table, others_sections_data
         )
+ 

@@ -383,4 +383,4 @@ class ApplicationSchema:
                     break
         
         truncated = description[:best_cut].strip()
-        return f"{truncated}\n\n... [Job description truncated for storage. Full details available in analysis.]" 
+        return f"{truncated}\n\n... [Job description truncated for storage. Full details available in analysis.]"  

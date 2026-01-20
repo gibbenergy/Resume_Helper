@@ -47,3 +47,4 @@ __all__ = [
     'TEMPLATE_DIR',
     'TEMP_DIR',
 ]
+ 

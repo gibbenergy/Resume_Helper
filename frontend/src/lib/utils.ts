@@ -166,3 +166,4 @@ export function parseMarkdownToAnalysis(markdown: string): { sections: Array<{ t
   
   return { sections };
 }
+ 

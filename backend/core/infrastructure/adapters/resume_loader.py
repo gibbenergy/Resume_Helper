@@ -139,3 +139,4 @@ class ResumeLoader:
         
         SchemaEngine.log_schema_operation("load_resume_json", "ResumeSchema", actual_count, success=True)
         return result
+ 

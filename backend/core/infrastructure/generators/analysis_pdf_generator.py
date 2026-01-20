@@ -158,3 +158,4 @@ def generate_improvement_suggestions_pdf(
     except Exception as e:
         logger.error(f"Error generating improvement suggestions PDF: {e}")
         return None 
+ 

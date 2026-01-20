@@ -228,3 +228,4 @@ def generate_cover_letter_pdf(candidate_data: Dict[str, Any],
         letter_title=letter_title,
         recipient_greeting=recipient_greeting
     )
+ 

@@ -717,3 +717,4 @@ export function ApplicationDetails({ appId, open, onClose, onEdit }: Application
     </Dialog>
   );
 }
+ 

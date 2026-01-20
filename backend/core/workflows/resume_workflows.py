@@ -700,4 +700,4 @@ class ResumeAIWorkflows:
             return {
                 "content": f"ERROR GENERATING SUGGESTIONS:\n\n{result['error']}",
                 "usage": {}
-            } 
+            }  

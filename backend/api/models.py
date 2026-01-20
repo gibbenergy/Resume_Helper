@@ -191,3 +191,4 @@ class ApplicationUpdateRequest(BaseModel):
     next_actions: Optional[List[str]] = None
     tags: Optional[List[str]] = None
 
+ 

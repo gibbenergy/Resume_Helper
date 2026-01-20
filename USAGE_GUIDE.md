@@ -287,3 +287,4 @@ For other models, check your provider's documentation for the latest available o
 ---
 
 This concludes the Resume Helper usage guide.
+ 

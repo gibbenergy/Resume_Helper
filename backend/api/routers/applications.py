@@ -368,3 +368,4 @@ async def delete_document(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting document: {str(e)}")
 
+ 

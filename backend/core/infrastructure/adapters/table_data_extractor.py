@@ -115,4 +115,4 @@ class TableDataExtractor:
             return [""] * field_count
         except Exception as e:
             logger.error(f"Error creating empty row: {str(e)}")
-            return [""] * field_count
+            return [""] * field_count 

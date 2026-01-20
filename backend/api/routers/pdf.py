@@ -925,4 +925,4 @@ async def generate_job_description_pdf(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating job description PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error generating job description PDF: {str(e)}") 

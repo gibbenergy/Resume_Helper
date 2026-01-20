@@ -169,4 +169,4 @@ class SchemaEngine:
     def log_schema_operation(operation: str, schema_name: str, field_count: int, success: bool = True):
         """Log schema operations for debugging and monitoring."""
         status = "✅" if success else "❌"
-        logger.info(f"{status} Schema operation: {operation} on {schema_name} ({field_count} fields)") 
+        logger.info(f"{status} Schema operation: {operation} on {schema_name} ({field_count} fields)")  

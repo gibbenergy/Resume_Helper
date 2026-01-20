@@ -124,4 +124,4 @@ def track_llm_operation(temp_dir: str, llm_response: Dict[str, Any], model_used:
 def get_cost_display(temp_dir: str) -> str:
     """Convenience function to get formatted cost display."""
     tracker = CostTracker(temp_dir)
-    return tracker.format_cost_display() 
+    return tracker.format_cost_display()  

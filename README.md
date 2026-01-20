@@ -128,3 +128,4 @@ For manual setup, see [Usage Guide](USAGE_GUIDE.md).
 ## License
 
 Business Source License 1.1 - See LICENSE file
+ 

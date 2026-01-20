@@ -145,3 +145,4 @@ class ProfileRepository:
             )
         finally:
             session.close()
+ 

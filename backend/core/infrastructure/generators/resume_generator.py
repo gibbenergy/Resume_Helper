@@ -246,3 +246,4 @@ class ResumeGenerator:
             import traceback
             traceback.print_exc()
             return False
+ 

@@ -292,4 +292,4 @@ def from_exception(e: Exception, operation: str = "operation") -> StandardRespon
         error=str(e),
         error_type=type(e).__name__,
         operation=operation
-    ) 
+    )  

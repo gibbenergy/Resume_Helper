@@ -181,3 +181,4 @@ def get_timeout(provider: str) -> int:
     """Get timeout for a specific provider."""
     config = get_provider_config(provider)
     return config.get("timeout", 60)
+ 

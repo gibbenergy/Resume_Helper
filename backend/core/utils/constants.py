@@ -290,4 +290,4 @@ def get_field_position(field_name: str) -> int:
 
 def validate_output_count(outputs: List) -> bool:
     """Validate that the output array has the correct number of elements."""
-    return len(outputs) == UIConstants.TOTAL_OUTPUT_COUNT
+    return len(outputs) == UIConstants.TOTAL_OUTPUT_COUNT 

@@ -308,4 +308,4 @@ class ResumeSchema:
     @classmethod
     def get_field_order(cls, section_name: str) -> List[str]:
         """Get field order for a specific section."""
-        return cls.SECTION_MAPPINGS.get(section_name, {}).get('field_order', [])
+        return cls.SECTION_MAPPINGS.get(section_name, {}).get('field_order', []) 

@@ -46,3 +46,4 @@ export const buttonStyles = {
   ghost: "hover:bg-accent hover:text-accent-foreground",
   disabled: "opacity-50 pointer-events-none",
 };
+ 

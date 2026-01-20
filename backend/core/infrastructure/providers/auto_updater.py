@@ -113,4 +113,4 @@ def force_update_litellm() -> str:
         else:
             return f"LiteLLM is already up to date (v{new_version or current_version})"
     else:
-        return message 
+        return message  

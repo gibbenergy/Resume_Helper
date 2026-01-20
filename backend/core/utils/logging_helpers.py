@@ -381,4 +381,4 @@ def replace_print(message: str, level: str = "info", **context):
     elif level.lower() == "error":
         log_error(message, request_id, **context)
     else:
-        log_info(message, request_id, **context) 
+        log_info(message, request_id, **context)  

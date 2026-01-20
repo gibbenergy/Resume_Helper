@@ -420,3 +420,4 @@ async def update_litellm() -> Dict[str, Any]:
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating LiteLLM: {str(e)}")
+ 

@@ -260,3 +260,4 @@ export const useApplicationStore = create<ApplicationStore>((set, get) => ({
   setSelectedRound: (roundName) => set({ selectedRound: roundName }),
 }));
 
+ 

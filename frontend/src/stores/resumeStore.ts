@@ -275,3 +275,4 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     }),
 }));
 
+ 
