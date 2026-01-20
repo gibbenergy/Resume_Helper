@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 
 from backend.api.dependencies import get_resume_helper
 from backend.api.models import GeneratePDFRequest, GenerateDOCXRequest, ResumeData
-from backend.core.resume_helper import ResumeHelper
+from backend.core.services import ResumeService as ResumeHelper
 from backend.core.workflows.application_workflows import ApplicationWorkflows
 
 router = APIRouter(prefix="/api/pdf", tags=["pdf"])

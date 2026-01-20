@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse, FileResponse
 
 from backend.api.dependencies import get_resume_helper
 from backend.api.models import BuildProfileRequest, ResumeData
-from backend.core.resume_helper import ResumeHelper
+from backend.core.services import ResumeService as ResumeHelper
 
 router = APIRouter(prefix="/api/resume", tags=["resume"])
 

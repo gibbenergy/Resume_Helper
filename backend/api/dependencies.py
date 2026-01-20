@@ -4,7 +4,7 @@ Provides shared instances like ResumeHelper.
 """
 
 from typing import Generator
-from backend.core.resume_helper import ResumeHelper
+from backend.core.services import ResumeService as ResumeHelper
 
 # Global instance
 _resume_helper: ResumeHelper = None

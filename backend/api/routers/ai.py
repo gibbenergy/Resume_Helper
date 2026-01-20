@@ -19,7 +19,7 @@ from backend.api.models import (
     ImprovementSuggestionsRequest,
     TestAPIKeyRequest
 )
-from backend.core.resume_helper import ResumeHelper
+from backend.core.services import ResumeService as ResumeHelper
 from backend.core.infrastructure.providers.litellm_provider import PROVIDER_MODELS
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
