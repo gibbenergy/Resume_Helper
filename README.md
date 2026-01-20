@@ -28,32 +28,33 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 ## Features
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#4a90d9', 'primaryTextColor': '#fff', 'primaryBorderColor': '#4a90d9', 'lineColor': '#6b7280', 'secondaryColor': '#22c55e', 'tertiaryColor': '#8b5cf6'}}}%%
 mindmap
   root((Resume Helper))
-    Resume Building
+    )Resume Building(
       Personal Info
       Education
       Experience
       Skills
       Projects
       Certifications
-    AI Features
+    ))AI Features((
       Job Analysis
       Resume Tailoring
       Cover Letters
       Suggestions
-    Application Tracker
+    )Application Tracker(
       Track Applications
       Interview Management
       Outcome Tracking
-    Multi-AI Support
-      Cloud: OpenAI, Anthropic, Google, Groq, Perplexity, xAI
-      Local: Ollama, llama.cpp, LM Studio, Lemonade
-    PDF Generation
+    ))Multi-AI Support((
+      Cloud Providers
+      Local Providers
+    )PDF Generation(
       Resume PDF
       Cover Letter PDF
       Analysis PDF
-    Privacy Protection
+    ))Privacy Protection((
       Strip Personal Data
       Process with AI
       Restore Data
