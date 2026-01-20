@@ -27,64 +27,14 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 
 ## Features
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#3b82f6', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#3b82f6', 'lineColor': '#94a3b8', 'secondaryColor': '#8b5cf6', 'tertiaryColor': '#10b981', 'background': '#1e293b', 'mainBkg': '#1e293b', 'nodeBkg': '#3b82f6', 'nodeBorder': '#3b82f6', 'clusterBkg': '#334155', 'clusterBorder': '#475569', 'titleColor': '#ffffff', 'nodeTextColor': '#ffffff'}}}%%
-mindmap
-  root((Resume Helper))
-    Resume Building
-      Personal Info
-      Education
-      Experience
-      Skills
-      Projects
-      Certifications
-    AI Features
-      Job Analysis
-      Resume Tailoring
-      Cover Letters
-      Suggestions
-    Application Tracker
-      Track Applications
-      Interview Management
-      Outcome Tracking
-    Multi-AI Support
-      Cloud Providers
-      Local Providers
-    PDF Generation
-      Resume PDF
-      Cover Letter PDF
-      Analysis PDF
-    Privacy Protection
-      Strip Personal Data
-      Process with AI
-      Restore Data
-```
+<div align="center">
+  <img src="assets/mindmap.svg" alt="Resume Helper Features"/>
+</div>
 
 ### Privacy-Preserving Workflow
 
 <div align="center">
-
-```mermaid
-flowchart TD
-    A[Resume<br/>Original Document] --> B[Strip Info<br/>Remove Personal Data]
-    B -->|send| C[Work Content<br/>Anonymized Resume]
-    B -->|remove| D[Personal Info<br/>Stored Locally]
-    C --> E[Cloud AI<br/>Process Content]
-    E --> F[AI Results<br/>Resume, Cover Letter,<br/>Suggestions, Skill Gaps]
-    F --> G[Restore Info<br/>Merge Personal Data]
-    D -->|append back| G
-    G --> H[Final Output<br/>Complete Document]
-    
-    style A fill:#1e3a5f,stroke:#4a90d9,color:#fff
-    style B fill:#6b21a8,stroke:#a855f7,color:#fff
-    style C fill:#166534,stroke:#22c55e,color:#fff
-    style D fill:#991b1b,stroke:#ef4444,color:#fff
-    style E fill:#0369a1,stroke:#38bdf8,color:#fff
-    style F fill:#1d4ed8,stroke:#60a5fa,color:#fff
-    style G fill:#6b21a8,stroke:#a855f7,color:#fff
-    style H fill:#1e3a5f,stroke:#4a90d9,color:#fff
-```
-
+  <img src="assets/privacy-workflow.svg" alt="Privacy Workflow"/>
 </div>
 
 ## Supported AI Providers
