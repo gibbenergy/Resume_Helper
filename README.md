@@ -27,14 +27,38 @@ https://github.com/user-attachments/assets/ea617f6f-fb20-44fa-9bba-d45a1c36756d
 
 ## Features
 
-| Category | Features |
-|----------|----------|
-| **Resume Building** | Personal Info, Education, Experience, Skills, Projects, Certifications |
-| **AI Features** | Job Analysis, Resume Tailoring, Cover Letters, Suggestions |
-| **Application Tracker** | Track Applications, Interview Management, Outcome Tracking |
-| **Multi-AI Support** | Cloud Providers (OpenAI, Anthropic, Google, Groq, xAI, Perplexity) + Local (Ollama, llama.cpp, LM Studio, Lemonade) |
-| **PDF Generation** | Resume PDF, Cover Letter PDF, Analysis PDF |
-| **Privacy Protection** | Strip Personal Data before AI, Restore after processing |
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#3b82f6', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#3b82f6', 'lineColor': '#94a3b8', 'secondaryColor': '#8b5cf6', 'tertiaryColor': '#10b981', 'background': '#1e293b', 'mainBkg': '#1e293b', 'nodeBkg': '#3b82f6', 'nodeBorder': '#3b82f6', 'clusterBkg': '#334155', 'clusterBorder': '#475569', 'titleColor': '#ffffff', 'nodeTextColor': '#ffffff'}}}%%
+mindmap
+  root((Resume Helper))
+    Resume Building
+      Personal Info
+      Education
+      Experience
+      Skills
+      Projects
+      Certifications
+    AI Features
+      Job Analysis
+      Resume Tailoring
+      Cover Letters
+      Suggestions
+    Application Tracker
+      Track Applications
+      Interview Management
+      Outcome Tracking
+    Multi-AI Support
+      Cloud Providers
+      Local Providers
+    PDF Generation
+      Resume PDF
+      Cover Letter PDF
+      Analysis PDF
+    Privacy Protection
+      Strip Personal Data
+      Process with AI
+      Restore Data
+```
 
 ### Privacy-Preserving Workflow
 
