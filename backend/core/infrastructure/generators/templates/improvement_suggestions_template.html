@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Improvement Suggestions - {{full_name}}</title>
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 1in;
+            @bottom-center {
+                content: "Resume Improvement Suggestions - Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                color: #666;
+                font-family: Arial, sans-serif;
+                padding-top: 0.2in;
+            }
+        }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+        }
+        
+        .report-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 1rem;
+        }
+        
+        .header h1 {
+            font-size: 24pt;
+            margin: 0 0 0.5rem 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .header .subtitle {
+            font-size: 14pt;
+            color: #666;
+            margin: 0;
+        }
+        
+        .meta-info {
+            margin-bottom: 1.5rem;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+        }
+        
+        .meta-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+        
+        .meta-info .info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section {
+            margin-bottom: 1.5rem;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #28a745;
+            border-bottom: 1px solid #28a745;
+            padding-bottom: 0.25rem;
+            margin: 0 0 0.75rem 0;
+        }
+        
+        .section-content {
+            margin-left: 0.5rem;
+        }
+        
+        .suggestion-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+        
+        .suggestion-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 12pt;
+        }
+        
+        .suggestion-content {
+            margin-bottom: 0.5rem;
+            text-align: justify;
+        }
+        
+        .priority-critical {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .priority-high {
+            border-left: 4px solid #fd7e14;
+            background-color: #fff3cd;
+        }
+        
+        .priority-medium {
+            border-left: 4px solid #ffc107;
+            background-color: #fff3cd;
+        }
+        
+        .priority-low {
+            border-left: 4px solid #20c997;
+            background-color: #d1ecf1;
+        }
+        
+        .improvement-list {
+            margin: 0.25rem 0;
+            padding-left: 1.5rem;
+            list-style-type: disc;
+        }
+        
+        .improvement-list li {
+            margin-bottom: 0.4rem;
+            line-height: 1.5;
+            padding-left: 0.25rem;
+        }
+        
+        .improvement-list li::marker {
+            color: #28a745;
+            font-size: 12pt;
+        }
+        
+        /* Bold section headers from markdown */
+        strong {
+            color: #28a745;
+            font-size: 13pt;
+            display: inline-block;
+            margin-top: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Paragraph spacing */
+        p {
+            margin: 0.25rem 0;
+        }
+        
+        /* Section spacing */
+        .section {
+            margin-bottom: 0.5rem;
+        }
+        
+        .key-recommendations {
+            background-color: #d4edda;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+            margin: 1rem 0;
+        }
+        
+        .recommendation-text {
+            text-align: justify;
+            margin-bottom: 0.75rem;
+        }
+        
+        .recommendation-text:last-child {
+            margin-bottom: 0;
+        }
+        
+        .action-items {
+            background-color: #e2e3e5;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin: 0.75rem 0;
+        }
+        
+        .action-items h4 {
+            margin: 0 0 0.5rem 0;
+            color: #495057;
+        }
+        
+        .action-list {
+            margin: 0;
+            padding-left: 1rem;
+        }
+        
+        .action-list li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .score-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 9pt;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        
+        .score-excellent {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .score-good {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .score-needs-improvement {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .score-poor {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .impact-high {
+            font-weight: bold;
+            color: #dc3545;
+        }
+        
+        .impact-medium {
+            color: #fd7e14;
+        }
+        
+        .impact-low {
+            color: #6c757d;
+        }
+        
+        @media print {
+            .report-container {
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="header">
+            <h1>Resume Improvement Suggestions</h1>
+            {% if full_name and full_name.strip() %}
+            <div class="subtitle">For {{full_name}}</div>
+            {% endif %}
+        </div>
+        
+        <div class="meta-info">
+            <div class="info-row">
+                <strong>Analysis Date:</strong>
+                <span>{{analysis_date}}</span>
+            </div>
+            {% if company_name and company_name.strip() %}
+            <div class="info-row">
+                <strong>Target Company:</strong>
+                <span>{{company_name}}</span>
+            </div>
+            {% endif %}
+            {% if job_position and job_position.strip() %}
+            <div class="info-row">
+                <strong>Target Position:</strong>
+                <span>{{job_position}}</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        {{suggestions_content}}
+        
+    </div>
+</body>
+</html> 

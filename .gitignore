@@ -23,6 +23,8 @@ wheels/
 # User data - contains personal information and should never be committed
 Resume_Helper/data/
 Resume_Helper/temp/
+backend/data/job_description_pdfs/
+backend/core/temp/
 
 # Database files - prevent upload at any level
 **/*.db
