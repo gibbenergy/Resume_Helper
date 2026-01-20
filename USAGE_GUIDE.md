@@ -274,16 +274,15 @@ Lemonade is an LLM server optimized for AMD GPUs with advanced features.
 | Perplexity | https://www.perplexity.ai/settings/api |
 | xAI | https://console.x.ai/ |
 
-### Recommended Models
+### Tested Configuration
 
-| Provider | Models |
-|----------|--------|
-| OpenAI | GPT-4o, GPT-4o-mini |
-| Anthropic | Claude 3.5 Sonnet, Claude 3 Opus |
-| Google | Gemini 2.0 Flash, Gemini 1.5 Pro |
-| Groq | Llama 3.3 70B |
-| Perplexity | Sonar Pro |
-| xAI | Grok 2 |
+This app has been tested with **gpt-oss:20b** (OpenAI's open-weight model) running locally via Ollama and produces satisfactory results for job analysis, resume tailoring, and cover letter generation.
+
+```bash
+ollama pull gpt-oss:20b
+```
+
+For other models, check your provider's documentation for the latest available options.
 
 ---
 

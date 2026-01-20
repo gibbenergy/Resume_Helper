@@ -105,7 +105,7 @@ flowchart TD
 [![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logoColor=white)](https://ollama.com)
 [![llama.cpp](https://img.shields.io/badge/llama.cpp-00ADD8?style=for-the-badge&logoColor=white)](https://github.com/ggml-org/llama.cpp)
 [![LM Studio](https://img.shields.io/badge/LM_Studio-6366F1?style=for-the-badge&logoColor=white)](https://lmstudio.ai)
-[![Lemonade](https://img.shields.io/badge/Lemonade-FBBF24?style=for-the-badge&logoColor=black)](https://github.com/lemonade-hq/lemonade)
+[![Lemonade](https://img.shields.io/badge/Lemonade-FBBF24?style=for-the-badge&logoColor=black)](https://github.com/lemonade-sdk/lemonade)
 
 </div>
 
