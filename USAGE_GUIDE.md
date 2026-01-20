@@ -201,10 +201,8 @@ Attach documents to applications:
 
 1. Download from: https://ollama.com/download
 2. Install and run Ollama
-3. Download a model:
-   ```bash
-   ollama pull llama3.2
-   ```
+3. Download a model
+  
 4. In Resume Helper: Select **Ollama (Local)**, leave API key empty
 
 ### llama.cpp (High Performance)
