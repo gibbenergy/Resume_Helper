@@ -25,7 +25,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { useProfileSave } from '@/lib/useProfileSave';
 import { Pagination } from '@/components/ui/pagination';
-import { Layers, RotateCcw, Trash2, Plus, Pencil, Save } from 'lucide-react';
+import { Layers, RotateCcw, Trash2, Plus, Pencil, Save, ChevronUp, ChevronDown } from 'lucide-react';
 
 const COMMON_SECTIONS = [
   'Awards & Honors',
@@ -52,7 +52,7 @@ interface OtherItem {
 }
 
 export function OthersForm() {
-  const { resumeData, updateOthers } = useResumeStore();
+  const { resumeData, updateOthers, moveOthersItemUp, moveOthersItemDown } = useResumeStore();
   const { toast } = useToast();
   const { saveProfile } = useProfileSave();
   const [selectedSection, setSelectedSection] = useState<string>(COMMON_SECTIONS[0]);
@@ -400,7 +400,45 @@ export function OthersForm() {
                               {item.description || '—'}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 ml-4">
+                          <div className="flex items-center gap-1 ml-4">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => moveOthersItemUp(sectionName, originalIndex)}
+                                    disabled={originalIndex === 0}
+                                  >
+                                    <ChevronUp className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Move up</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => moveOthersItemDown(sectionName, originalIndex)}
+                                    disabled={originalIndex === (sectionTotals[sectionName] || 0) - 1}
+                                  >
+                                    <ChevronDown className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Move down</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>

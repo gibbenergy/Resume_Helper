@@ -7,9 +7,16 @@ These tests verify:
 - Loading profiles
 - Deleting profiles
 - Profile listing
+
+IMPORTANT: All tests clean up after themselves to prevent test artifacts
+from polluting the production database.
 """
 import pytest
 from fastapi.testclient import TestClient
+
+
+# Use module-level cleanup as a safety net
+pytestmark = pytest.mark.usefixtures("cleanup_test_profiles")
 
 
 class Test01_ProfileListing:
@@ -28,7 +35,7 @@ class Test01_ProfileListing:
 class Test02_ProfileSave:
     """Test profile save functionality."""
 
-    def test_2_1_save_new_profile(self, client: TestClient):
+    def test_2_1_save_new_profile(self, client: TestClient, profile_cleanup):
         """Test 2.1: Save a new profile."""
         response = client.post(
             "/api/profiles",
@@ -51,8 +58,11 @@ class Test02_ProfileSave:
         assert response.status_code == 200
         data = response.json()
         assert data["success"] == True
+        # Track for cleanup
+        if data.get("profile", {}).get("id"):
+            profile_cleanup.track(data["profile"]["id"])
 
-    def test_2_2_save_profile_returns_id(self, client: TestClient):
+    def test_2_2_save_profile_returns_id(self, client: TestClient, profile_cleanup):
         """Test 2.2: Saved profile returns an ID."""
         response = client.post(
             "/api/profiles",
@@ -74,8 +84,10 @@ class Test02_ProfileSave:
             assert "profile" in data
             profile = data["profile"]
             assert "id" in profile
+            # Track for cleanup
+            profile_cleanup.track(profile["id"])
 
-    def test_2_3_save_profile_with_complete_data(self, client: TestClient):
+    def test_2_3_save_profile_with_complete_data(self, client: TestClient, profile_cleanup):
         """Test 2.3: Save profile with complete resume data."""
         response = client.post(
             "/api/profiles",
@@ -120,6 +132,10 @@ class Test02_ProfileSave:
             }
         )
         assert response.status_code == 200
+        data = response.json()
+        # Track for cleanup
+        if data.get("profile", {}).get("id"):
+            profile_cleanup.track(data["profile"]["id"])
 
 
 class Test03_ProfileRead:
@@ -130,7 +146,7 @@ class Test03_ProfileRead:
         response = client.get("/api/profiles/nonexistent-profile-id")
         assert response.status_code == 404
 
-    def test_3_2_get_profile_after_save(self, client: TestClient):
+    def test_3_2_get_profile_after_save(self, client: TestClient, profile_cleanup):
         """Test 3.2: Get profile by ID after saving."""
         # Save a profile first
         save_response = client.post(
@@ -152,6 +168,8 @@ class Test03_ProfileRead:
             save_data = save_response.json()
             if save_data["success"] and "profile" in save_data:
                 profile_id = save_data["profile"].get("id")
+                # Track for cleanup
+                profile_cleanup.track(profile_id)
                 if profile_id:
                     get_response = client.get(f"/api/profiles/{profile_id}")
                     assert get_response.status_code == 200
@@ -190,6 +208,7 @@ class Test04_ProfileDelete:
             if save_data["success"] and "profile" in save_data:
                 profile_id = save_data["profile"].get("id")
                 if profile_id:
+                    # This test explicitly deletes the profile as part of the test
                     delete_response = client.delete(f"/api/profiles/{profile_id}")
                     assert delete_response.status_code == 200
                     delete_data = delete_response.json()
@@ -199,7 +218,7 @@ class Test04_ProfileDelete:
 class Test05_ProfileUpdate:
     """Test profile update functionality."""
 
-    def test_5_1_update_existing_profile(self, client: TestClient):
+    def test_5_1_update_existing_profile(self, client: TestClient, profile_cleanup):
         """Test 5.1: Update an existing profile."""
         # Save a profile first
         save_response = client.post(
@@ -221,6 +240,8 @@ class Test05_ProfileUpdate:
             save_data = save_response.json()
             if save_data["success"] and "profile" in save_data:
                 profile_id = save_data["profile"].get("id")
+                # Track for cleanup (same ID will be updated, not duplicated)
+                profile_cleanup.track(profile_id)
                 if profile_id:
                     # Update with same ID
                     update_response = client.post(

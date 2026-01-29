@@ -19,29 +19,41 @@ interface ResumeStore {
   updateEducation: (index: number, education: Partial<EducationEntry>) => void;
   removeEducation: (index: number) => void;
   clearEducation: () => void;
-  
+  moveEducationUp: (index: number) => void;
+  moveEducationDown: (index: number) => void;
+
   addExperience: (experience: ExperienceEntry) => void;
   updateExperience: (index: number, experience: Partial<ExperienceEntry>) => void;
   removeExperience: (index: number) => void;
   clearExperience: () => void;
-  
+  moveExperienceUp: (index: number) => void;
+  moveExperienceDown: (index: number) => void;
+
   addSkill: (skill: SkillEntry) => void;
   updateSkill: (index: number, skill: Partial<SkillEntry>) => void;
   removeSkill: (index: number) => void;
   clearSkills: () => void;
-  
+  moveSkillUp: (index: number) => void;
+  moveSkillDown: (index: number) => void;
+
   addProject: (project: ProjectEntry) => void;
   updateProject: (index: number, project: Partial<ProjectEntry>) => void;
   removeProject: (index: number) => void;
   clearProjects: () => void;
-  
+  moveProjectUp: (index: number) => void;
+  moveProjectDown: (index: number) => void;
+
   addCertification: (certification: CertificationEntry) => void;
   updateCertification: (index: number, certification: Partial<CertificationEntry>) => void;
   removeCertification: (index: number) => void;
   clearCertifications: () => void;
+  moveCertificationUp: (index: number) => void;
+  moveCertificationDown: (index: number) => void;
   
   updateOthers: (others: Record<string, any>) => void;
-  
+  moveOthersItemUp: (sectionName: string, index: number) => void;
+  moveOthersItemDown: (sectionName: string, index: number) => void;
+
   setResumeData: (data: ResumeData) => void;
   resetResume: () => void;
 }
@@ -103,6 +115,22 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
+  moveEducationUp: (index) =>
+    set((state) => {
+      if (index <= 0) return state;
+      const updated = [...state.resumeData.education];
+      [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      return { resumeData: { ...state.resumeData, education: updated } };
+    }),
+
+  moveEducationDown: (index) =>
+    set((state) => {
+      if (index >= state.resumeData.education.length - 1) return state;
+      const updated = [...state.resumeData.education];
+      [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+      return { resumeData: { ...state.resumeData, education: updated } };
+    }),
+
   addExperience: (experience) =>
     set((state) => ({
       resumeData: {
@@ -138,6 +166,22 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         experience: [],
       },
     })),
+
+  moveExperienceUp: (index) =>
+    set((state) => {
+      if (index <= 0) return state;
+      const updated = [...state.resumeData.experience];
+      [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      return { resumeData: { ...state.resumeData, experience: updated } };
+    }),
+
+  moveExperienceDown: (index) =>
+    set((state) => {
+      if (index >= state.resumeData.experience.length - 1) return state;
+      const updated = [...state.resumeData.experience];
+      [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+      return { resumeData: { ...state.resumeData, experience: updated } };
+    }),
 
   addSkill: (skill) =>
     set((state) => ({
@@ -175,6 +219,22 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
+  moveSkillUp: (index) =>
+    set((state) => {
+      if (index <= 0) return state;
+      const updated = [...state.resumeData.skills];
+      [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      return { resumeData: { ...state.resumeData, skills: updated } };
+    }),
+
+  moveSkillDown: (index) =>
+    set((state) => {
+      if (index >= state.resumeData.skills.length - 1) return state;
+      const updated = [...state.resumeData.skills];
+      [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+      return { resumeData: { ...state.resumeData, skills: updated } };
+    }),
+
   addProject: (project) =>
     set((state) => ({
       resumeData: {
@@ -210,6 +270,22 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         projects: [],
       },
     })),
+
+  moveProjectUp: (index) =>
+    set((state) => {
+      if (index <= 0) return state;
+      const updated = [...state.resumeData.projects];
+      [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      return { resumeData: { ...state.resumeData, projects: updated } };
+    }),
+
+  moveProjectDown: (index) =>
+    set((state) => {
+      if (index >= state.resumeData.projects.length - 1) return state;
+      const updated = [...state.resumeData.projects];
+      [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+      return { resumeData: { ...state.resumeData, projects: updated } };
+    }),
 
   addCertification: (certification) =>
     set((state) => ({
@@ -247,6 +323,22 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
+  moveCertificationUp: (index) =>
+    set((state) => {
+      if (index <= 0) return state;
+      const updated = [...state.resumeData.certifications];
+      [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      return { resumeData: { ...state.resumeData, certifications: updated } };
+    }),
+
+  moveCertificationDown: (index) =>
+    set((state) => {
+      if (index >= state.resumeData.certifications.length - 1) return state;
+      const updated = [...state.resumeData.certifications];
+      [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+      return { resumeData: { ...state.resumeData, certifications: updated } };
+    }),
+
   updateOthers: (others) =>
     set((state) => ({
       resumeData: {
@@ -254,6 +346,36 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         others: { ...state.resumeData.others, ...others },
       },
     })),
+
+  moveOthersItemUp: (sectionName, index) =>
+    set((state) => {
+      const currentSections = state.resumeData.others || {};
+      const sectionItems = currentSections[sectionName];
+      if (!Array.isArray(sectionItems) || index <= 0) return state;
+      const updated = [...sectionItems];
+      [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      return {
+        resumeData: {
+          ...state.resumeData,
+          others: { ...currentSections, [sectionName]: updated },
+        },
+      };
+    }),
+
+  moveOthersItemDown: (sectionName, index) =>
+    set((state) => {
+      const currentSections = state.resumeData.others || {};
+      const sectionItems = currentSections[sectionName];
+      if (!Array.isArray(sectionItems) || index >= sectionItems.length - 1) return state;
+      const updated = [...sectionItems];
+      [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+      return {
+        resumeData: {
+          ...state.resumeData,
+          others: { ...currentSections, [sectionName]: updated },
+        },
+      };
+    }),
 
   setResumeData: (data) => {
     set({

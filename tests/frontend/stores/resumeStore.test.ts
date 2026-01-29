@@ -300,3 +300,263 @@ describe('Resume Store: Reset', () => {
     expect(state.resumeData.experience).toEqual([]);
   });
 });
+
+// ============ Reorder Tests ============
+describe('Resume Store: Education Reorder', () => {
+  it('should move education entry up', () => {
+    const { addEducation, moveEducationUp } = useResumeStore.getState();
+
+    addEducation({ institution: 'MIT', degree: 'B.S.' });
+    addEducation({ institution: 'Stanford', degree: 'M.S.' });
+    addEducation({ institution: 'Harvard', degree: 'Ph.D.' });
+
+    moveEducationUp(1); // Move Stanford up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.education[0].institution).toBe('Stanford');
+    expect(state.resumeData.education[1].institution).toBe('MIT');
+    expect(state.resumeData.education[2].institution).toBe('Harvard');
+  });
+
+  it('should move education entry down', () => {
+    const { addEducation, moveEducationDown } = useResumeStore.getState();
+
+    addEducation({ institution: 'MIT', degree: 'B.S.' });
+    addEducation({ institution: 'Stanford', degree: 'M.S.' });
+    addEducation({ institution: 'Harvard', degree: 'Ph.D.' });
+
+    moveEducationDown(0); // Move MIT down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.education[0].institution).toBe('Stanford');
+    expect(state.resumeData.education[1].institution).toBe('MIT');
+    expect(state.resumeData.education[2].institution).toBe('Harvard');
+  });
+
+  it('should not move first education entry up', () => {
+    const { addEducation, moveEducationUp } = useResumeStore.getState();
+
+    addEducation({ institution: 'MIT', degree: 'B.S.' });
+    addEducation({ institution: 'Stanford', degree: 'M.S.' });
+
+    moveEducationUp(0); // Try to move first item up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.education[0].institution).toBe('MIT');
+    expect(state.resumeData.education[1].institution).toBe('Stanford');
+  });
+
+  it('should not move last education entry down', () => {
+    const { addEducation, moveEducationDown } = useResumeStore.getState();
+
+    addEducation({ institution: 'MIT', degree: 'B.S.' });
+    addEducation({ institution: 'Stanford', degree: 'M.S.' });
+
+    moveEducationDown(1); // Try to move last item down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.education[0].institution).toBe('MIT');
+    expect(state.resumeData.education[1].institution).toBe('Stanford');
+  });
+});
+
+describe('Resume Store: Experience Reorder', () => {
+  it('should move experience entry up', () => {
+    const { addExperience, moveExperienceUp } = useResumeStore.getState();
+
+    addExperience({ company: 'Google', position: 'Engineer' });
+    addExperience({ company: 'Meta', position: 'Senior Engineer' });
+    addExperience({ company: 'Amazon', position: 'Lead Engineer' });
+
+    moveExperienceUp(2); // Move Amazon up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.experience[1].company).toBe('Amazon');
+    expect(state.resumeData.experience[2].company).toBe('Meta');
+  });
+
+  it('should move experience entry down', () => {
+    const { addExperience, moveExperienceDown } = useResumeStore.getState();
+
+    addExperience({ company: 'Google', position: 'Engineer' });
+    addExperience({ company: 'Meta', position: 'Senior Engineer' });
+
+    moveExperienceDown(0); // Move Google down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.experience[0].company).toBe('Meta');
+    expect(state.resumeData.experience[1].company).toBe('Google');
+  });
+});
+
+describe('Resume Store: Skills Reorder', () => {
+  it('should move skill entry up', () => {
+    const { addSkill, moveSkillUp } = useResumeStore.getState();
+
+    addSkill({ category: 'Programming', name: 'Python' });
+    addSkill({ category: 'Programming', name: 'JavaScript' });
+    addSkill({ category: 'Tools', name: 'Git' });
+
+    moveSkillUp(1); // Move JavaScript up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.skills[0].name).toBe('JavaScript');
+    expect(state.resumeData.skills[1].name).toBe('Python');
+  });
+
+  it('should move skill entry down', () => {
+    const { addSkill, moveSkillDown } = useResumeStore.getState();
+
+    addSkill({ category: 'Programming', name: 'Python' });
+    addSkill({ category: 'Programming', name: 'JavaScript' });
+
+    moveSkillDown(0); // Move Python down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.skills[0].name).toBe('JavaScript');
+    expect(state.resumeData.skills[1].name).toBe('Python');
+  });
+});
+
+describe('Resume Store: Projects Reorder', () => {
+  it('should move project entry up', () => {
+    const { addProject, moveProjectUp } = useResumeStore.getState();
+
+    addProject({ name: 'Project A', description: 'First' });
+    addProject({ name: 'Project B', description: 'Second' });
+    addProject({ name: 'Project C', description: 'Third' });
+
+    moveProjectUp(2); // Move Project C up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.projects[1].name).toBe('Project C');
+    expect(state.resumeData.projects[2].name).toBe('Project B');
+  });
+
+  it('should move project entry down', () => {
+    const { addProject, moveProjectDown } = useResumeStore.getState();
+
+    addProject({ name: 'Project A', description: 'First' });
+    addProject({ name: 'Project B', description: 'Second' });
+
+    moveProjectDown(0); // Move Project A down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.projects[0].name).toBe('Project B');
+    expect(state.resumeData.projects[1].name).toBe('Project A');
+  });
+});
+
+describe('Resume Store: Certifications Reorder', () => {
+  it('should move certification entry up', () => {
+    const { addCertification, moveCertificationUp } = useResumeStore.getState();
+
+    addCertification({ name: 'AWS', issuer: 'Amazon' });
+    addCertification({ name: 'GCP', issuer: 'Google' });
+    addCertification({ name: 'Azure', issuer: 'Microsoft' });
+
+    moveCertificationUp(1); // Move GCP up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.certifications[0].name).toBe('GCP');
+    expect(state.resumeData.certifications[1].name).toBe('AWS');
+  });
+
+  it('should move certification entry down', () => {
+    const { addCertification, moveCertificationDown } = useResumeStore.getState();
+
+    addCertification({ name: 'AWS', issuer: 'Amazon' });
+    addCertification({ name: 'GCP', issuer: 'Google' });
+
+    moveCertificationDown(0); // Move AWS down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.certifications[0].name).toBe('GCP');
+    expect(state.resumeData.certifications[1].name).toBe('AWS');
+  });
+});
+
+describe('Resume Store: Others Reorder', () => {
+  it('should move others item up within section', () => {
+    const { updateOthers, moveOthersItemUp } = useResumeStore.getState();
+
+    updateOthers({
+      'Patents': [
+        { title: 'Patent A', organization: 'USPTO' },
+        { title: 'Patent B', organization: 'USPTO' },
+        { title: 'Patent C', organization: 'USPTO' }
+      ]
+    });
+
+    moveOthersItemUp('Patents', 1); // Move Patent B up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.others['Patents'][0].title).toBe('Patent B');
+    expect(state.resumeData.others['Patents'][1].title).toBe('Patent A');
+    expect(state.resumeData.others['Patents'][2].title).toBe('Patent C');
+  });
+
+  it('should move others item down within section', () => {
+    const { updateOthers, moveOthersItemDown } = useResumeStore.getState();
+
+    updateOthers({
+      'Publications': [
+        { title: 'Paper A', organization: 'Journal' },
+        { title: 'Paper B', organization: 'Journal' },
+        { title: 'Paper C', organization: 'Journal' }
+      ]
+    });
+
+    moveOthersItemDown('Publications', 0); // Move Paper A down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.others['Publications'][0].title).toBe('Paper B');
+    expect(state.resumeData.others['Publications'][1].title).toBe('Paper A');
+    expect(state.resumeData.others['Publications'][2].title).toBe('Paper C');
+  });
+
+  it('should not move first others item up', () => {
+    const { updateOthers, moveOthersItemUp } = useResumeStore.getState();
+
+    updateOthers({
+      'Awards': [
+        { title: 'Award A', organization: 'Org' },
+        { title: 'Award B', organization: 'Org' }
+      ]
+    });
+
+    moveOthersItemUp('Awards', 0); // Try to move first item up
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.others['Awards'][0].title).toBe('Award A');
+    expect(state.resumeData.others['Awards'][1].title).toBe('Award B');
+  });
+
+  it('should not move last others item down', () => {
+    const { updateOthers, moveOthersItemDown } = useResumeStore.getState();
+
+    updateOthers({
+      'Awards': [
+        { title: 'Award A', organization: 'Org' },
+        { title: 'Award B', organization: 'Org' }
+      ]
+    });
+
+    moveOthersItemDown('Awards', 1); // Try to move last item down
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.others['Awards'][0].title).toBe('Award A');
+    expect(state.resumeData.others['Awards'][1].title).toBe('Award B');
+  });
+
+  it('should handle non-existent section gracefully', () => {
+    const { moveOthersItemUp, moveOthersItemDown } = useResumeStore.getState();
+
+    // Should not throw errors
+    moveOthersItemUp('NonExistent', 0);
+    moveOthersItemDown('NonExistent', 0);
+
+    const state = useResumeStore.getState();
+    expect(state.resumeData.others).toEqual({});
+  });
+});
