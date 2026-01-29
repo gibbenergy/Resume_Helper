@@ -11,12 +11,12 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Full history for file status checks
-    
+
     - name: Check file status before release
       if: github.event_name == 'release'
       run: |
@@ -38,37 +38,43 @@ jobs:
         echo ""
         echo "📝 Recent commits:"
         git log --oneline -5
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    
+
+    - name: Run backend tests (68 tests)
+      run: |
+        echo "🧪 Running backend tests..."
+        python -m pytest tests/backend/ -v --tb=short
+        echo "✅ All backend tests passed!"
+
     - name: Check Python Syntax (py_compile)
       run: |
         echo "🔍 Checking Python syntax for all files..."
         find backend -name "*.py" -exec python -m py_compile {} \;
         echo "✅ All Python files have valid syntax!"
-    
+
     - name: Check for Common Issues
       run: |
         echo "🔍 Checking for common code issues..."
-        
+
         # Check for mixed indentation
         echo "Checking for mixed tabs/spaces..."
         ! grep -r $'\t' backend --include="*.py" && echo "✅ No tabs found (using spaces only)" || (echo "❌ Found tabs - please use spaces only" && exit 1)
-        
+
         # Check for trailing whitespace
         echo "Checking for trailing whitespace..."
         ! grep -r ' $' backend --include="*.py" && echo "✅ No trailing whitespace" || echo "⚠️  Found trailing whitespace (non-critical)"
-        
+
         echo "✅ Code quality checks passed!"
-    
+
     - name: Lint with flake8 (optional)
       continue-on-error: true
       run: |
@@ -77,4 +83,3 @@ jobs:
         flake8 backend --count --select=E9,F63,F7,F82 --show-source --statistics
         # Check everything else (warnings only)
         flake8 backend --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
- 
