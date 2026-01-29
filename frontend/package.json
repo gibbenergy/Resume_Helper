@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test": "vitest",
+    "test:run": "vitest run --reporter=dot --reporter=json --outputFile=test-results.json",
+    "test:verbose": "vitest run --reporter=verbose"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -35,6 +38,8 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.2.0",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
@@ -48,7 +53,9 @@
     "tailwindcss": "^3.3.6",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vitest": "^1.2.0",
+    "jsdom": "^24.0.0"
   }
 }
  

@@ -10,8 +10,9 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# Python lib folders (at root only, not frontend/src/lib)
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -49,6 +50,7 @@ backend/core/temp/
 .vscode/
 .idea/
 .cursor/
+.claude/
 *.swp
 *.swo
 *~
@@ -120,6 +122,9 @@ test_setup/
 
 # Documentation folder - development only
 docs/
+
+# Scripts folder - development only (test runners, report generators)
+scripts/
 
 # Environment variables (catch all variations at any level)
 .env*
