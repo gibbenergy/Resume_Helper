@@ -433,8 +433,8 @@
                 {{ citizenship }}
             {% endif %}
 
-            {% if phone %}{% if current_address %} | {% endif %}{{phone}}{% endif %}
-            {% if email %}{% if phone or current_address %} | {% endif %}{{email}}{% endif %}
+            {% if phone %}{% if current_address or location or citizenship %} | {% endif %}{{phone}}{% endif %}
+            {% if email %}{% if phone or current_address or location or citizenship %} | {% endif %}{{email}}{% endif %}
             <br>
             {% if linkedin_url %}{{linkedin_url}}{% endif %}
             {% if github_url %}{% if linkedin_url %} | {% endif %}{{github_url}}{% endif %}
