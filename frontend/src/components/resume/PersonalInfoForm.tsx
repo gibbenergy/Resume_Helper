@@ -58,11 +58,12 @@ export function PersonalInfoForm() {
     loadProfiles();
   }, []);
 
-  // Sync form with store when personal_info changes (e.g., after reset)
+  // Sync form with store when personal_info changes (e.g., after reset or loading profile)
   // Use useRef to prevent infinite loops and expensive JSON.stringify calls
   const prevPersonalInfoRef = useRef<string>('');
   const isInitialMount = useRef(true);
-  
+  const isExternalUpdate = useRef(false);
+
   useEffect(() => {
     // Skip on initial mount to avoid unnecessary reset
     if (isInitialMount.current) {
@@ -75,21 +76,46 @@ export function PersonalInfoForm() {
       prevPersonalInfoRef.current = JSON.stringify(personalInfo);
       return;
     }
-    
+
     const personalInfoStr = JSON.stringify(resumeData.personal_info || {});
-    // Only reset if personal_info actually changed
+    // Only reset if personal_info actually changed from external source
     if (prevPersonalInfoRef.current !== personalInfoStr) {
       prevPersonalInfoRef.current = personalInfoStr;
+      isExternalUpdate.current = true;
       const personalInfo = resumeData.personal_info || {};
       reset(personalInfo);
-      
+
       // Handle name_prefix conversion for the select
       if (!personalInfo.name_prefix) {
         setValue('name_prefix', 'none');
       }
+      isExternalUpdate.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeData.personal_info]);
+
+  // Auto-sync form changes to the store (so changes persist when switching tabs)
+  const formValues = watch();
+  const prevFormValuesRef = useRef<string>('');
+
+  useEffect(() => {
+    // Skip if this is an external update (from loading profile, reset, etc.)
+    if (isExternalUpdate.current) return;
+
+    const formValuesStr = JSON.stringify(formValues);
+    // Only update store if form values actually changed
+    if (prevFormValuesRef.current && prevFormValuesRef.current !== formValuesStr) {
+      // Convert 'none' back to empty string for storage
+      const dataToStore = { ...formValues };
+      if (dataToStore.name_prefix === 'none') {
+        dataToStore.name_prefix = '';
+      }
+      updatePersonalInfo(dataToStore);
+      prevPersonalInfoRef.current = JSON.stringify(dataToStore);
+    }
+    prevFormValuesRef.current = formValuesStr;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formValues]);
 
   const onSubmit = async (data: any) => {
     updatePersonalInfo(data);
@@ -400,7 +426,7 @@ export function PersonalInfoForm() {
               </Label>
               <Select
                 value={watch('name_prefix') || 'none'}
-                onValueChange={(value) => setValue('name_prefix', value === 'none' ? '' : value)}
+                onValueChange={(value) => setValue('name_prefix', value)}
               >
                 <SelectTrigger className="text-sm">
                   <SelectValue placeholder="Select prefix" />
