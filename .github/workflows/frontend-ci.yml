@@ -38,7 +38,7 @@ jobs:
     - name: Run frontend tests (65 tests)
       run: |
         cd frontend
-        npx vitest run --config ../tests/frontend/vitest.config.ts --reporter=verbose
+        npx vitest run --reporter=verbose
 
     - name: Build frontend
       run: |
