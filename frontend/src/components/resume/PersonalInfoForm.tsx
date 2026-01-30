@@ -25,6 +25,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/lib/api';
 import { UserCircle, Save, RotateCcw, FileCode, Briefcase, X } from 'lucide-react';
+import { SaveProfileDialog } from './SaveProfileDialog';
 
 interface SavedProfile {
   id: string;
@@ -34,9 +35,10 @@ interface SavedProfile {
 }
 
 export function PersonalInfoForm() {
-  const { resumeData, updatePersonalInfo, setResumeData, resetResume } = useResumeStore();
+  const { resumeData, updatePersonalInfo, setResumeData, resetResume, setActiveProfileName } = useResumeStore();
   const { toast } = useToast();
   const [showClearDialog, setShowClearDialog] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [savedProfiles, setSavedProfiles] = useState<SavedProfile[]>([]);
   const { register, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: resumeData.personal_info,
@@ -118,35 +120,43 @@ export function PersonalInfoForm() {
   }, [formValues]);
 
   const onSubmit = async (data: any) => {
+    // Update the store with current form data
     updatePersonalInfo(data);
-    
-    // Save complete resume profile to database
-    const profileName = data.full_name || 'Untitled Profile';
+    // Open the save dialog to let user choose/customize profile name
+    setShowSaveDialog(true);
+  };
+
+  const handleSaveProfile = async (profileName: string) => {
     const updatedResumeData = {
       ...resumeData,
-      personal_info: { ...resumeData.personal_info, ...data },
+      personal_info: resumeData.personal_info,
     };
-    
+
     try {
-      // Check if profile with same name exists
-      const existingProfile = savedProfiles.find((p) => p.name === profileName);
-      
+      // Check if profile with same name exists (case-insensitive)
+      const existingProfile = savedProfiles.find(
+        (p) => p.name.toLowerCase() === profileName.toLowerCase()
+      );
+
       const response = await api.saveProfile(
         profileName,
         updatedResumeData,
         existingProfile?.id
       );
-      
+
       if (response.success) {
+        // Set the active profile name so other tabs can save to the same profile
+        setActiveProfileName(profileName);
+
         // Refresh profiles from database
         const profilesResponse = await api.getProfiles();
         if (profilesResponse.success) {
           setSavedProfiles(profilesResponse.profiles);
         }
-        
+
         toast({
           title: existingProfile ? 'Profile updated' : 'Profile saved',
-          description: existingProfile 
+          description: existingProfile
             ? `"${profileName}" has been updated.`
             : `"${profileName}" has been saved.`,
           variant: 'success',
@@ -166,7 +176,10 @@ export function PersonalInfoForm() {
 
   const loadSavedProfile = (profile: SavedProfile) => {
     setResumeData(profile.data);
-    
+
+    // Set the active profile name so other tabs can save to the same profile
+    setActiveProfileName(profile.name);
+
     // Update form values using reset to properly sync form state
     const personalInfo = profile.data.personal_info || {};
     const formData: any = {};
@@ -179,7 +192,7 @@ export function PersonalInfoForm() {
       }
     });
     reset(formData);
-    
+
     toast({
       title: 'Profile loaded',
       description: `"${profile.name}" has been loaded successfully.`,
@@ -637,6 +650,14 @@ export function PersonalInfoForm() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <SaveProfileDialog
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
+        defaultName={resumeData.personal_info?.full_name || 'Untitled Profile'}
+        existingProfiles={savedProfiles}
+        onSave={handleSaveProfile}
+      />
     </Card>
   );
 }

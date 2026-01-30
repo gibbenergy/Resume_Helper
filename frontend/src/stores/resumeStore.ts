@@ -12,8 +12,12 @@ import type {
 interface ResumeStore {
   // Resume data
   resumeData: ResumeData;
-  
+
+  // Active profile name (for saving to custom profile names)
+  activeProfileName: string | null;
+
   // Actions
+  setActiveProfileName: (name: string | null) => void;
   updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
   addEducation: (education: EducationEntry) => void;
   updateEducation: (index: number, education: Partial<EducationEntry>) => void;
@@ -70,6 +74,9 @@ const initialResumeData: ResumeData = {
 
 export const useResumeStore = create<ResumeStore>((set) => ({
   resumeData: initialResumeData,
+  activeProfileName: null,
+
+  setActiveProfileName: (name) => set({ activeProfileName: name }),
 
   updatePersonalInfo: (info) =>
     set((state) => ({
@@ -394,6 +401,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
   resetResume: () =>
     set({
       resumeData: initialResumeData,
+      activeProfileName: null,
     }),
 }));
 

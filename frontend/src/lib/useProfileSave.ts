@@ -10,20 +10,21 @@ export interface SavedProfile {
 }
 
 export function useProfileSave() {
-  const { resumeData } = useResumeStore();
+  const { resumeData, activeProfileName } = useResumeStore();
   const { toast } = useToast();
 
   const saveProfile = async () => {
-    const profileName = resumeData.personal_info?.full_name || 'Untitled Profile';
-    
+    // Use activeProfileName if set (from Personal Info save), otherwise fall back to full_name
+    const profileName = activeProfileName || resumeData.personal_info?.full_name || 'Untitled Profile';
+
     try {
       const response = await api.saveProfile(profileName, resumeData);
-      
+
       if (response.success) {
         const isUpdate = response.profile?.updated_at !== response.profile?.created_at;
         toast({
           title: isUpdate ? 'Profile updated' : 'Profile saved',
-          description: isUpdate 
+          description: isUpdate
             ? `"${profileName}" has been updated.`
             : `"${profileName}" has been saved.`,
           variant: 'success',
