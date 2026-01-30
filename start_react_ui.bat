@@ -7,19 +7,23 @@ echo Resume Helper - React UI Startup
 echo ========================================
 echo.
 
-REM Check if UV is installed
-echo [1/4] Checking UV installation...
+REM Check if UV is installed, install if not
+echo [1/5] Checking UV installation...
 uv --version >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: UV is not installed or not in PATH
-    echo Please install UV: https://github.com/astral-sh/uv
-    echo.
-    echo Or run: curl -LsSf https://astral.sh/uv/install.sh ^| sh
-    echo.
-    pause
-    exit /b 1
+    echo UV not found. Installing via pip...
+    pip install uv
+    if errorlevel 1 (
+        echo ERROR: Failed to install UV via pip
+        echo Please ensure Python and pip are installed and in PATH
+        echo.
+        pause
+        exit /b 1
+    )
+    echo UV installed successfully
+) else (
+    echo UV found
 )
-echo UV found
 echo.
 
 REM Check if Node.js is installed
