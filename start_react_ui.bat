@@ -10,15 +10,36 @@ echo.
 REM Change to script directory FIRST
 cd /d "%~dp0"
 
-REM Check if Python is installed
+REM Check if Python is installed, install if not
 echo [1/5] Checking Python installation...
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH
-    echo Please install Python 3.11+ from https://www.python.org/
+    echo Python not found. Attempting to install via winget...
+    winget install Python.Python.3.11 --accept-package-agreements --accept-source-agreements
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Could not auto-install Python
+        echo Please download and install Python 3.11+ manually from:
+        echo https://www.python.org/
+        echo.
+        echo After installation, restart this script.
+        echo.
+        pause
+        exit /b 1
+    )
+    echo.
+    echo ========================================
+    echo Python installed successfully!
+    echo ========================================
+    echo.
+    echo IMPORTANT: Python was just installed but is not yet available
+    echo in this terminal session because the PATH has not been updated.
+    echo.
+    echo Please close this window and double-click start_react_ui.bat again.
+    echo This is a one-time setup step. Future runs will work automatically.
     echo.
     pause
-    exit /b 1
+    exit /b 0
 )
 echo Python found
 
