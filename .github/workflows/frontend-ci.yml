@@ -35,7 +35,7 @@ jobs:
         cd frontend
         npm run type-check || npx tsc --noEmit || true
 
-    - name: Run frontend tests (94 tests)
+    - name: Run frontend tests (112 tests)
       run: |
         cd frontend
         npx vitest run --reporter=verbose

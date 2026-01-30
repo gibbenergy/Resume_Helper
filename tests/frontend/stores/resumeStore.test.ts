@@ -560,3 +560,75 @@ describe('Resume Store: Others Reorder', () => {
     expect(state.resumeData.others).toEqual({});
   });
 });
+
+// ============ Active Profile Name Tests ============
+describe('Resume Store: Active Profile Name', () => {
+  it('should have null activeProfileName by default', () => {
+    const state = useResumeStore.getState();
+    expect(state.activeProfileName).toBeNull();
+  });
+
+  it('should set activeProfileName using setActiveProfileName', () => {
+    useResumeStore.getState().setActiveProfileName('John Doe - Software Engineer');
+
+    const state = useResumeStore.getState();
+    expect(state.activeProfileName).toBe('John Doe - Software Engineer');
+  });
+
+  it('should clear activeProfileName when set to null', () => {
+    // First set a value
+    useResumeStore.getState().setActiveProfileName('Test Profile');
+    expect(useResumeStore.getState().activeProfileName).toBe('Test Profile');
+
+    // Then clear it
+    useResumeStore.getState().setActiveProfileName(null);
+    expect(useResumeStore.getState().activeProfileName).toBeNull();
+  });
+
+  it('should clear activeProfileName when resetResume is called', () => {
+    // Set a profile name
+    useResumeStore.getState().setActiveProfileName('My Profile');
+    expect(useResumeStore.getState().activeProfileName).toBe('My Profile');
+
+    // Reset the resume
+    useResumeStore.getState().resetResume();
+
+    // activeProfileName should be null
+    expect(useResumeStore.getState().activeProfileName).toBeNull();
+  });
+
+  it('should preserve activeProfileName when updating personal info', () => {
+    // Set active profile name
+    useResumeStore.getState().setActiveProfileName('Persistent Profile');
+
+    // Update personal info
+    useResumeStore.getState().updatePersonalInfo({
+      full_name: 'Test User',
+      email: 'test@example.com',
+    });
+
+    // activeProfileName should still be set
+    expect(useResumeStore.getState().activeProfileName).toBe('Persistent Profile');
+  });
+
+  it('should preserve activeProfileName when adding education', () => {
+    useResumeStore.getState().setActiveProfileName('Education Test');
+    useResumeStore.getState().addEducation({ institution: 'MIT', degree: 'B.S.' });
+
+    expect(useResumeStore.getState().activeProfileName).toBe('Education Test');
+  });
+
+  it('should allow switching between different profile names', () => {
+    // Set first profile
+    useResumeStore.getState().setActiveProfileName('John Doe - Process Engineer');
+    expect(useResumeStore.getState().activeProfileName).toBe('John Doe - Process Engineer');
+
+    // Change to second profile
+    useResumeStore.getState().setActiveProfileName('John Doe - Software Engineer');
+    expect(useResumeStore.getState().activeProfileName).toBe('John Doe - Software Engineer');
+
+    // Change to third profile
+    useResumeStore.getState().setActiveProfileName('John Doe - Data Scientist');
+    expect(useResumeStore.getState().activeProfileName).toBe('John Doe - Data Scientist');
+  });
+});
