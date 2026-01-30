@@ -56,10 +56,13 @@ async def create_application(
     workflows: ApplicationWorkflows = Depends(get_app_workflows)
 ) -> Dict[str, Any]:
     """Create a new job application."""
+    import logging
+    logger = logging.getLogger(__name__)
     try:
         app_data = request.dict(exclude_none=True)
+        logger.info(f"Creating application with data: company={app_data.get('company')}, position={app_data.get('position')}, job_url={app_data.get('job_url', '')[:50]}...")
         result = workflows.create_application(app_data)
-        
+
         if result.is_success():
             return {
                 "success": True,
@@ -67,13 +70,16 @@ async def create_application(
                 "message": result.get_data().get("message", "Application created successfully")
             }
         else:
+            error_msg = result.get_error_message()
+            logger.warning(f"Application creation failed: {error_msg}")
             raise HTTPException(
                 status_code=400,
-                detail=result.get_error_message()
+                detail=error_msg
             )
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Exception creating application: {e}")
         raise HTTPException(status_code=500, detail=f"Error creating application: {str(e)}")
 
 

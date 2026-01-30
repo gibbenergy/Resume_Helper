@@ -89,15 +89,17 @@ export const useApplicationStore = create<ApplicationStore>((set, get) => ({
         }));
         return newApp;
       } else {
-        set({ error: response.error || 'Failed to create application', loading: false });
-        return null;
+        const errMsg = response.error || 'Failed to create application';
+        set({ error: errMsg, loading: false });
+        throw new Error(errMsg);
       }
     } catch (error) {
+      const errMsg = error instanceof Error ? error.message : 'Failed to create application';
       set({
-        error: error instanceof Error ? error.message : 'Failed to create application',
+        error: errMsg,
         loading: false,
       });
-      return null;
+      throw error; // Re-throw so caller can display error message
     }
   },
 

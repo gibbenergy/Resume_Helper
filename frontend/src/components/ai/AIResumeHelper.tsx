@@ -431,9 +431,21 @@ export function AIResumeHelper() {
     // Get job details from analysis
     // job_details_state gets updated from analysis results (line 470: job_details.update(extracted_details))
     const jobDetails = (typeof jobAnalysis?.analysis === 'object' ? jobAnalysis.analysis : {}) as Record<string, any>;
-    const company = jobDetails.company_name || 'Unknown Company';
-    const position = jobDetails.position_title || 'Unknown Position';
-    const location = jobDetails.location || '';
+
+    // Helper to safely extract string values (AI may return objects like {name: "..."})
+    const extractString = (value: unknown, fallback: string): string => {
+      if (typeof value === 'string') return value;
+      if (value && typeof value === 'object') {
+        // Try common object property names
+        const obj = value as Record<string, unknown>;
+        return String(obj.name || obj.value || obj.title || obj.text || fallback);
+      }
+      return fallback;
+    };
+
+    const company = extractString(jobDetails.company_name, 'Unknown Company');
+    const position = extractString(jobDetails.position_title, 'Unknown Position');
+    const location = extractString(jobDetails.location, '');
     
     // Parse estimated salary range to extract min/max
     let salaryMin: number | undefined;
@@ -514,8 +526,9 @@ export function AIResumeHelper() {
     };
 
     try {
+      console.log('Sending application data:', JSON.stringify(appData, null, 2));
       const newApp = await createApplication(appData);
-      
+
       if (newApp) {
         const appId = newApp.id || 'unknown';
         setAddToTrackerSuccess(true);

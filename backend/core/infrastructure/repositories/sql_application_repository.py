@@ -95,7 +95,7 @@ class SQLApplicationRepository:
             existing = session.query(Application).filter_by(id=app_id).first()
             if existing:
                 return StandardResponse.error_response(
-                    error=f"Application with ID {app_id} already exists",
+                    error=f"Application for this job URL already exists (Company: {existing.company}, Position: {existing.position}). Use the Application Tracker to modify it.",
                     operation="create_application"
                 )
             
@@ -450,19 +450,28 @@ def validate_application_data(app_data: Dict[str, Any]) -> StandardResponse:
     """
     try:
         required_fields = ['company', 'position', 'job_url']
-        
+
         for field in required_fields:
-            if not app_data.get(field, "").strip():
+            value = app_data.get(field)
+            # Handle None, empty string, whitespace-only, or non-string values
+            if value is None:
                 return StandardResponse.error_response(
                     error=f"Required field '{field}' is missing",
                     validation_field=field
                 )
-        
+            # Convert to string if needed (handles dicts, lists, etc.)
+            str_value = str(value) if not isinstance(value, str) else value
+            if not str_value.strip():
+                return StandardResponse.error_response(
+                    error=f"Required field '{field}' is missing",
+                    validation_field=field
+                )
+
         return StandardResponse.success_response(
             data={"validation_status": "Valid"},
             validated_fields=len(app_data)
         )
-        
+
     except Exception as e:
         logger.error(f"Error in application validation: {e}")
         return StandardResponse.error_response(

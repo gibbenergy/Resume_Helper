@@ -78,8 +78,8 @@ class ApplicationWorkflows:
                     validation_field=getattr(validation_result, 'validation_field', None)
                 )
             
-            from infrastructure.frameworks.schema_engine import SchemaEngine
-            from models.application import ApplicationSchema
+            from backend.core.infrastructure.frameworks.schema_engine import SchemaEngine
+            from backend.core.models.application import ApplicationSchema
             
             new_app = SchemaEngine.extract_fields(app_data, ApplicationSchema.FIELDS)
             

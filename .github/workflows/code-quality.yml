@@ -49,7 +49,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run backend tests (68 tests)
+    - name: Run backend tests (86 tests)
       run: |
         echo "🧪 Running backend tests..."
         python -m pytest tests/backend/ -v --tb=short

@@ -195,3 +195,128 @@ class Test06_ApplicationSettings:
         # Note: This might conflict with /{app_id} route
         # If it does, it returns 404 or settings
         assert response.status_code in [200, 404]
+
+
+class Test07_ValidationEdgeCases:
+    """Test validation handles edge cases properly."""
+
+    def test_7_1_missing_required_field_company(self, client: TestClient):
+        """Test 7.1: Missing company field returns 422 validation error."""
+        response = client.post(
+            "/api/applications",
+            json={
+                "job_url": "https://example.com/job/validation-test-1",
+                "position": "Engineer"
+                # company is missing
+            }
+        )
+        assert response.status_code == 422  # Pydantic validation error
+
+    def test_7_2_missing_required_field_position(self, client: TestClient):
+        """Test 7.2: Missing position field returns 422 validation error."""
+        response = client.post(
+            "/api/applications",
+            json={
+                "job_url": "https://example.com/job/validation-test-2",
+                "company": "Test Corp"
+                # position is missing
+            }
+        )
+        assert response.status_code == 422  # Pydantic validation error
+
+    def test_7_3_missing_required_field_job_url(self, client: TestClient):
+        """Test 7.3: Missing job_url field returns 422 validation error."""
+        response = client.post(
+            "/api/applications",
+            json={
+                "company": "Test Corp",
+                "position": "Engineer"
+                # job_url is missing
+            }
+        )
+        assert response.status_code == 422  # Pydantic validation error
+
+    def test_7_4_empty_string_company(self, client: TestClient):
+        """Test 7.4: Empty string company returns 400 validation error."""
+        response = client.post(
+            "/api/applications",
+            json={
+                "job_url": "https://example.com/job/validation-test-4",
+                "company": "",  # Empty string
+                "position": "Engineer"
+            }
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert "company" in data.get("detail", "").lower() or "missing" in data.get("detail", "").lower()
+
+    def test_7_5_whitespace_only_job_url(self, client: TestClient):
+        """Test 7.5: Whitespace-only job_url returns 400 validation error."""
+        response = client.post(
+            "/api/applications",
+            json={
+                "job_url": "   ",  # Whitespace only
+                "company": "Test Corp",
+                "position": "Engineer"
+            }
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert "job_url" in data.get("detail", "").lower() or "missing" in data.get("detail", "").lower()
+
+
+class Test08_DuplicateDetection:
+    """Test duplicate job URL detection."""
+
+    def test_8_1_duplicate_job_url_returns_error(self, client: TestClient):
+        """Test 8.1: Adding same job URL twice returns meaningful error."""
+        unique_url = "https://example.com/job/duplicate-test-unique"
+
+        # First creation should succeed
+        response1 = client.post(
+            "/api/applications",
+            json={
+                "job_url": unique_url,
+                "company": "First Company",
+                "position": "First Position"
+            }
+        )
+        assert response1.status_code == 200
+
+        # Second creation with same URL should fail
+        response2 = client.post(
+            "/api/applications",
+            json={
+                "job_url": unique_url,
+                "company": "Second Company",
+                "position": "Second Position"
+            }
+        )
+        assert response2.status_code == 400
+        data = response2.json()
+        # Error message should mention the job URL already exists
+        assert "already exists" in data.get("detail", "").lower()
+
+    def test_8_2_different_urls_allowed(self, client: TestClient):
+        """Test 8.2: Different job URLs can be added."""
+        response1 = client.post(
+            "/api/applications",
+            json={
+                "job_url": "https://example.com/job/different-url-1",
+                "company": "Company A",
+                "position": "Position A"
+            }
+        )
+
+        response2 = client.post(
+            "/api/applications",
+            json={
+                "job_url": "https://example.com/job/different-url-2",
+                "company": "Company B",
+                "position": "Position B"
+            }
+        )
+
+        # Both should succeed
+        assert response1.status_code == 200
+        assert response2.status_code == 200
