@@ -33,6 +33,26 @@ async def get_applications(
         raise HTTPException(status_code=500, detail=f"Error getting applications: {str(e)}")
 
 
+@router.get("/settings")
+async def get_application_settings(
+    workflows: ApplicationWorkflows = Depends(get_app_workflows)
+) -> Dict[str, Any]:
+    """Get application settings (interview rounds, statuses, etc.)."""
+    try:
+        settings = workflows.get_settings()
+        return {"success": True, "data": settings}
+    except FileNotFoundError:
+        # Return default settings if file doesn't exist yet
+        default_settings = {
+            "interview_rounds": ["Phone Screen", "Technical", "Behavioral", "Final"],
+            "statuses": ["Not Started", "Applied", "Interview", "Offer", "Rejected", "Withdrawn"],
+            "priorities": ["Low", "Medium", "High"]
+        }
+        return {"success": True, "data": default_settings}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting settings: {str(e)}")
+
+
 @router.get("/{app_id}")
 async def get_application(
     app_id: str = Path(..., description="Application ID"),
@@ -134,26 +154,6 @@ async def delete_application(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting application: {str(e)}")
-
-
-@router.get("/settings")
-async def get_application_settings(
-    workflows: ApplicationWorkflows = Depends(get_app_workflows)
-) -> Dict[str, Any]:
-    """Get application settings (interview rounds, statuses, etc.)."""
-    try:
-        settings = workflows.get_settings()
-        return {"success": True, "data": settings}
-    except FileNotFoundError:
-        # Return default settings if file doesn't exist yet
-        default_settings = {
-            "interview_rounds": ["Phone Screen", "Technical", "Behavioral", "Final"],
-            "statuses": ["Not Started", "Applied", "Interview", "Offer", "Rejected", "Withdrawn"],
-            "priorities": ["Low", "Medium", "High"]
-        }
-        return {"success": True, "data": default_settings}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting settings: {str(e)}")
 
 
 @router.post("/{app_id}/interview-rounds/{round_name}")

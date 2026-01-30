@@ -451,14 +451,23 @@ export function AIResumeHelper() {
     let salaryMin: number | undefined;
     let salaryMax: number | undefined;
     const salaryRange = jobDetails.estimated_salary_range;
-    
+
     if (salaryRange) {
-      // Handle both object format (with range/reasoning OR amount/reasoning) and string format
+      // LLM-agnostic parsing: stringify the entire object and search for salary patterns
+      // This works regardless of what property names the LLM uses (range, base, amount, salary, etc.)
       let salaryStr: string;
       if (typeof salaryRange === 'object' && salaryRange !== null) {
-        // Try multiple property names that AI might use
+        // First try common property names for cleaner extraction
         const salaryObj = salaryRange as any;
-        salaryStr = salaryObj.range || salaryObj.amount || salaryObj.salary || String(salaryRange);
+        const directValue = salaryObj.range || salaryObj.base || salaryObj.amount ||
+                           salaryObj.salary || salaryObj.estimated || salaryObj.value ||
+                           salaryObj.compensation || salaryObj.pay;
+        if (directValue && typeof directValue === 'string') {
+          salaryStr = directValue;
+        } else {
+          // Fallback: stringify entire object to catch any format
+          salaryStr = JSON.stringify(salaryRange);
+        }
       } else {
         // Use as string directly
         salaryStr = typeof salaryRange === 'string' ? salaryRange : String(salaryRange);

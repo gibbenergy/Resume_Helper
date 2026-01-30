@@ -1,6 +1,6 @@
 [project]
 name = "resume-helper"
-version = "1.0.0"
+version = "3.1.0"
 description = "AI-powered resume builder with multi-provider LLM support"
 readme = "README.md"
 requires-python = ">=3.11"
