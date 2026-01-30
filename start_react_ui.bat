@@ -26,19 +26,26 @@ if errorlevel 1 (
 )
 echo.
 
-REM Check if Node.js is installed
+REM Check if Node.js is installed, install if not
 echo Checking Node.js installation...
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: Node.js is not installed or not in PATH
-    echo.
-    echo Please download and install Node.js 18+ from:
-    echo https://nodejs.org/
-    echo.
-    echo After installation, restart this script.
-    echo.
+    echo Node.js not found. Attempting to install via winget...
+    winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements >nul 2>&1
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Could not auto-install Node.js
+        echo Please download and install Node.js 18+ manually from:
+        echo https://nodejs.org/
+        echo.
+        echo After installation, restart this script.
+        echo.
+        pause
+        exit /b 1
+    )
+    echo Node.js installed successfully
+    echo NOTE: You may need to restart this script for Node.js to be in PATH
     pause
-    exit /b 1
 )
 echo Node.js found
 echo.
