@@ -7,23 +7,48 @@ echo Resume Helper - React UI Startup
 echo ========================================
 echo.
 
-REM Check if UV is installed, install if not
-echo [1/5] Checking UV installation...
-uv --version >nul 2>&1
+REM Change to script directory FIRST
+cd /d "%~dp0"
+
+REM Check if Python is installed
+echo [1/5] Checking Python installation...
+python --version >nul 2>&1
 if errorlevel 1 (
-    echo UV not found. Installing via pip...
-    pip install uv
+    echo ERROR: Python is not installed or not in PATH
+    echo Please install Python 3.11+ from https://www.python.org/
+    echo.
+    pause
+    exit /b 1
+)
+echo Python found
+
+REM Create virtual environment if it doesn't exist
+if not exist ".venv\" (
+    echo Creating virtual environment...
+    python -m venv .venv
     if errorlevel 1 (
-        echo ERROR: Failed to install UV via pip
-        echo Please ensure Python and pip are installed and in PATH
-        echo.
+        echo ERROR: Failed to create virtual environment
         pause
         exit /b 1
     )
-    echo UV installed successfully
-) else (
-    echo UV found
 )
+
+REM Activate virtual environment and install UV
+echo Activating virtual environment...
+call .venv\Scripts\activate.bat
+
+REM Check if UV is installed in venv, install if not
+uv --version >nul 2>&1
+if errorlevel 1 (
+    echo Installing UV in virtual environment...
+    pip install uv
+    if errorlevel 1 (
+        echo ERROR: Failed to install UV
+        pause
+        exit /b 1
+    )
+)
+echo UV ready
 echo.
 
 REM Check if Node.js is installed, install if not
@@ -49,9 +74,6 @@ if errorlevel 1 (
 )
 echo Node.js found
 echo.
-
-REM Change to script directory
-cd /d "%~dp0"
 
 REM Use port 5000 for backend (avoids conflicts with LLM services on 8000, 8080, 1234, 11434)
 echo Checking backend port...
@@ -131,7 +153,7 @@ echo.
 
 REM Start FastAPI backend in a new window using UV
 echo Starting FastAPI backend server on port %BACKEND_PORT%...
-start "Resume Helper - FastAPI Backend" cmd /k "cd /d %~dp0 && uv run uvicorn backend.api.main:app --host 127.0.0.1 --port %BACKEND_PORT%"
+start "Resume Helper - FastAPI Backend" cmd /k "cd /d %~dp0 && call .venv\Scripts\activate.bat && uv run uvicorn backend.api.main:app --host 127.0.0.1 --port %BACKEND_PORT%"
 
 REM Wait for backend to start
 echo Waiting for backend to start...
@@ -184,4 +206,3 @@ echo.
 echo Frontend server stopped.
 echo Backend may still be running in the other window.
 pause
- 
