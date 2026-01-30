@@ -56,7 +56,7 @@ echo Checking Node.js installation...
 node --version >nul 2>&1
 if errorlevel 1 (
     echo Node.js not found. Attempting to install via winget...
-    winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements >nul 2>&1
+    winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements
     if errorlevel 1 (
         echo.
         echo ERROR: Could not auto-install Node.js
@@ -68,9 +68,22 @@ if errorlevel 1 (
         pause
         exit /b 1
     )
-    echo Node.js installed successfully
-    echo NOTE: You may need to restart this script for Node.js to be in PATH
+    echo.
+    echo ========================================
+    echo Node.js installed successfully!
+    echo ========================================
+    echo.
+    echo IMPORTANT: Node.js was just installed but is not yet available
+    echo in this terminal session because the PATH has not been updated.
+    echo.
+    echo Please do ONE of the following:
+    echo   1. Close this window and double-click start_react_ui.bat again
+    echo   2. Or open a NEW command prompt and run start_react_ui.bat
+    echo.
+    echo This is a one-time setup step. Future runs will work automatically.
+    echo.
     pause
+    exit /b 0
 )
 echo Node.js found
 echo.
