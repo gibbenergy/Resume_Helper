@@ -8,7 +8,7 @@
  * - Prefix dropdown updates store correctly
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
 import { useResumeStore } from '@/stores/resumeStore';
 
@@ -105,11 +105,18 @@ describe('PersonalInfoForm: Auto-sync Behavior', () => {
   });
 
   it('should persist changes after unmount and remount (simulating tab switch)', async () => {
-    const { unmount } = render(<PersonalInfoForm />);
+    let unmountFn: () => void;
+
+    await act(async () => {
+      const { unmount } = render(<PersonalInfoForm />);
+      unmountFn = unmount;
+    });
 
     // Type a value
     const fullNameInput = screen.getByLabelText(/full name/i);
-    fireEvent.change(fullNameInput, { target: { value: 'Jane Smith' } });
+    await act(async () => {
+      fireEvent.change(fullNameInput, { target: { value: 'Jane Smith' } });
+    });
 
     // Wait for sync
     await waitFor(() => {
@@ -118,10 +125,14 @@ describe('PersonalInfoForm: Auto-sync Behavior', () => {
     });
 
     // Unmount (simulating switching to another tab)
-    unmount();
+    await act(async () => {
+      unmountFn();
+    });
 
     // Remount (simulating coming back to the tab)
-    render(<PersonalInfoForm />);
+    await act(async () => {
+      render(<PersonalInfoForm />);
+    });
 
     // Verify the value persisted
     const newFullNameInput = screen.getByLabelText(/full name/i);
@@ -179,17 +190,26 @@ describe('PersonalInfoForm: Name Prefix', () => {
     // Set a prefix in the store
     useResumeStore.getState().updatePersonalInfo({ name_prefix: 'Prof.' });
 
-    const { unmount } = render(<PersonalInfoForm />);
+    let unmountFn: () => void;
+
+    await act(async () => {
+      const { unmount } = render(<PersonalInfoForm />);
+      unmountFn = unmount;
+    });
 
     // Verify initial value
     let selectTrigger = screen.getByRole('combobox');
     expect(selectTrigger).toHaveTextContent('Prof.');
 
     // Unmount
-    unmount();
+    await act(async () => {
+      unmountFn();
+    });
 
     // Remount
-    render(<PersonalInfoForm />);
+    await act(async () => {
+      render(<PersonalInfoForm />);
+    });
 
     // Verify persisted
     selectTrigger = screen.getByRole('combobox');
