@@ -453,23 +453,35 @@ export function AIResumeHelper() {
       }
       
       const rangeMatch = salaryStr.match(/\$?([\d,]+)k?\s*[-–]\s*\$?([\d,]+)k?/i);
-      
+
       if (rangeMatch) {
         const minStr = rangeMatch[1].replace(/,/g, '');
         const maxStr = rangeMatch[2].replace(/,/g, '');
-        
-        // Check if values are in thousands (k format)
-        const isThousands = salaryStr.toLowerCase().includes('k');
-        
-        salaryMin = parseInt(minStr) * (isThousands ? 1000 : 1);
-        salaryMax = parseInt(maxStr) * (isThousands ? 1000 : 1);
+        const minVal = parseInt(minStr);
+        const maxVal = parseInt(maxStr);
+
+        // Smart detection: if values are small (< 1000), they're likely in "k" format
+        // If values are large (>= 1000), they're likely already full amounts
+        // e.g., "150k-190k" means 150000-190000, but "150000-190000" also means 150000-190000
+        const hasKSuffix = salaryStr.toLowerCase().includes('k');
+        const isSmallNumber = minVal < 1000 && maxVal < 1000;
+
+        // Only multiply by 1000 if we have "k" AND the numbers are small
+        const multiplier = (hasKSuffix && isSmallNumber) ? 1000 : 1;
+
+        salaryMin = minVal * multiplier;
+        salaryMax = maxVal * multiplier;
       } else {
         // Try single value like "$80,000" or "$80k"
         const singleMatch = salaryStr.match(/\$?([\d,]+)k?/i);
         if (singleMatch) {
           const value = parseInt(singleMatch[1].replace(/,/g, ''));
-          const isThousands = salaryStr.toLowerCase().includes('k');
-          salaryMin = value * (isThousands ? 1000 : 1);
+          const hasKSuffix = salaryStr.toLowerCase().includes('k');
+          const isSmallNumber = value < 1000;
+
+          // Only multiply by 1000 if we have "k" AND the number is small
+          const multiplier = (hasKSuffix && isSmallNumber) ? 1000 : 1;
+          salaryMin = value * multiplier;
         }
       }
     }
