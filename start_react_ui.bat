@@ -31,7 +31,11 @@ echo Checking Node.js installation...
 node --version >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Node.js is not installed or not in PATH
-    echo Please install Node.js 18+ and try again
+    echo.
+    echo Please download and install Node.js 18+ from:
+    echo https://nodejs.org/
+    echo.
+    echo After installation, restart this script.
     echo.
     pause
     exit /b 1
