@@ -120,31 +120,42 @@ if not errorlevel 1 (
     echo.
 )
 
-echo [2/5] Installing Python dependencies with UV...
-echo This may take a few minutes on first run...
-uv sync --link-mode copy
-if errorlevel 1 (
-    echo.
-    echo ERROR: Failed to install Python dependencies with UV
-    echo.
-    pause
-    exit /b 1
+echo [2/5] Checking Python dependencies...
+if exist ".venv\Scripts\uvicorn.exe" (
+    echo Python dependencies already installed
+) else (
+    echo Installing Python dependencies with UV...
+    echo This may take a few minutes on first run...
+    uv sync --link-mode copy
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Failed to install Python dependencies with UV
+        echo.
+        pause
+        exit /b 1
+    )
+    echo Python dependencies installed successfully
 )
-echo Python dependencies installed successfully
 echo.
 
-echo [3/5] Ensuring Playwright browsers are installed...
-echo This may take a few minutes on first run (downloading ~150MB)...
-uv run playwright install chromium
+echo [3/5] Checking Playwright browsers...
+dir /b "%LOCALAPPDATA%\ms-playwright\chromium-*" >nul 2>&1
 if errorlevel 1 (
-    echo.
-    echo ERROR: Failed to install Playwright browsers
-    echo PDF generation will not work without this
-    echo.
-    pause
-    exit /b 1
+    echo Installing Playwright browsers...
+    echo This may take a few minutes on first run (downloading ~150MB)...
+    uv run playwright install chromium
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Failed to install Playwright browsers
+        echo PDF generation will not work without this
+        echo.
+        pause
+        exit /b 1
+    )
+    echo Playwright browsers installed successfully
+) else (
+    echo Playwright browsers already installed
 )
-echo Playwright browsers installed successfully
 echo.
 
 echo [4/5] Checking Node.js dependencies...
