@@ -19,9 +19,6 @@ dependencies = [
     # Document Processing
     "python-docx>=1.1.0",
     
-    # Data Processing
-    "pandas>=2.2.0",
-    
     # HTTP Requests
     "requests>=2.31.0",
     
