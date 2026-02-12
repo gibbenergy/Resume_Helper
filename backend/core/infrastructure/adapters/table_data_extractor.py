@@ -27,10 +27,6 @@ class TableDataExtractor:
             if table is None:
                 return []
             
-            # If it's a pandas DataFrame
-            if hasattr(table, 'values') and hasattr(table, 'to_dict'):
-                return table.values.tolist()
-            
             # If it's a dict with 'data' key
             if isinstance(table, dict) and 'data' in table:
                 return table['data']
