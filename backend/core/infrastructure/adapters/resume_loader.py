@@ -86,13 +86,17 @@ class ResumeLoader:
         
         # Experience
         result.extend([""] * UIConstants.WORK_INPUT_FIELDS)
-        experience_data = SchemaEngine.extract_list_fields(data.get('experience', []), ResumeSchema.EXPERIENCE)
-        for exp in experience_data:
+        # Preserve achievements lists before schema extraction converts them to strings
+        raw_experience = data.get('experience', [])
+        raw_achievements = []
+        for exp in raw_experience:
             achievements = exp.get('achievements', [])
-            if isinstance(achievements, list):
-                exp['achievements'] = '\n'.join([f"- {item}" for item in achievements if item])
-            else:
-                exp['achievements'] = ''
+            raw_achievements.append(achievements if isinstance(achievements, list) else [])
+
+        experience_data = SchemaEngine.extract_list_fields(raw_experience, ResumeSchema.EXPERIENCE)
+        for i, exp in enumerate(experience_data):
+            achievements = raw_achievements[i] if i < len(raw_achievements) else []
+            exp['achievements'] = '\n'.join([f"- {item}" for item in achievements if item])
         
         experience_table = SchemaEngine.convert_to_table_format(
             experience_data, ResumeSchema.EXPERIENCE, ResumeSchema.get_field_order('experience')
